@@ -1,0 +1,159 @@
+---
+import { PROCESS_STEPS } from '../data';
+
+const initial = PROCESS_STEPS[0];
+---
+
+<section id="proceso" class="bg-[#F7F5F2] py-20 md:py-[120px]" data-process>
+  <div class="max-w-[1280px] mx-auto px-4 md:px-6">
+    <div class="mb-14 md:mb-16 text-center flex flex-col items-center">
+      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// proceso</p>
+      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A]">Cómo trabajamos</h2>
+      <p class="font-inter text-sm text-[#5B5B5E] mt-3 max-w-lg">
+        Metodología ágil y predecible. Selecciona cada paso para conocer los puntos de control y entregables.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+      <div class="hidden md:block absolute top-6 left-0 w-full h-0.5 bg-[#E5E0D8] z-0"></div>
+
+      {
+        PROCESS_STEPS.map((item) => (
+          <div
+            role="button"
+            tabindex="0"
+            data-step={item.step}
+            data-title={item.title}
+            data-detail={item.detail}
+            class:list={[
+              'process-step relative z-10 text-center flex flex-col items-center p-6 rounded-2xl transition-all cursor-pointer',
+              item.step === initial.step
+                ? 'is-active bg-white shadow-lg border border-[#fd625d]'
+                : 'bg-transparent hover:bg-white/60',
+            ]}
+          >
+            <div
+              class:list={[
+                'process-badge w-12 h-12 rounded-full flex items-center justify-center font-sora font-bold text-lg mb-6 transition-transform',
+                item.step === initial.step
+                  ? 'bg-[#fd625d] text-white scale-110 shadow-md'
+                  : 'bg-[#1A1A1A] text-white',
+              ]}
+            >
+              {item.step}
+            </div>
+            <h4 class="font-sora text-xl md:text-2xl font-bold text-[#1A1A1A] mb-2">{item.title}</h4>
+            <p class="text-sm font-inter text-[#4A4A4A] leading-relaxed">{item.description}</p>
+            <div class="mt-4 text-xs font-technical text-[#fd625d] uppercase font-bold flex items-center gap-1">
+              <span class="process-label">{item.step === initial.step ? 'Estando Aquí' : 'Ver Detalle'}</span>
+              <span class="material-symbols-outlined text-sm process-icon">
+                {item.step === initial.step ? 'expand_less' : 'expand_more'}
+              </span>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-10 bg-[#1A1A1A] text-white p-8 rounded-2xl border border-[#2A2A2A] shadow-xl animate-fadeIn flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-5">
+        <div class="process-detail-number w-16 h-16 rounded-2xl bg-[#fd625d]/20 text-[#fd625d] flex items-center justify-center font-technical text-2xl font-bold shrink-0">
+          0{initial.step}
+        </div>
+        <div>
+          <div class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider mb-1">
+            FASA DE INGENIERÍA // METODOLOGÍA BIT &amp; BYTE
+          </div>
+          <h3 class="process-detail-title font-sora text-xl md:text-2xl font-bold text-white mb-1">
+            {initial.title}
+          </h3>
+          <p class="process-detail-text font-inter text-sm text-[#9CA3AF] max-w-2xl">{initial.detail}</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        {
+          PROCESS_STEPS.map((item) => (
+            <button
+              type="button"
+              data-step-dot={item.step}
+              aria-label={`Ir al paso ${item.step}`}
+              class:list={[
+                'process-dot w-3 h-3 rounded-full transition-colors',
+                item.step === initial.step ? 'bg-[#fd625d]' : 'bg-[#353437]',
+              ]}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initProcess(root: HTMLElement) {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('.process-step'));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('.process-dot'));
+    const detailNumber = root.querySelector<HTMLElement>('.process-detail-number');
+    const detailTitle = root.querySelector<HTMLElement>('.process-detail-title');
+    const detailText = root.querySelector<HTMLElement>('.process-detail-text');
+
+    const setActive = (step: number) => {
+      steps.forEach((el) => {
+        const current = Number(el.dataset.step);
+        const active = current === step;
+        el.classList.toggle('is-active', active);
+        el.classList.toggle('bg-white', active);
+        el.classList.toggle('shadow-lg', active);
+        el.classList.toggle('border', active);
+        el.classList.toggle('border-[#fd625d]', active);
+        el.classList.toggle('bg-transparent', !active);
+
+        const badge = el.querySelector('.process-badge');
+        badge?.classList.toggle('bg-[#fd625d]', active);
+        badge?.classList.toggle('scale-110', active);
+        badge?.classList.toggle('shadow-md', active);
+        badge?.classList.toggle('bg-[#1A1A1A]', !active);
+
+        const label = el.querySelector('.process-label');
+        const icon = el.querySelector('.process-icon');
+        if (label) label.textContent = active ? 'Estando Aquí' : 'Ver Detalle';
+        if (icon) icon.textContent = active ? 'expand_less' : 'expand_more';
+
+        if (active) {
+          if (detailNumber) detailNumber.textContent = `0${current}`;
+          if (detailTitle) detailTitle.textContent = el.dataset.title || '';
+          if (detailText) detailText.textContent = el.dataset.detail || '';
+        }
+      });
+
+      dots.forEach((dot) => {
+        const active = Number(dot.dataset.stepDot) === step;
+        dot.classList.toggle('bg-[#fd625d]', active);
+        dot.classList.toggle('bg-[#353437]', !active);
+      });
+    };
+
+    steps.forEach((el) => {
+      const activate = () => setActive(Number(el.dataset.step));
+      el.addEventListener('click', activate);
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activate();
+        }
+      });
+    });
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => setActive(Number(dot.dataset.stepDot)));
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-process]').forEach(initProcess);
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

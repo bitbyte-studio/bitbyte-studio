@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Services from '../components/Services.astro';
+import Portfolio from '../components/Portfolio.astro';
+import Process from '../components/Process.astro';
+import Pricing from '../components/Pricing.astro';
+import TechStack from '../components/TechStack.astro';
+import AboutContact from '../components/AboutContact.astro';
+import Footer from '../components/Footer.astro';
+import SiteModals from '../components/SiteModals.astro';
+import '../styles/global.css';
+---
+
+<BaseLayout>
+  <div class="min-h-screen bg-[#131315] text-[#e5e1e4] flex flex-col font-inter">
+    <Navbar />
+    <Hero />
+    <Services />
+    <Portfolio />
+    <Process />
+    <Pricing />
+
+    <section class="bg-[#F7F5F2] py-20 md:py-[120px]">
+      <div class="max-w-[1280px] mx-auto px-4 md:px-6">
+        <TechStack />
+        <AboutContact />
+      </div>
+    </section>
+
+    <Footer />
+    <SiteModals />
+  </div>
+</BaseLayout>

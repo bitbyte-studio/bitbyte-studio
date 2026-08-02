@@ -1,0 +1,190 @@
+<section
+  id="inicio"
+  class="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#131315] pt-24 pb-16"
+  data-hero
+>
+  <div class="absolute inset-0 w-full h-full opacity-40 pointer-events-none">
+    <canvas data-hero-canvas class="w-full h-full block"></canvas>
+  </div>
+
+  <div class="relative z-10 text-center px-4 md:px-6 max-w-4xl mx-auto flex flex-col items-center">
+    <div class="w-48 h-32 md:w-64 md:h-40 mb-6 flex items-center justify-center">
+      <canvas
+        data-logo-canvas
+        class="w-full h-full block"
+        aria-label="Bit & Byte Studio logo"
+        role="img"
+      ></canvas>
+    </div>
+
+    <p class="font-technical text-xs md:text-sm text-white tracking-[0.4em] mb-3 uppercase font-bold">
+      BIT <span class="ampersand font-normal tracking-normal text-[#fd625d]">&amp;</span> BYTE STUDIO
+    </p>
+
+    <p class="font-technical text-xs md:text-sm text-[#fd625d] mb-6 uppercase tracking-wider font-semibold">
+      // BUILDING DIGITAL SOLUTIONS
+    </p>
+
+    <h1 class="font-sora text-4xl sm:text-5xl md:text-[64px] text-white mb-6 leading-tight font-bold tracking-tight">
+      Convertimos ideas en <span class="text-gradient-coral">tecnología</span>
+    </h1>
+
+    <p class="font-inter text-base md:text-lg text-[#9CA3AF] mb-10 max-w-2xl">
+      Desarrollo web · Automatizaciones · E-commerce · Hardware
+    </p>
+
+    <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center">
+      <a
+        href="#portafolio"
+        class="w-full sm:w-auto bg-[#fd625d] text-white px-8 py-4 rounded-full font-sora text-base font-semibold hover:scale-105 transition-all glow-coral text-center flex items-center justify-center gap-2"
+      >
+        <span>Ver portafolio</span>
+        <span class="material-symbols-outlined text-sm">arrow_downward</span>
+      </a>
+
+      <button
+        type="button"
+        data-open-quote
+        class="w-full sm:w-auto border-2 border-white text-white px-8 py-4 rounded-full font-sora text-base font-semibold hover:bg-white hover:text-[#131315] transition-colors text-center"
+      >
+        Cotizar proyecto
+      </button>
+    </div>
+
+    <div class="mt-12 inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-xs font-technical text-[#e5e1e4]">
+      <span class="w-2 h-2 rounded-full bg-[#58ddb0] animate-pulse"></span>
+      <span>SISTEMA DE DISEÑO RESPONSIVO</span>
+      <span class="text-[#9CA3AF]">| v2.0.4 - STABLE</span>
+    </div>
+  </div>
+
+  <a
+    href="#servicios"
+    aria-label="Ir a servicios"
+    class="absolute bottom-6 animate-bounce text-white/70 hover:text-white transition-colors"
+  >
+    <span class="material-symbols-outlined text-3xl">expand_more</span>
+  </a>
+</section>
+
+<script>
+  import { openQuote } from '../lib/events';
+
+  type Cell = { char: string; opacity: number; speed: number; y: number };
+
+  function initHeroCanvas(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return () => {};
+
+    let animationFrameId = 0;
+    let width = (canvas.width = canvas.clientWidth || window.innerWidth);
+    let height = (canvas.height = canvas.clientHeight || window.innerHeight);
+
+    const buildGrid = (): Cell[] => {
+      const columns = Math.floor(width / 26);
+      const rows = Math.floor(height / 26);
+      const next: Cell[] = [];
+      for (let i = 0; i < columns * rows; i++) {
+        next.push({
+          char: Math.random() > 0.5 ? '1' : '0',
+          opacity: Math.random() * 0.18 + 0.03,
+          speed: Math.random() * 0.015 + 0.005,
+          y: Math.random() * height,
+        });
+      }
+      return next;
+    };
+
+    let grid = buildGrid();
+    let mouseX = width / 2;
+    let mouseY = height / 2;
+
+    const handleResize = () => {
+      width = canvas.width = canvas.clientWidth || window.innerWidth;
+      height = canvas.height = canvas.clientHeight || window.innerHeight;
+      grid = buildGrid();
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = event.clientX - rect.left;
+      mouseY = event.clientY - rect.top;
+    };
+
+    const render = () => {
+      ctx.fillStyle = '#131315';
+      ctx.fillRect(0, 0, width, height);
+      ctx.font = '700 13px "JetBrains Mono", monospace';
+
+      const cols = Math.floor(width / 26);
+      const rowCount = Math.floor(height / 26);
+
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rowCount; r++) {
+          const cell = grid[c * rowCount + r];
+          if (!cell) continue;
+
+          const x = c * 26 + 12;
+          const y = r * 26 + 18;
+          const dist = Math.hypot(x - mouseX, y - mouseY);
+
+          let alpha = cell.opacity;
+          let color = '160, 160, 160';
+
+          if (dist < 120) {
+            alpha = Math.min(0.8, cell.opacity + (120 - dist) / 150);
+            color = cell.char === '1' ? '253, 98, 93' : '237, 193, 87';
+          }
+
+          ctx.fillStyle = `rgba(${color}, ${alpha})`;
+          ctx.fillText(cell.char, x, y);
+
+          if (Math.random() < 0.003) {
+            cell.char = cell.char === '1' ? '0' : '1';
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
+    render();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }
+
+  const cleanups: Array<() => void> = [];
+
+  function boot() {
+    cleanups.splice(0).forEach((fn) => fn());
+
+    document.querySelectorAll<HTMLElement>('[data-hero]').forEach((root) => {
+      const bgCanvas = root.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+      if (bgCanvas) cleanups.push(initHeroCanvas(bgCanvas));
+
+      const logoCanvas = root.querySelector<HTMLCanvasElement>('[data-logo-canvas]');
+      if (logoCanvas) {
+        void import('../lib/logo3d').then(({ mountLogo3D }) => {
+          if (!logoCanvas.isConnected) return;
+          const logo = mountLogo3D(logoCanvas);
+          cleanups.push(logo.dispose);
+        });
+      }
+
+      root.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
+        if (button.dataset.bound === 'true') return;
+        button.dataset.bound = 'true';
+        button.addEventListener('click', () => openQuote());
+      });
+    });
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

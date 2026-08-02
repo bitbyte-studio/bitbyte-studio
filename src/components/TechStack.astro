@@ -1,0 +1,117 @@
+---
+import { TECH_STACK } from '../data';
+
+const initial = TECH_STACK[0];
+---
+
+<div class="mb-20 md:mb-24" data-tech-stack>
+  <div class="mb-10 md:mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div>
+      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// stack</p>
+      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A]">
+        Tecnologías que dominamos
+      </h2>
+    </div>
+    <p class="font-inter text-sm text-[#4A4A4A] max-w-sm">
+      Selecciona cualquier tecnología para ver cómo la aplicamos en nuestras arquitecturas de software y hardware.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3 md:gap-4 mb-8">
+    {
+      TECH_STACK.map((tech) => (
+        <button
+          type="button"
+          data-tech-name={tech.name}
+          data-tech-category={tech.category}
+          data-tech-description={tech.description}
+          class:list={[
+            'tech-btn aspect-square rounded-xl flex flex-col items-center justify-center transition-all p-3 border',
+            tech.name === initial.name
+              ? 'is-active bg-[#1A1A1A] text-white border-[#fd625d] shadow-lg scale-105'
+              : 'bg-white text-[#1A1A1A] border-[#E5E0D8] hover:border-[#fd625d] hover:shadow-md',
+          ]}
+        >
+          <span class="font-technical text-xs sm:text-sm font-bold text-center uppercase tracking-wider">
+            {tech.name}
+          </span>
+          <span
+            class:list={[
+              'tech-cat text-[9px] font-technical mt-1 uppercase',
+              tech.name === initial.name ? 'text-[#ffb3ad]' : 'text-[#9CA3AF]',
+            ]}
+          >
+            {tech.category.split(' ')[0]}
+          </span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="bg-[#1A1A1A] text-white p-6 md:p-8 rounded-2xl border border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl animate-fadeIn">
+    <div class="flex items-center gap-5">
+      <div class="tech-abbr w-12 h-12 rounded-xl bg-[#fd625d]/20 text-[#fd625d] flex items-center justify-center font-technical font-bold text-lg shrink-0">
+        {initial.name.slice(0, 2).toUpperCase()}
+      </div>
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="tech-name font-sora font-bold text-lg text-white">{initial.name}</span>
+          <span class="tech-category text-xs font-technical px-2 py-0.5 rounded bg-[#2A2A2A] text-[#edc157]">
+            {initial.category}
+          </span>
+        </div>
+        <p class="tech-description font-inter text-sm text-[#9CA3AF] max-w-2xl">{initial.description}</p>
+      </div>
+    </div>
+    <div class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider bg-[#58ddb0]/10 px-3 py-1.5 rounded border border-[#58ddb0]/30 shrink-0">
+      STACK PRODUCCIÓN ACTIVO
+    </div>
+  </div>
+</div>
+
+<script>
+  function initTechStack(root: HTMLElement) {
+    const buttons = Array.from(root.querySelectorAll<HTMLElement>('.tech-btn'));
+    const abbr = root.querySelector<HTMLElement>('.tech-abbr');
+    const name = root.querySelector<HTMLElement>('.tech-name');
+    const category = root.querySelector<HTMLElement>('.tech-category');
+    const description = root.querySelector<HTMLElement>('.tech-description');
+
+    const setActive = (button: HTMLElement) => {
+      buttons.forEach((btn) => {
+        const active = btn === button;
+        btn.classList.toggle('is-active', active);
+        btn.classList.toggle('bg-[#1A1A1A]', active);
+        btn.classList.toggle('text-white', active);
+        btn.classList.toggle('border-[#fd625d]', active);
+        btn.classList.toggle('shadow-lg', active);
+        btn.classList.toggle('scale-105', active);
+        btn.classList.toggle('bg-white', !active);
+        btn.classList.toggle('text-[#1A1A1A]', !active);
+        btn.classList.toggle('border-[#E5E0D8]', !active);
+
+        const cat = btn.querySelector('.tech-cat');
+        cat?.classList.toggle('text-[#ffb3ad]', active);
+        cat?.classList.toggle('text-[#9CA3AF]', !active);
+      });
+
+      const techName = button.dataset.techName || '';
+      if (abbr) abbr.textContent = techName.slice(0, 2).toUpperCase();
+      if (name) name.textContent = techName;
+      if (category) category.textContent = button.dataset.techCategory || '';
+      if (description) description.textContent = button.dataset.techDescription || '';
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => setActive(button));
+      button.addEventListener('mouseenter', () => setActive(button));
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-tech-stack]').forEach(initTechStack);
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

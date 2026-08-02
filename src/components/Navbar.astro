@@ -1,0 +1,212 @@
+---
+const navLinks = [
+  { label: 'Inicio', href: '#inicio', id: 'inicio' },
+  { label: 'Servicios', href: '#servicios', id: 'servicios' },
+  { label: 'Portafolio', href: '#portafolio', id: 'portafolio' },
+  { label: 'Proceso', href: '#proceso', id: 'proceso' },
+  { label: 'Precios', href: '#precios', id: 'precios' },
+  { label: 'Contacto', href: '#contacto', id: 'contacto' },
+];
+---
+
+<header
+  class="bg-[#131315]/90 backdrop-blur-md text-[#ffb3ad] sticky top-0 border-b border-[#353437] z-50 transition-colors"
+  data-navbar
+>
+  <div class="flex justify-between items-center w-full px-4 md:px-6 max-w-[1280px] mx-auto h-20">
+    <a href="#inicio" class="font-sora text-2xl md:text-[32px] font-bold text-[#e5e1e4] hover:opacity-90 transition-opacity flex items-center gap-1.5">
+      Bit <span class="ampersand text-[#ffb3ad]">&amp;</span> Byte
+      <span class="text-xs font-technical uppercase tracking-widest text-[#58ddb0] border border-[#58ddb0]/30 px-1.5 py-0.5 rounded ml-2 hidden sm:inline-block">
+        STUDIO
+      </span>
+    </a>
+
+    <nav aria-label="Navegación principal" class="hidden md:flex items-center gap-6">
+      {
+        navLinks.map((link) => (
+          <a
+            href={link.href}
+            data-nav-link={link.id}
+            class:list={[
+              'font-sora text-sm font-semibold transition-all py-1',
+              link.id === 'inicio'
+                ? 'is-active text-[#ffb3ad] border-b-2 border-[#ffb3ad]'
+                : 'text-[#e1bfbb] hover:text-[#ffb3ad]',
+            ]}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+
+      <button
+        type="button"
+        data-open-quote
+        class="border border-[#fd625d] text-[#fd625d] px-4 py-2 rounded-full font-sora text-sm font-semibold hover:bg-[#fd625d] hover:text-white transition-all ml-2"
+      >
+        Cotizador <span class="font-technical text-xs">//</span>
+      </button>
+
+      <button
+        type="button"
+        data-whatsapp
+        class="bg-[#fd625d] text-white px-6 py-2 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral flex items-center gap-2"
+      >
+        <span>WhatsApp</span>
+      </button>
+    </nav>
+
+    <div class="flex items-center gap-2 md:hidden">
+      <button
+        type="button"
+        data-open-quote
+        class="bg-[#fd625d]/20 border border-[#fd625d] text-[#fd625d] px-3 py-1.5 rounded-full font-sora text-xs font-semibold"
+      >
+        Cotizar
+      </button>
+      <button
+        type="button"
+        data-menu-toggle
+        class="p-2 text-[#e5e1e4] hover:text-[#ffb3ad] focus:outline-none"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+      >
+        <span class="material-symbols-outlined text-2xl" data-menu-icon>menu</span>
+      </button>
+    </div>
+  </div>
+
+  <div data-mobile-menu class="md:hidden bg-[#1a1a1a] border-b border-[#353437] px-4 py-6 space-y-4 animate-fadeIn hidden" hidden>
+    <nav class="flex flex-col gap-4">
+      {
+        navLinks.map((link) => (
+          <a
+            href={link.href}
+            data-nav-link={link.id}
+            data-mobile-link
+            class:list={[
+              'font-sora text-base font-semibold transition-colors',
+              link.id === 'inicio' ? 'is-active text-[#ffb3ad]' : 'text-[#e5e1e4]',
+            ]}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="pt-4 border-t border-[#353437] flex flex-col gap-3">
+      <button
+        type="button"
+        data-open-quote
+        data-close-menu
+        class="w-full text-center border-2 border-[#fd625d] text-[#fd625d] py-3 rounded-full font-sora text-sm font-semibold"
+      >
+        Cotizar Proyecto Online
+      </button>
+      <button
+        type="button"
+        data-whatsapp
+        data-close-menu
+        class="w-full text-center bg-[#fd625d] text-white py-3 rounded-full font-sora text-sm font-semibold glow-coral"
+      >
+        Hablar por WhatsApp
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  import { openQuote } from '../lib/events';
+
+  const SECTIONS = ['inicio', 'servicios', 'portafolio', 'proceso', 'precios', 'contacto'];
+  const WA_MESSAGE = encodeURIComponent(
+    '¡Hola Bit & Byte Studio! Estoy interesado en construir una solución digital con ustedes.',
+  );
+
+  const cleanups: Array<() => void> = [];
+
+  function initNavbar(root: HTMLElement) {
+    const menu = root.querySelector<HTMLElement>('[data-mobile-menu]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+    const icon = root.querySelector<HTMLElement>('[data-menu-icon]');
+    const links = Array.from(root.querySelectorAll<HTMLElement>('[data-nav-link]'));
+
+    if (!menu || !toggle || !icon) return () => {};
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const setMenuOpen = (open: boolean) => {
+      menu.classList.toggle('hidden', !open);
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      icon.textContent = open ? 'close' : 'menu';
+    };
+
+    const setActiveSection = (id: string) => {
+      links.forEach((link) => {
+        const active = link.dataset.navLink === id;
+        const isMobile = link.hasAttribute('data-mobile-link');
+        link.classList.toggle('is-active', active);
+
+        if (isMobile) {
+          link.classList.toggle('text-[#ffb3ad]', active);
+          link.classList.toggle('text-[#e5e1e4]', !active);
+        } else {
+          link.classList.toggle('text-[#ffb3ad]', active);
+          link.classList.toggle('border-b-2', active);
+          link.classList.toggle('border-[#ffb3ad]', active);
+          link.classList.toggle('text-[#e1bfbb]', !active);
+        }
+      });
+    };
+
+    const onScroll = () => {
+      const scrollPos = window.scrollY + 120;
+      for (const id of SECTIONS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.offsetTop;
+        const height = el.offsetHeight;
+        if (scrollPos >= top && scrollPos < top + height) {
+          setActiveSection(id);
+          break;
+        }
+      }
+    };
+
+    toggle.addEventListener('click', () => {
+      setMenuOpen(menu.hidden);
+    }, { signal });
+
+    root.querySelectorAll<HTMLElement>('[data-mobile-link], [data-close-menu]').forEach((el) => {
+      el.addEventListener('click', () => setMenuOpen(false), { signal });
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
+      button.addEventListener('click', () => openQuote(), { signal });
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-whatsapp]').forEach((button) => {
+      button.addEventListener('click', () => {
+        window.open(`https://wa.me/5350000000?text=${WA_MESSAGE}`, '_blank');
+      }, { signal });
+    });
+
+    window.addEventListener('scroll', onScroll, { passive: true, signal });
+    onScroll();
+
+    return () => controller.abort();
+  }
+
+  function boot() {
+    cleanups.splice(0).forEach((fn) => fn());
+    document.querySelectorAll<HTMLElement>('[data-navbar]').forEach((root) => {
+      cleanups.push(initNavbar(root));
+    });
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

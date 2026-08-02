@@ -1,0 +1,241 @@
+---
+import { PROJECTS } from '../data';
+---
+
+<div
+  data-project-modal
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn hidden"
+  hidden
+>
+  <div class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl text-white relative">
+    {
+      PROJECTS.map((project) => (
+        <div data-project-panel={project.id} class="project-panel hidden" hidden>
+          <div class="sticky top-0 bg-[#1A1A1A]/95 backdrop-blur-md border-b border-[#2A2A2A] px-6 py-4 flex items-center justify-between z-10">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-[#fd625d]"></span>
+              <span class="font-technical text-xs text-[#9CA3AF] uppercase">
+                // ESTUDIO DE CASO · {project.client || 'BIT & BYTE STUDIO'}
+              </span>
+            </div>
+            <button
+              type="button"
+              data-project-close
+              class="w-9 h-9 rounded-full bg-[#2A2A2A] hover:bg-[#353437] flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors"
+              aria-label="Cerrar modal"
+            >
+              <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+          </div>
+
+          <div class="p-6 md:p-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="font-sora text-2xl md:text-3xl font-bold text-white mb-2">{project.title}</h2>
+                <div class="flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <span class="px-2.5 py-0.5 rounded bg-[#2A2A2A] text-xs font-technical text-[#fd625d]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 bg-[#131315] p-1 rounded-full border border-[#2A2A2A]">
+                <button
+                  type="button"
+                  data-project-tab="overview"
+                  class="project-tab is-active px-4 py-1.5 rounded-full font-sora text-xs font-semibold transition-all bg-[#fd625d] text-white"
+                >
+                  Resumen Técnico
+                </button>
+                <button
+                  type="button"
+                  data-project-tab="simulation"
+                  class="project-tab px-4 py-1.5 rounded-full font-sora text-xs font-semibold transition-all flex items-center gap-1.5 text-[#9CA3AF] hover:text-white"
+                >
+                  <span class="material-symbols-outlined text-sm">play_circle</span>
+                  <span>Vista Previa Simulación</span>
+                </button>
+              </div>
+            </div>
+
+            <div data-tab-panel="overview" class="space-y-6">
+              <div class="rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#131315]">
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  referrerpolicy="no-referrer"
+                  class="w-full h-auto max-h-[360px] object-cover"
+                />
+              </div>
+              <div class="space-y-4">
+                <h3 class="font-sora text-lg font-bold text-white">Desafío y Solución Tecnológica</h3>
+                <p class="font-inter text-sm md:text-base text-[#9CA3AF] leading-relaxed">
+                  {project.longDescription || project.description}
+                </p>
+              </div>
+              {project.metrics && (
+                <div>
+                  <h4 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-3">
+                    // RESULTADOS MEDIBLES DE INGENIERÍA
+                  </h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {project.metrics.map((metric) => (
+                      <div class="p-4 rounded-xl bg-[#131315] border border-[#2A2A2A] text-center">
+                        <div class="font-sora text-2xl font-bold text-[#edc157] mb-1">{metric.value}</div>
+                        <div class="font-technical text-xs text-[#9CA3AF] uppercase">{metric.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div data-tab-panel="simulation" class="bg-[#131315] border border-[#2A2A2A] rounded-xl p-6 text-center hidden" hidden>
+              <div class="mb-4 flex items-center justify-between border-b border-[#2A2A2A] pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                  <span class="font-technical text-xs text-[#9CA3AF] ml-2">
+                    {project.liveUrl || 'https://demo.bitandbyte.studio'}
+                  </span>
+                </div>
+                <span class="text-xs font-technical text-[#58ddb0] bg-[#58ddb0]/10 px-2.5 py-0.5 rounded">
+                  SANDBOX INTERACTIVO ACTIVADO
+                </span>
+              </div>
+              <div class="py-12 px-6 space-y-6 max-w-xl mx-auto">
+                <div class="w-16 h-16 rounded-full bg-[#fd625d]/20 text-[#fd625d] flex items-center justify-center mx-auto">
+                  <span class="material-symbols-outlined text-4xl">devices</span>
+                </div>
+                <h4 class="font-sora text-xl font-bold text-white">Vista Previa en Vivo: {project.title}</h4>
+                <p class="font-inter text-sm text-[#9CA3AF]">
+                  El proyecto ha sido renderizado con {project.tags.join(' + ')}. Rendimiento verificado para dispositivos móviles, escritorio y cargas concurrentes de alto volumen.
+                </p>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#2A2A2A] hover:bg-[#353437] text-white text-sm font-sora font-semibold transition-colors"
+                  >
+                    <span>Abrir Demo en Nueva Pestaña</span>
+                    <span class="material-symbols-outlined text-sm">open_in_new</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="text-sm font-inter text-[#9CA3AF]">
+                ¿Te gustaría un sistema similar al de <strong class="text-white">{project.title}</strong>?
+              </div>
+              <div class="flex items-center gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  data-project-close
+                  class="w-full sm:w-auto px-5 py-2.5 rounded-full border border-[#353437] text-white font-sora text-sm hover:bg-[#2A2A2A] transition-colors"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  data-quote-similar={project.title}
+                  class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#fd625d] text-white font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral"
+                >
+                  Cotizar Proyecto Similar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  import { OPEN_PROJECT_EVENT, openQuote, type OpenProjectDetail } from '../lib/events';
+
+  function setVisible(el: HTMLElement | null, visible: boolean) {
+    if (!el) return;
+    el.classList.toggle('hidden', !visible);
+    el.hidden = !visible;
+  }
+
+  function initProjectModal(modal: HTMLElement) {
+    const panels = Array.from(modal.querySelectorAll<HTMLElement>('[data-project-panel]'));
+
+    const close = () => {
+      setVisible(modal, false);
+      document.body.style.overflow = '';
+    };
+
+    const setTab = (panel: HTMLElement, tab: 'overview' | 'simulation') => {
+      panel.querySelectorAll<HTMLElement>('[data-project-tab]').forEach((button) => {
+        const active = button.dataset.projectTab === tab;
+        button.classList.toggle('is-active', active);
+        button.classList.toggle('bg-[#fd625d]', active && tab === 'overview');
+        button.classList.toggle('text-white', active && tab === 'overview');
+        button.classList.toggle('bg-[#58ddb0]', active && tab === 'simulation');
+        button.classList.toggle('text-[#131315]', active && tab === 'simulation');
+        button.classList.toggle('text-[#9CA3AF]', !active);
+      });
+
+      panel.querySelectorAll<HTMLElement>('[data-tab-panel]').forEach((tabPanel) => {
+        setVisible(tabPanel, tabPanel.dataset.tabPanel === tab);
+      });
+    };
+
+    const open = (projectId: string) => {
+      panels.forEach((panel) => {
+        const active = panel.dataset.projectPanel === projectId;
+        setVisible(panel, active);
+        if (active) setTab(panel, 'overview');
+      });
+      setVisible(modal, true);
+      document.body.style.overflow = 'hidden';
+    };
+
+    modal.querySelectorAll<HTMLElement>('[data-project-close]').forEach((button) => {
+      button.addEventListener('click', close);
+    });
+
+    modal.querySelectorAll<HTMLElement>('[data-project-tab]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const panel = button.closest<HTMLElement>('[data-project-panel]');
+        const tab = button.dataset.projectTab as 'overview' | 'simulation';
+        if (panel && tab) setTab(panel, tab);
+      });
+    });
+
+    modal.querySelectorAll<HTMLElement>('[data-quote-similar]').forEach((button) => {
+      button.addEventListener('click', () => {
+        close();
+        openQuote(button.dataset.quoteSimilar || undefined);
+      });
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) close();
+    });
+
+    window.addEventListener(OPEN_PROJECT_EVENT, (event) => {
+      const detail = (event as CustomEvent<OpenProjectDetail>).detail;
+      if (detail?.project?.id) open(detail.project.id);
+    });
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.hidden) close();
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-project-modal]').forEach(initProjectModal);
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

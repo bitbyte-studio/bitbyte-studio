@@ -1,0 +1,176 @@
+---
+import { SERVICES } from '../data';
+---
+
+<section id="servicios" class="bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A]" data-services>
+  <div class="max-w-[1280px] mx-auto">
+    <div class="mb-14 md:mb-16 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <div>
+        <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// servicios</p>
+        <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A] leading-tight">
+          Lo que hacemos
+        </h2>
+      </div>
+      <p class="font-inter text-sm text-[#4A4A4A] max-w-md">
+        Haz clic en cualquiera de nuestras áreas de ingeniería para explorar arquitectura, entregables y stack técnico.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {
+        SERVICES.map((service) => (
+          <div
+            role="button"
+            tabindex="0"
+            data-service-card={service.id}
+            class="service-card bg-white p-8 rounded-xl border border-[#E5E0D8] hover-lift transition-all cursor-pointer relative overflow-hidden group flex flex-col justify-between"
+          >
+            <div>
+              <div class="absolute top-0 right-0 p-3 opacity-10 font-technical text-3xl text-[#1A1A1A] font-bold">
+                {service.number}
+              </div>
+              <div class="w-14 h-14 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-6 text-[#FD625D] group-hover:bg-[#FD625D] group-hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl">{service.icon}</span>
+              </div>
+              <h3 class="font-sora text-2xl font-bold text-[#1A1A1A] mb-3">{service.title}</h3>
+              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-6">{service.description}</p>
+            </div>
+            <div class="pt-4 border-t border-[#E5E0D8] flex items-center justify-between text-xs font-technical text-[#fd625d] font-bold">
+              <span>VER ARQUITECTURA</span>
+              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      SERVICES.map((service) => (
+        <div
+          data-service-detail={service.id}
+          class="service-detail mt-10 bg-[#1A1A1A] text-white p-8 md:p-10 rounded-2xl border border-[#2A2A2A] relative animate-fadeIn shadow-2xl hidden"
+          hidden
+        >
+          <button
+            type="button"
+            data-service-close
+            aria-label="Cerrar detalle"
+            class="absolute top-6 right-6 text-[#9CA3AF] hover:text-white transition-colors"
+          >
+            <span class="material-symbols-outlined text-2xl">close</span>
+          </button>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div class="lg:col-span-1">
+              <div class="inline-block px-3 py-1 rounded-full bg-[#fd625d]/20 text-[#fd625d] font-technical text-xs font-bold mb-3 uppercase">
+                {service.number} SERVICIO DETALLADO
+              </div>
+              <h3 class="font-sora text-2xl md:text-3xl font-bold text-white mb-4">{service.title}</h3>
+              <p class="font-inter text-sm text-[#9CA3AF] leading-relaxed mb-6">{service.longDescription}</p>
+              <button
+                type="button"
+                data-open-quote={service.title}
+                class="bg-[#fd625d] text-white px-6 py-3 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral inline-flex items-center gap-2"
+              >
+                <span>Cotizar {service.title}</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            </div>
+
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#131315] p-6 rounded-xl border border-[#2A2A2A]">
+              <div>
+                <h4 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-base">check_circle</span>
+                  Entregables de Ingeniería
+                </h4>
+                <ul class="space-y-3">
+                  {service.deliverables.map((item) => (
+                    <li class="flex items-start gap-2.5 text-sm font-inter text-[#e5e1e4]">
+                      <span class="text-[#fd625d] font-bold font-technical">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-technical text-xs font-bold text-[#edc157] uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-base">layers</span>
+                  Stack &amp; Casos de Uso
+                </h4>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  {service.technologies.map((tech) => (
+                    <span class="px-2.5 py-1 bg-[#2A2A2A] text-[#e5e1e4] rounded text-xs font-technical border border-[#353437]">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                <p class="text-xs font-inter text-[#9CA3AF] border-t border-[#2A2A2A] pt-3">
+                  <strong class="text-white">Caso Ideal:</strong> {service.useCase}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { openQuote } from '../lib/events';
+
+  function initServices(root: HTMLElement) {
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-service-card]'));
+    const details = Array.from(root.querySelectorAll<HTMLElement>('[data-service-detail]'));
+
+    const showService = (id: string | null) => {
+      cards.forEach((card) => {
+        const active = card.dataset.serviceCard === id;
+        card.classList.toggle('border-[#fd625d]', active);
+        card.classList.toggle('shadow-xl', active);
+        card.classList.toggle('-translate-y-1', active);
+        card.classList.toggle('border-[#E5E0D8]', !active);
+        card.classList.toggle('hover-lift', !active);
+      });
+
+      details.forEach((detail) => {
+        const active = detail.dataset.serviceDetail === id;
+        detail.classList.toggle('hidden', !active);
+        detail.hidden = !active;
+      });
+    };
+
+    cards.forEach((card) => {
+      const activate = () => showService(card.dataset.serviceCard || null);
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activate();
+        }
+      });
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-service-close]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        showService(null);
+      });
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
+      if (button.dataset.bound === 'true') return;
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        openQuote(button.getAttribute('data-open-quote') || undefined);
+      });
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-services]').forEach(initServices);
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>
