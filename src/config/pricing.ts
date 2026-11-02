@@ -2,13 +2,13 @@
  * Single source of truth for prices, lead times, extras and payment terms.
  * Every price shown on the site or used by the quote calculator must come from here.
  *
- * TODO: Precios de dominio y hosting pendientes de fijar por Jhon.
- * Mientras `price` sea null, el sitio muestra "a consultar" y nunca suma un importe.
+ * Publicación (HOSTING_OPTIONS y DOMAIN_OPTION): si algún `price` vuelve a ser null, el sitio
+ * muestra "a consultar" y nunca suma un importe inventado.
  */
 
 export const CURRENCY = 'USD';
 export const CURRENCY_NOTE = 'Precios en USD; también aceptamos CUP al cambio del día.';
-export const PLANS_NOTE = 'Hosting y dominio no incluidos: se calculan en el cotizador según lo que necesites.';
+export const PLANS_NOTE = 'Hosting y dominio no incluidos: elige y suma su precio en el cotizador.';
 
 export interface Service {
   id: string;
@@ -16,6 +16,8 @@ export interface Service {
   description: string;
   /** "Desde" price in CURRENCY. For the maintenance plan it is the monthly price. */
   from: number;
+  /** The price depends on the scope, so quotes show it as "desde X". */
+  variablePrice?: boolean;
   suffix?: string;
   leadTime: string;
   /** Material Symbols icon name. */
@@ -55,6 +57,7 @@ const SERVICE_LIST = [
     name: 'Rediseño de web',
     description: 'Renovamos la web que ya tienes: más clara, más rápida y pensada para el móvil.',
     from: 30,
+    variablePrice: true,
     leadTime: '7–10 días',
     icon: 'brush',
   },
@@ -63,6 +66,7 @@ const SERVICE_LIST = [
     name: 'Sistema de gestión',
     description: 'Un sistema a tu medida para llevar inventario, ventas, reservas o clientes sin cuadernos.',
     from: 150,
+    variablePrice: true,
     leadTime: 'Según alcance',
     icon: 'dashboard',
   },
@@ -71,6 +75,7 @@ const SERVICE_LIST = [
     name: 'Automatizaciones y bots',
     description: 'Automatizamos tareas repetitivas: respuestas, avisos, reportes y envío de datos.',
     from: 40,
+    variablePrice: true,
     leadTime: '5–10 días',
     icon: 'smart_toy',
   },
@@ -79,6 +84,7 @@ const SERVICE_LIST = [
     name: 'DigitalMenu',
     description: 'Carta digital para restaurantes y cafeterías, instalada y lista para usar.',
     from: 120,
+    variablePrice: true,
     suffix: 'instalación incluida',
     leadTime: '2–3 días',
     icon: 'restaurant_menu',
@@ -150,42 +156,58 @@ export const EXTRAS: readonly Extra[] = EXTRA_LIST;
 
 export type Billing = 'once' | 'yearly' | 'monthly';
 
+/** Price of a publishing option for one specific service. `from: true` renders it as "desde X". */
+export interface PublishingPrice {
+  price: number;
+  from?: boolean;
+}
+
 export interface PublishingOption {
   id: string;
   name: string;
   description: string;
-  /** `null` = price not set yet: shown as "a consultar" and never added to a total. */
+  /** Default price. `null` = not set yet: shown as "a consultar" and never added to a total. */
   price: number | null;
   billing: Billing;
+  /** Overrides `price` when the quote's base service is one of these. */
+  priceByService?: Partial<Record<ProjectServiceId, PublishingPrice>>;
+  /** Wording used instead of `name`/`description` when a custom domain is also selected. */
+  withDomain?: { name: string; description: string };
 }
 
-const PUBLISHING_LIST = [
+/** Where the project lives. Exactly one is chosen in the quote (radio). */
+const HOSTING_LIST = [
   {
     id: 'free',
     name: 'Dirección gratuita',
     description: 'tunegocio.vercel.app',
     price: 0,
     billing: 'once',
-  },
-  {
-    id: 'domain',
-    name: 'Dominio propio .com',
-    description: 'Registro y gestión del dominio',
-    price: null,
-    billing: 'yearly',
+    // With a custom domain the .vercel.app address is not the final one, so it is not mentioned.
+    withDomain: { name: 'Alojamiento gratuito', description: 'Tu sitio se verá en tu dominio propio' },
   },
   {
     id: 'managed',
     name: 'Hosting gestionado',
-    description: 'Para proyectos con servidor o base de datos, p. ej. un sistema de gestión',
-    price: null,
+    description: 'Para proyectos sencillos con base de datos. Los sistemas de gestión requieren más recursos.',
+    price: 10,
     billing: 'monthly',
+    priceByService: { gestion: { price: 25, from: true } },
   },
 ] as const satisfies readonly PublishingOption[];
 
-export type PublishingId = (typeof PUBLISHING_LIST)[number]['id'];
-export const DEFAULT_PUBLISHING_ID = 'free' satisfies PublishingId;
-export const PUBLISHING_OPTIONS: readonly (PublishingOption & { id: PublishingId })[] = PUBLISHING_LIST;
+export type HostingId = (typeof HOSTING_LIST)[number]['id'];
+export const DEFAULT_HOSTING_ID = 'free' satisfies HostingId;
+export const HOSTING_OPTIONS: readonly (PublishingOption & { id: HostingId })[] = HOSTING_LIST;
+
+/** Custom .com domain. It is independent from the hosting choice (checkbox) and billed yearly. */
+export const DOMAIN_OPTION: PublishingOption = {
+  id: 'domain',
+  name: 'Dominio propio .com',
+  description: 'Registro y gestión del dominio',
+  price: 20,
+  billing: 'yearly',
+};
 
 const DEPOSIT_PERCENT = 50;
 

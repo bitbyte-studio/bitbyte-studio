@@ -2,20 +2,26 @@
 import {
   CURRENCY,
   CURRENCY_NOTE,
-  DEFAULT_PUBLISHING_ID,
+  DEFAULT_HOSTING_ID,
+  DOMAIN_OPTION,
   EXTRAS,
+  HOSTING_OPTIONS,
   MAINTENANCE,
   PROJECT_SERVICES,
-  PUBLISHING_OPTIONS,
-  type PublishingOption,
 } from '../config/pricing';
-import { calculateQuote, formatLineAmount } from '../lib/quote';
+import { calculateQuote, hostingDisplay, publishingOptionPrice } from '../lib/quote';
 
 const money = (value: number) => value.toLocaleString('en-US');
-const publishingPrice = (option: PublishingOption) =>
-  option.price === 0
-    ? 'Gratis'
-    : formatLineAmount({ amount: option.price, billing: option.billing }).replace(/^a consultar$/, 'precio a consultar');
+const annualMonthly = MAINTENANCE.annualFrom ?? MAINTENANCE.from;
+const maintenanceOptions = [
+  { id: 'none', name: 'Sin mantenimiento', price: '' },
+  { id: 'monthly', name: 'Mensual', price: `${money(MAINTENANCE.from)} ${CURRENCY}${MAINTENANCE.suffix ?? ''}` },
+  {
+    id: 'annual',
+    name: 'Anual',
+    price: `${money(annualMonthly)} ${CURRENCY}${MAINTENANCE.suffix ?? ''} · ${money(annualMonthly * 12)} ${CURRENCY} al año`,
+  },
+] as const;
 
 const initialService = PROJECT_SERVICES[0];
 const initialQuote = calculateQuote(initialService.id);
@@ -88,22 +94,36 @@ const initialQuote = calculateQuote(initialService.id);
           }
         </div>
 
-        <label
-          data-maintenance-label
-          class="mt-3 flex items-start justify-between p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
-        >
-          <div class="flex items-start gap-3">
-            <input
-              type="checkbox"
-              data-maintenance
-              class="mt-0.5 w-4 h-4 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
-            />
-            <span class="text-sm font-inter">Añadir mantenimiento mensual</span>
+        <fieldset class="mt-4">
+          <legend class="font-technical text-xs text-[#9CA3AF] font-bold uppercase tracking-wider block mb-2">
+            Mantenimiento
+          </legend>
+          <div class="grid grid-cols-1 gap-3">
+            {
+              maintenanceOptions.map((option) => (
+                <label
+                  data-maintenance-row={option.id}
+                  class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
+                >
+                  <div class="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      name="quote-maintenance"
+                      value={option.id}
+                      data-maintenance={option.id}
+                      checked={option.id === 'none'}
+                      class="mt-0.5 w-4 h-4 shrink-0 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+                    />
+                    <span class="text-sm font-inter">{option.name}</span>
+                  </div>
+                  {option.price && (
+                    <span class="font-technical text-xs font-bold text-[#edc157] text-right">{option.price}</span>
+                  )}
+                </label>
+              ))
+            }
           </div>
-          <span class="font-technical text-xs font-bold text-[#edc157] ml-2 whitespace-nowrap">
-            +{money(MAINTENANCE.from)} {CURRENCY}{MAINTENANCE.suffix}
-          </span>
-        </label>
+        </fieldset>
       </div>
 
       <div>
@@ -121,7 +141,7 @@ const initialQuote = calculateQuote(initialService.id);
                   <input
                     type="checkbox"
                     data-extra={extra.id}
-                    class="w-4 h-4 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+                    class="w-4 h-4 shrink-0 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
                   />
                   <span class="text-sm font-inter">{extra.name}</span>
                 </label>
@@ -160,31 +180,57 @@ const initialQuote = calculateQuote(initialService.id);
         </legend>
         <div class="grid grid-cols-1 gap-3">
           {
-            PUBLISHING_OPTIONS.map((option) => (
+            HOSTING_OPTIONS.map((option) => (
               <label
-                data-publishing-row={option.id}
+                data-hosting-row={option.id}
                 class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
               >
                 <div class="flex items-start gap-3">
                   <input
                     type="radio"
-                    name="quote-publishing"
+                    name="quote-hosting"
                     value={option.id}
-                    data-publishing={option.id}
-                    checked={option.id === DEFAULT_PUBLISHING_ID}
-                    class="mt-0.5 w-4 h-4 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+                    data-hosting={option.id}
+                    checked={option.id === DEFAULT_HOSTING_ID}
+                    class="mt-0.5 w-4 h-4 shrink-0 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
                   />
                   <span>
-                    <span class="block text-sm font-inter">{option.name}</span>
-                    <span class="block text-xs font-inter opacity-80 mt-0.5">{option.description}</span>
+                    <span data-hosting-name class="block text-sm font-inter">
+                      {hostingDisplay(option, false).name}
+                    </span>
+                    <span data-hosting-description class="block text-xs font-inter opacity-80 mt-0.5">
+                      {hostingDisplay(option, false).description}
+                    </span>
                   </span>
                 </div>
-                <span class="font-technical text-xs font-bold text-[#edc157] whitespace-nowrap">
-                  {publishingPrice(option)}
+                <span data-hosting-price class="font-technical text-xs font-bold text-[#edc157] text-right">
+                  {publishingOptionPrice(option, initialService.id)}
                 </span>
               </label>
             ))
           }
+
+          <label
+            data-domain-row
+            class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
+          >
+            <div class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                data-domain
+                class="mt-0.5 w-4 h-4 shrink-0 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+              />
+              <span>
+                <span class="block text-sm font-inter">{DOMAIN_OPTION.name}</span>
+                <span class="block text-xs font-inter opacity-80 mt-0.5">
+                  {DOMAIN_OPTION.description}. Se puede combinar con cualquiera de las opciones de arriba.
+                </span>
+              </span>
+            </div>
+            <span class="font-technical text-xs font-bold text-[#edc157] text-right">
+              {publishingOptionPrice(DOMAIN_OPTION, initialService.id)}
+            </span>
+          </label>
         </div>
       </fieldset>
 
@@ -203,8 +249,14 @@ const initialQuote = calculateQuote(initialService.id);
         </div>
 
         <div class="border-t border-[#2A2A2A] pt-4" aria-live="polite">
+          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-2">Publicación</div>
+          <ul data-quote-publishing class="space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
+        </div>
+
+        <div class="border-t border-[#2A2A2A] pt-4" aria-live="polite">
           <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-2">Pago recurrente</div>
           <ul data-quote-recurring class="space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
+          <ul data-quote-recurring-totals class="mt-2 pt-2 border-t border-[#2A2A2A] space-y-1 text-sm font-inter font-semibold text-white hidden" hidden></ul>
           <p data-quote-empty class="text-sm font-inter text-[#9CA3AF] hidden" hidden>Ninguno.</p>
         </div>
 
@@ -239,19 +291,25 @@ const initialQuote = calculateQuote(initialService.id);
   import { OPEN_QUOTE_EVENT, openQuote, type OpenQuoteDetail } from '../lib/events';
   import { whatsappLink } from '../config/contact';
   import {
-    DEFAULT_PUBLISHING_ID,
+    DEFAULT_HOSTING_ID,
+    HOSTING_OPTIONS,
     PROJECT_SERVICES,
-    PUBLISHING_OPTIONS,
     type ExtraId,
+    type HostingId,
     type ProjectServiceId,
-    type PublishingId,
   } from '../config/pricing';
   import {
     calculateQuote,
+    clampQuantity,
     formatLineAmount,
+    hostingDisplay,
     oneTimeLines,
+    publishingOptionPrice,
+    publishingSummary,
     quoteToMessage,
     recurringLines,
+    recurringTotals,
+    type MaintenanceMode,
     type QuoteExtraInput,
     type QuoteLine,
   } from '../lib/quote';
@@ -266,8 +324,11 @@ const initialQuote = calculateQuote(initialService.id);
   const isServiceId = (value: string | undefined): value is ProjectServiceId =>
     PROJECT_SERVICES.some((service) => service.id === value);
 
-  const isPublishingId = (value: string | undefined): value is PublishingId =>
-    PUBLISHING_OPTIONS.some((option) => option.id === value);
+  const isHostingId = (value: string | undefined): value is HostingId =>
+    HOSTING_OPTIONS.some((option) => option.id === value);
+
+  const isMaintenanceMode = (value: string | undefined): value is MaintenanceMode =>
+    value === 'none' || value === 'monthly' || value === 'annual';
 
   function lineItem(line: QuoteLine): HTMLLIElement {
     const li = document.createElement('li');
@@ -284,15 +345,18 @@ const initialQuote = calculateQuote(initialService.id);
   function initQuoteModal(root: HTMLElement, signal: AbortSignal) {
     const serviceButtons = Array.from(root.querySelectorAll<HTMLElement>('[data-service]'));
     const extraInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-extra]'));
-    const maintenanceInput = root.querySelector<HTMLInputElement>('[data-maintenance]');
+    const maintenanceInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-maintenance]'));
+    const publishingEl = root.querySelector<HTMLElement>('[data-quote-publishing]');
+    const recurringTotalsEl = root.querySelector<HTMLElement>('[data-quote-recurring-totals]');
+    const domainInput = root.querySelector<HTMLInputElement>('[data-domain]');
     const totalEl = root.querySelector<HTMLElement>('[data-quote-total]');
     const leadTimeEl = root.querySelector<HTMLElement>('[data-quote-leadtime]');
     const onceEl = root.querySelector<HTMLElement>('[data-quote-once]');
     const recurringEl = root.querySelector<HTMLElement>('[data-quote-recurring]');
     const emptyEl = root.querySelector<HTMLElement>('[data-quote-empty]');
-    const publishingInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-publishing]'));
+    const hostingInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-hosting]'));
 
-    if (!serviceButtons.length || !maintenanceInput) return;
+    if (!serviceButtons.length || !maintenanceInputs.length || !domainInput) return;
 
     const modal = createModal(root, signal);
     let serviceId: ProjectServiceId = PROJECT_SERVICES[0].id;
@@ -308,16 +372,28 @@ const initialQuote = calculateQuote(initialService.id);
           return { id, quantity: qty ? Number(qty.value) : undefined };
         });
 
-    const selectedPublishing = (): PublishingId => {
-      const value = publishingInputs.find((input) => input.checked)?.value;
-      return isPublishingId(value) ? value : DEFAULT_PUBLISHING_ID;
+    const selectedHosting = (): HostingId => {
+      const value = hostingInputs.find((input) => input.checked)?.value;
+      return isHostingId(value) ? value : DEFAULT_HOSTING_ID;
+    };
+
+    const selectedMaintenance = (): MaintenanceMode => {
+      const value = maintenanceInputs.find((input) => input.checked)?.value;
+      return isMaintenanceMode(value) ? value : 'none';
     };
 
     const currentQuote = () =>
       calculateQuote(serviceId, selectedExtras(), {
-        maintenance: maintenanceInput.checked,
-        publishing: selectedPublishing(),
+        maintenance: selectedMaintenance(),
+        publishing: { hosting: selectedHosting(), domain: domainInput.checked },
       });
+
+    // Rewrites a quantity input with the same clamped integer that calculateQuote uses.
+    const normalizeQuantity = (input: HTMLInputElement) => {
+      const max = Number(input.max);
+      const value = clampQuantity(input.value === '' ? undefined : Number(input.value), max);
+      input.value = String(value);
+    };
 
     const paintRow = (el: HTMLElement | null, active: boolean) => {
       if (!el) return;
@@ -332,18 +408,50 @@ const initialQuote = calculateQuote(initialService.id);
         if (qty) qty.disabled = !input.checked;
         paintRow(input.closest<HTMLElement>('[data-extra-row]'), input.checked);
       });
-      paintRow(root.querySelector<HTMLElement>('[data-maintenance-label]'), maintenanceInput.checked);
-      publishingInputs.forEach((input) => {
-        paintRow(input.closest<HTMLElement>('[data-publishing-row]'), input.checked);
+      maintenanceInputs.forEach((input) => {
+        paintRow(input.closest<HTMLElement>('[data-maintenance-row]'), input.checked);
+      });
+      paintRow(domainInput.closest<HTMLElement>('[data-domain-row]'), domainInput.checked);
+      hostingInputs.forEach((input) => {
+        const row = input.closest<HTMLElement>('[data-hosting-row]');
+        paintRow(row, input.checked);
+        const option = HOSTING_OPTIONS.find((item) => item.id === input.value);
+        if (!option || !row) return;
+        const text = hostingDisplay(option, domainInput.checked);
+        const nameEl = row.querySelector('[data-hosting-name]');
+        const descriptionEl = row.querySelector('[data-hosting-description]');
+        const priceEl = row.querySelector('[data-hosting-price]');
+        if (nameEl) nameEl.textContent = text.name;
+        if (descriptionEl) descriptionEl.textContent = text.description;
+        if (priceEl) priceEl.textContent = publishingOptionPrice(option, serviceId);
       });
 
       const quote = currentQuote();
       if (totalEl) totalEl.textContent = quote.oneTime.toLocaleString('en-US');
       if (leadTimeEl) leadTimeEl.textContent = quote.leadTime;
+      publishingEl?.replaceChildren(
+        ...publishingSummary(quote).map((text) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          return li;
+        }),
+      );
       onceEl?.replaceChildren(...oneTimeLines(quote).map(lineItem));
 
       const recurring = recurringLines(quote);
       recurringEl?.replaceChildren(...recurring.map(lineItem));
+      if (recurringTotalsEl) {
+        const totals = recurringTotals(quote);
+        recurringTotalsEl.replaceChildren(
+          ...totals.map((text) => {
+            const li = document.createElement('li');
+            li.textContent = text;
+            return li;
+          }),
+        );
+        recurringTotalsEl.classList.toggle('hidden', totals.length === 0);
+        recurringTotalsEl.hidden = totals.length === 0;
+      }
       if (emptyEl) {
         emptyEl.classList.toggle('hidden', recurring.length > 0);
         emptyEl.hidden = recurring.length > 0;
@@ -377,11 +485,17 @@ const initialQuote = calculateQuote(initialService.id);
       );
     });
 
-    [...extraInputs, ...publishingInputs, maintenanceInput].forEach((input) => {
+    [...extraInputs, ...hostingInputs, ...maintenanceInputs, domainInput].forEach((input) => {
       input.addEventListener('change', render, { signal });
     });
     root.querySelectorAll<HTMLInputElement>('[data-extra-qty]').forEach((input) => {
       input.addEventListener('input', render, { signal });
+      const commit = () => {
+        normalizeQuantity(input);
+        render();
+      };
+      input.addEventListener('change', commit, { signal });
+      input.addEventListener('blur', commit, { signal });
     });
 
     root.querySelectorAll<HTMLElement>('[data-quote-close]').forEach((button) => {
