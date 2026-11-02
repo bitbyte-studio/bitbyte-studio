@@ -1,5 +1,9 @@
+import type { ProjectServiceId } from './config/pricing';
+
 export interface Project {
   id: string;
+  /** Quotable service from config/pricing.ts that "Cotizar Proyecto Similar" preselects (never maintenance). */
+  serviceId: ProjectServiceId;
   title: string;
   description: string;
   longDescription?: string;

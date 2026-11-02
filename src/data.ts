@@ -80,6 +80,7 @@ export const SERVICE_DETAILS: Record<ServiceId, ServiceDetail> = {
 export const PROJECTS: Project[] = [
   {
     id: 'sazon-de-lola',
+    serviceId: 'gestion',
     title: 'La Sazón de Lola',
     description:
       'Plataforma gastronómica de vanguardia con sistema de reservas en tiempo real y gestión de inventario automatizada.',
@@ -99,6 +100,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'barba-negra',
+    serviceId: 'tienda',
     title: 'Barba Negra',
     description:
       'E-commerce premium para productos de cuidado personal masculino, con una experiencia de usuario cinematográfica.',
@@ -118,6 +120,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'tropical-vibes',
+    serviceId: 'landing',
     title: 'Tropical Vibes',
     description:
       'Landing page interactiva para un resort de lujo, integrando visuales 3D y una navegación fluida por capas.',
