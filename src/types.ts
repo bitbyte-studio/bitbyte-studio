@@ -15,29 +15,6 @@ export interface Project {
   year?: string;
 }
 
-export interface ServiceItem {
-  id: string;
-  number: string;
-  icon: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  deliverables: string[];
-  technologies: string[];
-  useCase: string;
-}
-
-export interface PricingPlan {
-  id: string;
-  name: string;
-  price: string;
-  period: string;
-  description: string;
-  features: string[];
-  popular?: boolean;
-  ctaText: string;
-}
-
 export interface TechItem {
   name: string;
   category: string;

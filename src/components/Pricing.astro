@@ -1,96 +1,144 @@
 ---
-import { PRICING_PLANS } from '../data';
+import { whatsappLink } from '../config/contact';
+import {
+  CURRENCY,
+  CURRENCY_NOTE,
+  MAINTENANCE,
+  PAYMENT,
+  PLANS_NOTE,
+  PROJECT_SERVICES,
+} from '../config/pricing';
+
+const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
+const money = (value: number) => value.toLocaleString('en-US');
 ---
 
-<section id="precios" class="bg-[#131315] py-20 md:py-[120px] px-4 md:px-6">
+<section id="precios" class="bg-[#131315] py-20 md:py-[120px] px-4 md:px-6 scroll-mt-20">
   <div class="max-w-[1280px] mx-auto">
     <div class="mb-14 md:mb-16 text-center flex flex-col items-center">
       <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// precios</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-white mb-4">
-        Inversión en tu éxito
+        Precios claros, sin sorpresas
       </h2>
       <p class="font-inter text-sm md:text-base text-[#9CA3AF] max-w-xl">
-        Precios claros y predecibles sin costos ocultos. Todos nuestros planes incluyen código propiedad 100% del cliente y garantía técnica de rendimiento.
+        Estos son los precios de partida. El precio final lo cerramos contigo por WhatsApp según lo que necesites.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" data-pricing-list>
       {
-        PRICING_PLANS.map((plan) => {
-          const isPopular = plan.popular;
-          return (
-            <div
-              class:list={[
-                'p-8 md:p-10 rounded-2xl flex flex-col justify-between hover-lift transition-all relative overflow-hidden',
-                isPopular
-                  ? 'bg-[#1A1A1A] border-2 border-[#fd625d] shadow-2xl'
-                  : 'bg-[#1A1A1A] border border-[#2A2A2A]',
-              ]}
-            >
-              {isPopular && (
-                <div class="absolute top-0 right-0 bg-[#fd625d] text-white text-[10px] px-4 py-1 font-technical uppercase tracking-widest font-bold">
-                  Popular
-                </div>
-              )}
-
-              <div>
-                <h3 class="font-sora text-2xl md:text-3xl font-bold text-white mb-3">{plan.name}</h3>
-                <p class="text-[#9CA3AF] text-sm font-inter mb-8">{plan.description}</p>
-                <div class="text-[#fd625d] text-4xl sm:text-5xl font-bold font-sora mb-8 flex items-baseline">
-                  {plan.price}
-                  <span class="text-base font-normal text-[#9CA3AF] font-inter ml-1">{plan.period}</span>
-                </div>
-                <ul class="space-y-4 mb-10">
-                  {plan.features.map((feature) => (
-                    <li class="flex items-start gap-3 text-white font-inter text-sm">
-                      <span class="material-symbols-outlined text-[#fd625d] shrink-0 text-xl">check_circle</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+        PROJECT_SERVICES.map((service) => (
+          <li
+            data-service-id={service.id}
+            class="p-7 rounded-2xl flex flex-col justify-between hover-lift transition-all bg-[#1A1A1A] border border-[#2A2A2A]"
+          >
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-[#fd625d]/10 text-[#fd625d] flex items-center justify-center mb-5">
+                <span class="material-symbols-outlined text-2xl" aria-hidden="true">{service.icon}</span>
               </div>
+              <h3 class="font-sora text-xl font-bold text-white mb-2">{service.name}</h3>
+              <p class="text-[#9CA3AF] text-sm font-inter mb-6 leading-relaxed">{service.description}</p>
 
-              <button
-                type="button"
-                data-open-quote={plan.name}
-                class:list={[
-                  'w-full py-4 rounded-full font-sora text-sm font-semibold transition-all',
-                  isPopular
-                    ? 'bg-[#fd625d] text-white glow-coral hover:scale-105'
-                    : 'border border-white text-white hover:bg-white hover:text-[#131315]',
-                ]}
-              >
-                {plan.ctaText}
-              </button>
+              <p class="mb-1">
+                <span class="font-technical text-xs uppercase text-[#9CA3AF] mr-1">desde</span>
+                <span class="text-[#fd625d] text-4xl font-bold font-sora">{money(service.from)}</span>
+                <span class="font-technical text-sm text-[#9CA3AF] ml-1">{CURRENCY}</span>
+              </p>
+              {service.suffix && <p class="font-technical text-xs text-[#58ddb0] mb-1">{service.suffix}</p>}
+              <p class="font-inter text-sm text-[#e5e1e4] flex items-center gap-2 mt-3 mb-6">
+                <span class="material-symbols-outlined text-base text-[#edc157]" aria-hidden="true">schedule</span>
+                <span>Plazo: {service.leadTime}</span>
+              </p>
             </div>
-          );
-        })
-      }
-    </div>
 
-    <div class="mt-14 p-8 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex flex-col md:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-[#58ddb0]/20 text-[#58ddb0] flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-2xl">calculate</span>
+            <a
+              href={waLink(service.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Pedir ${service.name} por WhatsApp (se abre en una pestaña nueva)`}
+              class="w-full py-3.5 rounded-full font-sora text-sm font-semibold transition-all border border-white text-white hover:bg-white hover:text-[#131315] flex items-center justify-center gap-2"
+            >
+              <span>Pedir por WhatsApp</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div
+      data-service-id={MAINTENANCE.id}
+      class="mt-6 p-7 md:p-8 rounded-2xl bg-[#1A1A1A] border-2 border-[#fd625d] shadow-2xl grid grid-cols-1 lg:grid-cols-3 gap-8 items-center"
+    >
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-12 h-12 rounded-xl bg-[#fd625d]/10 text-[#fd625d] flex items-center justify-center">
+            <span class="material-symbols-outlined text-2xl" aria-hidden="true">{MAINTENANCE.icon}</span>
+          </div>
+          <h3 class="font-sora text-2xl font-bold text-white">{MAINTENANCE.name}</h3>
         </div>
-        <div>
-          <h4 class="font-sora text-lg md:text-xl font-bold text-white mb-1">
-            ¿Necesitas un sistema personalizado o hardware IoT?
-          </h4>
-          <p class="font-inter text-sm text-[#9CA3AF]">
-            Prueba nuestro Cotizador Interactivo en vivo y calcula el tiempo y costo de tu solución a medida.
-          </p>
-        </div>
+        <p class="text-[#9CA3AF] text-sm font-inter leading-relaxed mb-5">{MAINTENANCE.description}</p>
+        <p>
+          <span class="text-[#fd625d] text-4xl font-bold font-sora">{money(MAINTENANCE.from)}</span>
+          <span class="font-technical text-sm text-[#9CA3AF] ml-1">{CURRENCY}{MAINTENANCE.suffix}</span>
+        </p>
+        {
+          MAINTENANCE.annualFrom !== undefined && (
+            <p class="font-technical text-xs text-[#58ddb0] mt-1">
+              {money(MAINTENANCE.annualFrom)} {CURRENCY}/mes pagando el año completo
+            </p>
+          )
+        }
       </div>
 
-      <button
-        type="button"
-        data-open-quote
-        class="w-full md:w-auto bg-white text-[#131315] px-8 py-3.5 rounded-full font-sora text-sm font-bold hover:bg-[#ffb3ad] hover:text-[#131315] transition-colors whitespace-nowrap"
+      <ul class="space-y-3">
+        {
+          MAINTENANCE.includes?.map((item) => (
+            <li class="flex items-start gap-3 text-white font-inter text-sm">
+              <span class="material-symbols-outlined text-[#fd625d] shrink-0 text-xl" aria-hidden="true">check_circle</span>
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a
+        href={waLink(MAINTENANCE.name)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Pedir ${MAINTENANCE.name} por WhatsApp (se abre en una pestaña nueva)`}
+        class="w-full py-3.5 rounded-full font-sora text-sm font-semibold transition-all bg-[#fd625d] text-white glow-coral hover:scale-105 flex items-center justify-center gap-2"
       >
-        Abrir Cotizador Interactivo //
-      </button>
+        <span>Pedir por WhatsApp</span>
+      </a>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="p-7 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A]">
+        <h4 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-base" aria-hidden="true">payments</span>
+          Cómo se paga
+        </h4>
+        <p class="font-inter text-sm text-white mb-3">{PAYMENT.terms}</p>
+        <p class="font-inter text-sm text-[#9CA3AF] mb-3">
+          Métodos: {PAYMENT.methods.join(', ')}.
+        </p>
+        <p class="font-inter text-sm text-[#9CA3AF]">{CURRENCY_NOTE}</p>
+      </div>
+
+      <div class="p-7 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A]">
+        <h4 class="font-technical text-xs font-bold text-[#edc157] uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-base" aria-hidden="true">cloud_done</span>
+          Hosting y dominio
+        </h4>
+        <p class="font-inter text-sm text-white mb-5">{PLANS_NOTE}</p>
+        <button
+          type="button"
+          data-open-quote
+          class="w-full sm:w-auto bg-white text-[#131315] px-8 py-3 rounded-full font-sora text-sm font-bold hover:bg-[#ffb3ad] transition-colors"
+        >
+          Calcular mi presupuesto //
+        </button>
+      </div>
     </div>
   </div>
 </section>
-

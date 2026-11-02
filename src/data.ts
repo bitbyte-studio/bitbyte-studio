@@ -1,75 +1,81 @@
-import type { Project, ServiceItem, PricingPlan, TechItem } from './types';
+import type { Project, TechItem } from './types';
+import { MAINTENANCE, type ServiceId } from './config/pricing';
 
-export const SERVICES: ServiceItem[] = [
-  {
-    id: 'web-dev',
-    number: '01/',
-    icon: 'code',
-    title: 'Web Dev',
-    description: 'Sitios web de alto rendimiento optimizados para velocidad y SEO.',
-    longDescription:
-      'Diseñamos y desarrollamos arquitecturas web de ultra-bajo tiempo de carga utilizando frameworks modernos con renderizado estático y en servidor. Creadas con precisión para posicionamiento orgánico (SEO) y escalabilidad masiva.',
-    deliverables: [
-      'Arquitectura Next.js / Astro 100% optimizada',
-      'Puntuación 98+ en Google Lighthouse (Core Web Vitals)',
-      'CMS Headless auto-gestionable para tu equipo',
-      'Optimización SEO técnica, semántica y OpenGraph'
+/** Detail copy for each service. Names, prices and lead times live in config/pricing.ts. */
+export interface ServiceDetail {
+  highlights: readonly string[];
+  idealFor: string;
+}
+
+export const SERVICE_DETAILS: Record<ServiceId, ServiceDetail> = {
+  catalogo: {
+    highlights: [
+      'Tus productos o servicios con fotos y precios',
+      'Un enlace listo para compartir por WhatsApp y redes',
+      'Se ve bien en cualquier móvil',
+      'Botón para que el cliente te escriba directo',
     ],
-    technologies: ['Astro', 'Tailwind CSS', 'Next.js', 'Sanity CMS', 'TypeScript'],
-    useCase: 'Portales de marca, plataformas SaaS, webs institucionales y medios digitales de alto tráfico.'
+    idealFor: 'Negocios que hoy mandan fotos y precios uno por uno por WhatsApp.',
   },
-  {
-    id: 'automation',
-    number: '02/',
-    icon: 'settings_suggest',
-    title: 'Automation',
-    description: 'Optimización de procesos internos mediante scripts y flujos digitales.',
-    longDescription:
-      'Eliminamos tareas repetitivas conectando tus sistemas de facturación, CRM, hojas de cálculo e inteligencia artificial mediante flujos automatizados de alta velocidad.',
-    deliverables: [
-      'Integración API entre sistemas incompatibles',
-      'Bots de alertas automáticas (WhatsApp, Slack, Email)',
-      'Procesamiento de datos e inventario con Python / Node.js',
-      'Paneles de telemetría y monitoreo en tiempo real'
+  landing: {
+    highlights: [
+      'Una página con lo esencial de tu negocio',
+      'Botón de contacto por WhatsApp',
+      'Diseño pensado para el móvil',
+      'Textos claros y bien ordenados',
     ],
-    technologies: ['Python', 'Node.js', 'Webhooks', 'Express', 'Google APIs'],
-    useCase: 'Empresas con alta carga operativa, logística, reservas automáticas y reportes financieros.'
+    idealFor: 'Profesionales y emprendimientos que quieren una presencia sencilla y clara.',
   },
-  {
-    id: 'ecommerce',
-    number: '03/',
-    icon: 'shopping_bag',
-    title: 'E-commerce',
-    description: 'Tiendas online robustas que maximizan tus ventas y conversiones.',
-    longDescription:
-      'Desarrollo de comercios electrónicos Headless y con Shopify/Sanity con tiempos de respuesta instantáneos, pasarelas locales e internacionales y embudos reducidos para alta conversión.',
-    deliverables: [
-      'Checkouts súper veloces con pagos en 1 clic',
-      'Gestión de inventario multi-almacén optimizada',
-      'Sincronización con pasarelas y envíos automáticos',
-      'Analítica avanzada de carritos y clientes'
+  tienda: {
+    highlights: [
+      'Catálogo de productos con variantes',
+      'Pedidos organizados para cerrar la venta',
+      'Pensada para comprar desde el móvil',
+      'Carga de productos disponible como extra',
     ],
-    technologies: ['React', 'Shopify Storefront API', 'Tailwind', 'Stripe / Pasarelas locales'],
-    useCase: 'Marcos de moda, productos gourmet, electrónica de consumo y retail escalable.'
+    idealFor: 'Negocios con varios productos que quieren vender también por internet.',
   },
-  {
-    id: 'hardware',
-    number: '04/',
-    icon: 'memory',
-    title: 'Hardware',
-    description: 'Soluciones integrales que unen el mundo físico con el digital.',
-    longDescription:
-      'Sistemas embebidos e internet de las cosas (IoT). Diseñamos sensores, tableros inteligentes y kioscos interactivos que envían telemetría y datos a tus aplicaciones web en tiempo real.',
-    deliverables: [
-      'Prototipado y firmware con ESP32 / Arduino',
-      'Dashboards web para monitoreo IoT en tiempo real',
-      'Comportamientos automatizados por sensores de presencia / clima',
-      'Sistemas de display en punto de venta (POS inteligentes)'
+  rediseno: {
+    highlights: [
+      'Revisión de tu web actual',
+      'Diseño nuevo, más limpio y ligero',
+      'Adaptada al móvil',
+      'Conservamos tu contenido',
     ],
-    technologies: ['Arduino', 'C++', 'MQTT', 'WebSockets', 'React IoT'],
-    useCase: 'Restaurantes inteligentes, agro-tech, exhibiciones de museo interactivas y domótica de lujo.'
-  }
-];
+    idealFor: 'Negocios que ya tienen web, pero se ve anticuada o carga lenta.',
+  },
+  gestion: {
+    highlights: [
+      'Hecho a la medida de cómo trabajas',
+      'Inventario, ventas, reservas o clientes en un solo lugar',
+      'Sustituye cuadernos y hojas sueltas',
+      'Precio y plazo finales según el alcance',
+    ],
+    idealFor: 'Negocios que ya no pueden llevar todo a mano.',
+  },
+  bots: {
+    highlights: [
+      'Respuestas y avisos automáticos',
+      'Reportes y envío de datos sin hacerlo a mano',
+      'Conectan las herramientas que ya usas',
+      'Adaptados a tu forma de trabajar',
+    ],
+    idealFor: 'Negocios que repiten las mismas tareas todos los días.',
+  },
+  digitalmenu: {
+    highlights: [
+      'Carta digital con tus platos y precios',
+      'Instalación incluida',
+      'Fácil de actualizar cuando cambie algo',
+      'Lista en pocos días',
+    ],
+    idealFor: 'Restaurantes, cafeterías y bares.',
+  },
+  mantenimiento: {
+    highlights: MAINTENANCE.includes ?? [],
+    idealFor: 'Quien ya tiene su web y prefiere olvidarse de lo técnico.',
+  },
+};
 
 export const PROJECTS: Project[] = [
   {
@@ -131,55 +137,6 @@ export const PROJECTS: Project[] = [
   }
 ];
 
-export const PRICING_PLANS: PricingPlan[] = [
-  {
-    id: 'basic',
-    name: 'Básico',
-    price: '$499',
-    period: '/pago único',
-    description: 'Ideal para presencia digital personal o marcas emergentes.',
-    features: [
-      'Landing Page de Alto Impacto',
-      'SEO Básico (Metadatos & Sitemap)',
-      'Dominio + Hosting de alta velocidad (1 año)',
-      'Diseño Responsivo Móvil / Desktop',
-      'Integración con WhatsApp y Formulario'
-    ],
-    ctaText: 'Empezar ahora'
-  },
-  {
-    id: 'professional',
-    name: 'Profesional',
-    price: '$999',
-    period: '/pago único',
-    description: 'Soluciones personalizadas para negocios en crecimiento.',
-    features: [
-      'Web Multi-página (hasta 8 secciones)',
-      'CMS Headless (Auto-gestionable)',
-      '3 Meses de Soporte & Mantenimiento',
-      'Blog Integrado u Optimización SEO avanzada',
-      'Panel de Analítica y Conversión en Vivo'
-    ],
-    popular: true,
-    ctaText: 'Seleccionar Pro'
-  },
-  {
-    id: 'ecommerce',
-    name: 'E-commerce',
-    price: '$1499',
-    period: '/pago único',
-    description: 'Tu tienda online completa con todas las herramientas.',
-    features: [
-      'Hasta 50 productos con variantes',
-      'Pasarela de Pagos (Stripe / Local)',
-      'Panel de Inventario y Alertas de Stock',
-      'Automatización de correos y envíos',
-      'Capacitación 1-on-1 para tu equipo de ventas'
-    ],
-    ctaText: 'Consultar ahora'
-  }
-];
-
 export const TECH_STACK: TechItem[] = [
   {
     name: 'Astro',
@@ -220,11 +177,6 @@ export const TECH_STACK: TechItem[] = [
     name: 'Sanity',
     category: 'Headless CMS',
     description: 'Gestor de contenido estructurado que le otorga control total a tu equipo sin romper el código.'
-  },
-  {
-    name: 'Arduino',
-    category: 'Hardware & IoT',
-    description: 'Prototipado electrónico, sensores embebidos e integración de dispositivos en tiempo real.'
   }
 ];
 

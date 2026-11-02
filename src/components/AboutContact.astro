@@ -1,5 +1,5 @@
 ---
-import { SERVICES } from '../data';
+import { SERVICES } from '../config/pricing';
 import { EMAIL, EMAIL_URL, TELEGRAM_HANDLE, TELEGRAM_URL } from '../config/contact';
 
 const inputClass =
@@ -83,7 +83,7 @@ const inputClass =
           <label for="contact-service" class="sr-only">Servicio de interés</label>
           <select id="contact-service" name="service" class={inputClass}>
             <option value="">Servicio de interés (opcional)</option>
-            {SERVICES.map((service) => <option value={service.title}>{service.title}</option>)}
+            {SERVICES.map((service) => <option value={service.name}>{service.name}</option>)}
             <option value="Otro">Otro / No estoy seguro</option>
           </select>
         </div>

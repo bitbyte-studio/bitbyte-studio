@@ -1,8 +1,11 @@
 ---
-import { SERVICES } from '../data';
+import { SERVICE_DETAILS } from '../data';
+import { CURRENCY, SERVICES } from '../config/pricing';
+
+const money = (value: number) => value.toLocaleString('en-US');
 ---
 
-<section id="servicios" class="bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A]" data-services>
+<section id="servicios" class="bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A] scroll-mt-20" data-services>
   <div class="max-w-[1280px] mx-auto">
     <div class="mb-14 md:mb-16 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
       <div>
@@ -12,33 +15,33 @@ import { SERVICES } from '../data';
         </h2>
       </div>
       <p class="font-inter text-sm text-[#4A4A4A] max-w-md">
-        Haz clic en cualquiera de nuestras áreas de ingeniería para explorar arquitectura, entregables y stack técnico.
+        Soluciones digitales para negocios en Cuba. Toca un servicio para ver qué incluye y para quién es.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {
-        SERVICES.map((service) => (
+        SERVICES.map((service, index) => (
           <div
             role="button"
             tabindex="0"
             aria-expanded="false"
             data-service-card={service.id}
-            class="service-card bg-white p-8 rounded-xl border border-[#E5E0D8] hover-lift transition-all cursor-pointer relative overflow-hidden group flex flex-col justify-between"
+            class="service-card bg-white p-7 rounded-xl border border-[#E5E0D8] hover-lift transition-all cursor-pointer relative overflow-hidden group flex flex-col justify-between"
           >
             <div>
-              <div class="absolute top-0 right-0 p-3 opacity-10 font-technical text-3xl text-[#1A1A1A] font-bold">
-                {service.number}
+              <div class="absolute top-0 right-0 p-3 opacity-10 font-technical text-3xl text-[#1A1A1A] font-bold" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}/
               </div>
-              <div class="w-14 h-14 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-6 text-[#FD625D] group-hover:bg-[#FD625D] group-hover:text-white transition-colors">
-                <span class="material-symbols-outlined text-3xl">{service.icon}</span>
+              <div class="w-14 h-14 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-5 text-[#FD625D] group-hover:bg-[#FD625D] group-hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl" aria-hidden="true">{service.icon}</span>
               </div>
-              <h3 class="font-sora text-2xl font-bold text-[#1A1A1A] mb-3">{service.title}</h3>
-              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-6">{service.description}</p>
+              <h3 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2">{service.name}</h3>
+              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-5">{service.description}</p>
             </div>
-            <div class="pt-4 border-t border-[#E5E0D8] flex items-center justify-between text-xs font-technical text-[#fd625d] font-bold">
-              <span>VER ARQUITECTURA</span>
-              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            <div class="pt-4 border-t border-[#E5E0D8] flex items-center justify-between text-xs font-technical text-[#c8403b] font-bold">
+              <span>desde {money(service.from)} {CURRENCY}{service.suffix?.startsWith('/') ? service.suffix : ''}</span>
+              <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span>
             </div>
           </div>
         ))
@@ -46,73 +49,80 @@ import { SERVICES } from '../data';
     </div>
 
     {
-      SERVICES.map((service) => (
-        <div
-          data-service-detail={service.id}
-          class="service-detail mt-10 bg-[#1A1A1A] text-white p-8 md:p-10 rounded-2xl border border-[#2A2A2A] relative animate-fadeIn shadow-2xl hidden"
-          hidden
-        >
-          <button
-            type="button"
-            data-service-close
-            aria-label="Cerrar detalle"
-            class="absolute top-6 right-6 text-[#9CA3AF] hover:text-white transition-colors"
+      SERVICES.map((service) => {
+        const detail = SERVICE_DETAILS[service.id as keyof typeof SERVICE_DETAILS];
+        return (
+          <div
+            data-service-detail={service.id}
+            class="service-detail mt-10 bg-[#1A1A1A] text-white p-8 md:p-10 rounded-2xl border border-[#2A2A2A] relative animate-fadeIn shadow-2xl hidden"
+            hidden
           >
-            <span class="material-symbols-outlined text-2xl">close</span>
-          </button>
+            <button
+              type="button"
+              data-service-close
+              aria-label="Cerrar detalle"
+              class="absolute top-6 right-6 text-[#9CA3AF] hover:text-white transition-colors"
+            >
+              <span class="material-symbols-outlined text-2xl" aria-hidden="true">close</span>
+            </button>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <div class="lg:col-span-1">
-              <div class="inline-block px-3 py-1 rounded-full bg-[#fd625d]/20 text-[#fd625d] font-technical text-xs font-bold mb-3 uppercase">
-                {service.number} SERVICIO DETALLADO
-              </div>
-              <h3 class="font-sora text-2xl md:text-3xl font-bold text-white mb-4">{service.title}</h3>
-              <p class="font-inter text-sm text-[#9CA3AF] leading-relaxed mb-6">{service.longDescription}</p>
-              <button
-                type="button"
-                data-open-quote={service.title}
-                class="bg-[#fd625d] text-white px-6 py-3 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral inline-flex items-center gap-2"
-              >
-                <span>Cotizar {service.title}</span>
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
-            </div>
-
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#131315] p-6 rounded-xl border border-[#2A2A2A]">
-              <div>
-                <h4 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span class="material-symbols-outlined text-base">check_circle</span>
-                  Entregables de Ingeniería
-                </h4>
-                <ul class="space-y-3">
-                  {service.deliverables.map((item) => (
-                    <li class="flex items-start gap-2.5 text-sm font-inter text-[#e5e1e4]">
-                      <span class="text-[#fd625d] font-bold font-technical">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 class="font-technical text-xs font-bold text-[#edc157] uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span class="material-symbols-outlined text-base">layers</span>
-                  Stack &amp; Casos de Uso
-                </h4>
-                <div class="flex flex-wrap gap-2 mb-4">
-                  {service.technologies.map((tech) => (
-                    <span class="px-2.5 py-1 bg-[#2A2A2A] text-[#e5e1e4] rounded text-xs font-technical border border-[#353437]">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-                <p class="text-xs font-inter text-[#9CA3AF] border-t border-[#2A2A2A] pt-3">
-                  <strong class="text-white">Caso Ideal:</strong> {service.useCase}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+              <div class="lg:col-span-1">
+                <h3 class="font-sora text-2xl md:text-3xl font-bold text-white mb-3">{service.name}</h3>
+                <p class="font-inter text-sm text-[#9CA3AF] leading-relaxed mb-5">{service.description}</p>
+                <p class="mb-1">
+                  <span class="font-technical text-xs uppercase text-[#9CA3AF] mr-1">desde</span>
+                  <span class="text-[#fd625d] text-3xl font-bold font-sora">{money(service.from)}</span>
+                  <span class="font-technical text-sm text-[#9CA3AF] ml-1">
+                    {CURRENCY}{service.suffix?.startsWith('/') ? service.suffix : ''}
+                  </span>
                 </p>
+                {service.suffix && !service.suffix.startsWith('/') && (
+                  <p class="font-technical text-xs text-[#58ddb0] mb-1">{service.suffix}</p>
+                )}
+                <p class="font-inter text-sm text-[#e5e1e4] flex items-center gap-2 mt-2 mb-6">
+                  <span class="material-symbols-outlined text-base text-[#edc157]" aria-hidden="true">schedule</span>
+                  <span>Plazo: {service.leadTime}</span>
+                </p>
+                {service.id !== 'mantenimiento' && (
+                  <button
+                    type="button"
+                    data-open-quote={service.id}
+                    class="bg-[#fd625d] text-white px-6 py-3 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral inline-flex items-center gap-2"
+                  >
+                    <span>Cotizar {service.name}</span>
+                    <span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
+                  </button>
+                )}
+              </div>
+
+              <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#131315] p-6 rounded-xl border border-[#2A2A2A]">
+                <div>
+                  <h4 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base" aria-hidden="true">check_circle</span>
+                    Qué incluye
+                  </h4>
+                  <ul class="space-y-3">
+                    {detail.highlights.map((item) => (
+                      <li class="flex items-start gap-2.5 text-sm font-inter text-[#e5e1e4]">
+                        <span class="text-[#fd625d] font-bold font-technical" aria-hidden="true">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-technical text-xs font-bold text-[#edc157] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base" aria-hidden="true">storefront</span>
+                    Ideal para
+                  </h4>
+                  <p class="text-sm font-inter text-[#e5e1e4]">{detail.idealFor}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      ))
+        );
+      })
     }
   </div>
 </section>
@@ -139,6 +149,7 @@ import { SERVICES } from '../data';
         const active = detail.dataset.serviceDetail === id;
         detail.classList.toggle('hidden', !active);
         detail.hidden = !active;
+        if (active) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     };
 

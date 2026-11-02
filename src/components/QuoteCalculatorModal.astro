@@ -1,38 +1,28 @@
 ---
-const projectTypes = [
-  { id: 'landing', label: 'Landing Page', base: 499, weeks: 3 },
-  { id: 'webapp', label: 'Web App / SaaS', base: 999, weeks: 5 },
-  { id: 'ecommerce', label: 'E-commerce', base: 1499, weeks: 6 },
-  { id: 'hardware', label: 'Hardware / IoT', base: 1800, weeks: 8 },
-] as const;
-
-const addons = [
-  { id: 'cms', label: 'CMS Auto-gestionable (Sanity / Headless)', price: 200, checked: true },
-  { id: 'seo', label: 'SEO Técnico Avanzado & Schema OpenGraph', price: 150, checked: false },
-  { id: 'animations', label: 'Animaciones 3D (Three.js / GSAP en capas)', price: 300, checked: false },
-  { id: 'automation', label: 'Integración APIs y Flujos Automatizados', price: 250, checked: false },
-  { id: 'priority', label: 'Entrega Prioritaria (Sprint Ágil en 14 días)', price: 400, checked: false },
-] as const;
-
-const PAGE_PRICE = 80;
-const PRIORITY_WEEKS = 2;
-const initialPages = 3;
+import {
+  CURRENCY,
+  CURRENCY_NOTE,
+  DEFAULT_PUBLISHING_ID,
+  EXTRAS,
+  MAINTENANCE,
+  PROJECT_SERVICES,
+  PUBLISHING_OPTIONS,
+  type PublishingOption,
+} from '../config/pricing';
+import { calculateQuote, formatLineAmount } from '../lib/quote';
 
 const money = (value: number) => value.toLocaleString('en-US');
+const publishingPrice = (option: PublishingOption) =>
+  option.price === 0
+    ? 'Gratis'
+    : formatLineAmount({ amount: option.price, billing: option.billing }).replace(/^a consultar$/, 'precio a consultar');
 
-// Defaults must match the calculator: first project type + initial pages + pre-checked add-ons
-const initialType = projectTypes[0];
-const initialTotal =
-  initialType.base +
-  (initialPages - 1) * PAGE_PRICE +
-  addons.filter((addon) => addon.checked).reduce((sum, addon) => sum + addon.price, 0);
-const initialWeeks = initialType.weeks;
+const initialService = PROJECT_SERVICES[0];
+const initialQuote = calculateQuote(initialService.id);
 ---
 
 <div
   data-quote-modal
-  data-page-price={PAGE_PRICE}
-  data-priority-weeks={PRIORITY_WEEKS}
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn hidden"
   hidden
 >
@@ -47,7 +37,7 @@ const initialWeeks = initialType.weeks;
       <div class="flex items-center gap-3">
         <span class="w-3 h-3 rounded-full bg-[#58ddb0]" aria-hidden="true"></span>
         <span class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider">
-          // COTIZADOR INTERACTIVO DE INGENIERÍA · BIT &amp; BYTE
+          // COTIZADOR · BIT &amp; BYTE
         </span>
       </div>
       <button
@@ -63,116 +53,166 @@ const initialWeeks = initialType.weeks;
     <div class="p-6 md:p-8 space-y-8">
       <div>
         <h2 id="quote-title" class="font-sora text-2xl md:text-3xl font-bold text-white mb-2">
-          Calcula tu Presupuesto al Instante
+          Calcula tu presupuesto
         </h2>
         <p class="font-inter text-sm text-[#9CA3AF]">
-          Selecciona los módulos de tu aplicación para obtener una estimación precisa de tiempo y costos.
+          Elige lo que necesitas y te mostramos un estimado de partida. El precio final lo confirmamos por WhatsApp.
         </p>
       </div>
 
       <div>
-        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-type-label">
-          1. Tipo de Solución Principal
+        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-service-label">
+          1. ¿Qué necesitas?
         </span>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" role="group" aria-labelledby="quote-type-label">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-labelledby="quote-service-label">
           {
-            projectTypes.map((item) => (
+            PROJECT_SERVICES.map((service) => (
               <button
                 type="button"
-                data-project-type={item.id}
-                data-label={item.label}
-                data-base={item.base}
-                data-weeks={item.weeks}
-                aria-pressed={item.id === initialType.id ? 'true' : 'false'}
+                data-service={service.id}
+                aria-pressed={service.id === initialService.id ? 'true' : 'false'}
                 class:list={[
-                  'quote-type p-4 rounded-xl border text-left transition-all',
-                  item.id === initialType.id
+                  'quote-service p-4 rounded-xl border text-left transition-all',
+                  service.id === initialService.id
                     ? 'is-active bg-[#fd625d]/10 border-[#fd625d] text-white shadow-md'
                     : 'bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] hover:border-[#353437]',
                 ]}
               >
-                <div class="font-sora font-semibold text-sm mb-1">{item.label}</div>
-                <div class="font-technical text-xs text-[#fd625d]">${money(item.base)} base</div>
+                <div class="font-sora font-semibold text-sm mb-1">{service.name}</div>
+                <div class="font-technical text-xs text-[#fd625d]">
+                  desde {money(service.from)} {CURRENCY}
+                  {service.suffix ? ` · ${service.suffix}` : ''}
+                </div>
               </button>
             ))
           }
         </div>
-      </div>
 
-      <div class="bg-[#131315] p-5 rounded-xl border border-[#2A2A2A]">
-        <div class="flex justify-between items-center mb-3">
-          <label class="font-sora text-sm font-semibold text-white" for="quote-pages">
-            Número estimado de páginas / vistas:
-          </label>
-          <span data-pages-label class="font-technical text-base font-bold text-[#edc157] px-3 py-1 rounded bg-[#2A2A2A]">
-            {initialPages} páginas
+        <label
+          data-maintenance-label
+          class="mt-3 flex items-start justify-between p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
+        >
+          <div class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              data-maintenance
+              class="mt-0.5 w-4 h-4 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+            />
+            <span class="text-sm font-inter">Añadir mantenimiento mensual</span>
+          </div>
+          <span class="font-technical text-xs font-bold text-[#edc157] ml-2 whitespace-nowrap">
+            +{money(MAINTENANCE.from)} {CURRENCY}{MAINTENANCE.suffix}
           </span>
-        </div>
-        <input
-          id="quote-pages"
-          data-pages-range
-          type="range"
-          min="1"
-          max="20"
-          value={initialPages}
-          class="w-full accent-[#fd625d] cursor-pointer"
-        />
-        <div class="flex justify-between text-[10px] font-technical text-[#9CA3AF] mt-1">
-          <span>1 página (Single screen)</span>
-          <span>10 páginas</span>
-          <span>20+ páginas</span>
-        </div>
+        </label>
       </div>
 
       <div>
-        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-addons-label">
-          2. Características de Ingeniería &amp; Optimización
+        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-extras-label">
+          2. Extras (opcional)
         </span>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-labelledby="quote-addons-label">
+        <div class="grid grid-cols-1 gap-3" role="group" aria-labelledby="quote-extras-label">
           {
-            addons.map((addon) => (
-              <label
-                data-addon-label={addon.id}
-                class:list={[
-                  'quote-addon flex items-start justify-between p-3.5 rounded-xl border bg-[#131315] cursor-pointer transition-all',
-                  addon.checked
-                    ? 'is-active border-[#fd625d] text-white'
-                    : 'border-[#2A2A2A] text-[#9CA3AF]',
-                ]}
+            EXTRAS.map((extra) => (
+              <div
+                data-extra-row={extra.id}
+                class="quote-extra flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] transition-all"
               >
-                <div class="flex items-start gap-3">
+                <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-[12rem]">
                   <input
                     type="checkbox"
-                    data-addon={addon.id}
-                    data-label={addon.label}
-                    data-price={addon.price}
-                    checked={addon.checked}
-                    class="mt-0.5 w-4 h-4 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+                    data-extra={extra.id}
+                    class="w-4 h-4 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
                   />
-                  <span class="text-sm font-inter">{addon.label}</span>
+                  <span class="text-sm font-inter">{extra.name}</span>
+                </label>
+
+                <div class="flex items-center gap-4">
+                  {extra.quantity && (
+                    <label class="flex items-center gap-2 text-xs font-technical">
+                      <span class="sr-only">{extra.quantity.label}</span>
+                      <span aria-hidden="true">×</span>
+                      <input
+                        type="number"
+                        inputmode="numeric"
+                        data-extra-qty={extra.id}
+                        min="1"
+                        max={extra.quantity.max}
+                        value="1"
+                        disabled
+                        aria-label={extra.quantity.label}
+                        class="w-16 bg-[#1A1A1A] border border-[#353437] rounded-lg px-2 py-1 text-white text-center disabled:opacity-40"
+                      />
+                    </label>
+                  )}
+                  <span class="font-technical text-xs font-bold text-[#edc157] whitespace-nowrap">
+                    {`+${money(extra.price ?? 0)} ${CURRENCY}${extra.unit ? ` ${extra.unit}` : ''}`}
+                  </span>
                 </div>
-                <span class="font-technical text-xs font-bold text-[#edc157] ml-2">+${money(addon.price)}</span>
-              </label>
+              </div>
             ))
           }
         </div>
       </div>
 
-      <div class="bg-[#131315] p-6 rounded-2xl border-2 border-[#fd625d]/60 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-        <div>
-          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-1">
-            INVERSIÓN ESTIMADA DE INGENIERÍA
-          </div>
+      <fieldset>
+        <legend class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3">
+          3. Publicación
+        </legend>
+        <div class="grid grid-cols-1 gap-3">
+          {
+            PUBLISHING_OPTIONS.map((option) => (
+              <label
+                data-publishing-row={option.id}
+                class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
+              >
+                <div class="flex items-start gap-3">
+                  <input
+                    type="radio"
+                    name="quote-publishing"
+                    value={option.id}
+                    data-publishing={option.id}
+                    checked={option.id === DEFAULT_PUBLISHING_ID}
+                    class="mt-0.5 w-4 h-4 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+                  />
+                  <span>
+                    <span class="block text-sm font-inter">{option.name}</span>
+                    <span class="block text-xs font-inter opacity-80 mt-0.5">{option.description}</span>
+                  </span>
+                </div>
+                <span class="font-technical text-xs font-bold text-[#edc157] whitespace-nowrap">
+                  {publishingPrice(option)}
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <div class="bg-[#131315] p-6 rounded-2xl border-2 border-[#fd625d]/60 shadow-xl space-y-5">
+        <div aria-live="polite">
+          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-1">Pago único del proyecto</div>
           <div class="font-sora text-3xl md:text-4xl font-bold text-white flex items-baseline gap-2">
-            $<span data-quote-total>{money(initialTotal)}</span>
-            <span class="text-sm font-normal text-[#9CA3AF] font-inter">USD</span>
+            <span class="text-sm font-normal text-[#9CA3AF] font-inter">desde</span>
+            <span data-quote-total>{money(initialQuote.oneTime)}</span>
+            <span class="text-sm font-normal text-[#9CA3AF] font-inter">{CURRENCY}</span>
           </div>
-          <div class="text-xs font-technical text-[#58ddb0] mt-1">
-            ⏱ Tiempo estimado de entrega: ~<span data-quote-weeks>{initialWeeks}</span> semanas
-          </div>
+          <p class="text-xs font-technical text-[#58ddb0] mt-2">
+            Plazo orientativo: <span data-quote-leadtime>{initialQuote.leadTime}</span>
+          </p>
+          <ul data-quote-once class="mt-3 space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <div class="border-t border-[#2A2A2A] pt-4" aria-live="polite">
+          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-2">Pago recurrente</div>
+          <ul data-quote-recurring class="space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
+          <p data-quote-empty class="text-sm font-inter text-[#9CA3AF] hidden" hidden>Ninguno.</p>
+        </div>
+
+        <p class="text-xs font-inter text-[#9CA3AF]">
+          Precio final por WhatsApp. {CURRENCY_NOTE}
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
           <button
             type="button"
             data-quote-close
@@ -187,7 +227,7 @@ const initialWeeks = initialType.weeks;
             class="px-6 py-3 rounded-full bg-[#fd625d] text-white font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral flex items-center justify-center gap-2"
           >
             <span class="material-symbols-outlined text-lg" aria-hidden="true">send</span>
-            <span>Enviar cotización por WhatsApp</span>
+            <span>Enviar por WhatsApp</span>
           </button>
         </div>
       </div>
@@ -198,114 +238,150 @@ const initialWeeks = initialType.weeks;
 <script>
   import { OPEN_QUOTE_EVENT, openQuote, type OpenQuoteDetail } from '../lib/events';
   import { whatsappLink } from '../config/contact';
+  import {
+    DEFAULT_PUBLISHING_ID,
+    PROJECT_SERVICES,
+    PUBLISHING_OPTIONS,
+    type ExtraId,
+    type ProjectServiceId,
+    type PublishingId,
+  } from '../config/pricing';
+  import {
+    calculateQuote,
+    formatLineAmount,
+    oneTimeLines,
+    quoteToMessage,
+    recurringLines,
+    type QuoteExtraInput,
+    type QuoteLine,
+  } from '../lib/quote';
   import { mountAll } from '../lib/lifecycle';
   import { createModal } from '../lib/modal';
 
-  const TYPE_ACTIVE = ['is-active', 'bg-[#fd625d]/10', 'border-[#fd625d]', 'text-white', 'shadow-md'];
-  const TYPE_INACTIVE = ['bg-[#131315]', 'border-[#2A2A2A]', 'text-[#9CA3AF]'];
-  const ADDON_ACTIVE = ['is-active', 'border-[#fd625d]', 'text-white'];
-  const ADDON_INACTIVE = ['border-[#2A2A2A]', 'text-[#9CA3AF]'];
+  const SERVICE_ACTIVE = ['is-active', 'bg-[#fd625d]/10', 'border-[#fd625d]', 'text-white', 'shadow-md'];
+  const SERVICE_INACTIVE = ['bg-[#131315]', 'border-[#2A2A2A]', 'text-[#9CA3AF]'];
+  const ROW_ACTIVE = ['border-[#fd625d]', 'text-white'];
+  const ROW_INACTIVE = ['border-[#2A2A2A]', 'text-[#9CA3AF]'];
 
-  const money = (value: number) => value.toLocaleString('en-US');
+  const isServiceId = (value: string | undefined): value is ProjectServiceId =>
+    PROJECT_SERVICES.some((service) => service.id === value);
 
-  // Maps the label of whatever opened the quote (service card, pricing plan...) to a project type.
-  function serviceToType(service?: string): string {
-    switch (service) {
-      case 'E-commerce':
-        return 'ecommerce';
-      case 'Hardware':
-        return 'hardware';
-      case 'Automation':
-      case 'Profesional':
-        return 'webapp';
-      default:
-        return 'landing';
-    }
+  const isPublishingId = (value: string | undefined): value is PublishingId =>
+    PUBLISHING_OPTIONS.some((option) => option.id === value);
+
+  function lineItem(line: QuoteLine): HTMLLIElement {
+    const li = document.createElement('li');
+    li.className = 'flex justify-between gap-4';
+    const label = document.createElement('span');
+    label.textContent = line.label;
+    const amount = document.createElement('span');
+    amount.className = 'font-technical text-xs text-[#edc157] whitespace-nowrap';
+    amount.textContent = formatLineAmount(line);
+    li.append(label, amount);
+    return li;
   }
 
   function initQuoteModal(root: HTMLElement, signal: AbortSignal) {
-    const pagesRange = root.querySelector<HTMLInputElement>('[data-pages-range]');
-    const pagesLabel = root.querySelector<HTMLElement>('[data-pages-label]');
+    const serviceButtons = Array.from(root.querySelectorAll<HTMLElement>('[data-service]'));
+    const extraInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-extra]'));
+    const maintenanceInput = root.querySelector<HTMLInputElement>('[data-maintenance]');
     const totalEl = root.querySelector<HTMLElement>('[data-quote-total]');
-    const weeksEl = root.querySelector<HTMLElement>('[data-quote-weeks]');
-    const typeButtons = Array.from(root.querySelectorAll<HTMLElement>('[data-project-type]'));
-    const addonInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-addon]'));
+    const leadTimeEl = root.querySelector<HTMLElement>('[data-quote-leadtime]');
+    const onceEl = root.querySelector<HTMLElement>('[data-quote-once]');
+    const recurringEl = root.querySelector<HTMLElement>('[data-quote-recurring]');
+    const emptyEl = root.querySelector<HTMLElement>('[data-quote-empty]');
+    const publishingInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-publishing]'));
 
-    if (!pagesRange || !typeButtons.length) return;
+    if (!serviceButtons.length || !maintenanceInput) return;
 
-    const pagePrice = Number(root.dataset.pagePrice);
-    const priorityWeeks = Number(root.dataset.priorityWeeks);
     const modal = createModal(root, signal);
+    let serviceId: ProjectServiceId = PROJECT_SERVICES[0].id;
 
-    let activeType = typeButtons[0];
+    const qtyInput = (id: string) => root.querySelector<HTMLInputElement>(`[data-extra-qty="${id}"]`);
 
-    const compute = () => {
-      const pages = Number(pagesRange.value);
-      const checked = addonInputs.filter((input) => input.checked);
-      const total =
-        Number(activeType.dataset.base) +
-        (pages - 1) * pagePrice +
-        checked.reduce((sum, input) => sum + Number(input.dataset.price), 0);
-      const weeks = checked.some((input) => input.dataset.addon === 'priority')
-        ? priorityWeeks
-        : Number(activeType.dataset.weeks);
+    const selectedExtras = (): QuoteExtraInput[] =>
+      extraInputs
+        .filter((input) => input.checked)
+        .map((input) => {
+          const id = input.dataset.extra as ExtraId;
+          const qty = qtyInput(id);
+          return { id, quantity: qty ? Number(qty.value) : undefined };
+        });
 
-      return {
-        pages,
-        total,
-        weeks,
-        typeLabel: activeType.dataset.label ?? '',
-        extras: checked.map((input) => input.dataset.label ?? ''),
-      };
+    const selectedPublishing = (): PublishingId => {
+      const value = publishingInputs.find((input) => input.checked)?.value;
+      return isPublishingId(value) ? value : DEFAULT_PUBLISHING_ID;
+    };
+
+    const currentQuote = () =>
+      calculateQuote(serviceId, selectedExtras(), {
+        maintenance: maintenanceInput.checked,
+        publishing: selectedPublishing(),
+      });
+
+    const paintRow = (el: HTMLElement | null, active: boolean) => {
+      if (!el) return;
+      el.classList.remove(...(active ? ROW_INACTIVE : ROW_ACTIVE));
+      el.classList.add(...(active ? ROW_ACTIVE : ROW_INACTIVE));
     };
 
     const render = () => {
-      const { pages, total, weeks } = compute();
-      if (pagesLabel) pagesLabel.textContent = `${pages} ${pages === 1 ? 'página' : 'páginas'}`;
-      if (totalEl) totalEl.textContent = money(total);
-      if (weeksEl) weeksEl.textContent = String(weeks);
+      extraInputs.forEach((input) => {
+        const id = input.dataset.extra ?? '';
+        const qty = qtyInput(id);
+        if (qty) qty.disabled = !input.checked;
+        paintRow(input.closest<HTMLElement>('[data-extra-row]'), input.checked);
+      });
+      paintRow(root.querySelector<HTMLElement>('[data-maintenance-label]'), maintenanceInput.checked);
+      publishingInputs.forEach((input) => {
+        paintRow(input.closest<HTMLElement>('[data-publishing-row]'), input.checked);
+      });
+
+      const quote = currentQuote();
+      if (totalEl) totalEl.textContent = quote.oneTime.toLocaleString('en-US');
+      if (leadTimeEl) leadTimeEl.textContent = quote.leadTime;
+      onceEl?.replaceChildren(...oneTimeLines(quote).map(lineItem));
+
+      const recurring = recurringLines(quote);
+      recurringEl?.replaceChildren(...recurring.map(lineItem));
+      if (emptyEl) {
+        emptyEl.classList.toggle('hidden', recurring.length > 0);
+        emptyEl.hidden = recurring.length > 0;
+      }
     };
 
-    const setProjectType = (type: string) => {
-      activeType = typeButtons.find((button) => button.dataset.projectType === type) ?? typeButtons[0];
-      typeButtons.forEach((button) => {
-        const active = button === activeType;
-        button.classList.remove(...(active ? TYPE_INACTIVE : TYPE_ACTIVE));
-        button.classList.add(...(active ? TYPE_ACTIVE : TYPE_INACTIVE));
+    const setService = (id: ProjectServiceId) => {
+      serviceId = id;
+      serviceButtons.forEach((button) => {
+        const active = button.dataset.service === id;
+        button.classList.remove(...(active ? SERVICE_INACTIVE : SERVICE_ACTIVE));
+        button.classList.add(...(active ? SERVICE_ACTIVE : SERVICE_INACTIVE));
         button.setAttribute('aria-pressed', String(active));
       });
       render();
     };
 
-    const syncAddonStyles = () => {
-      addonInputs.forEach((input) => {
-        const label = input.closest<HTMLElement>('[data-addon-label]');
-        if (!label) return;
-        label.classList.remove(...(input.checked ? ADDON_INACTIVE : ADDON_ACTIVE));
-        label.classList.add(...(input.checked ? ADDON_ACTIVE : ADDON_INACTIVE));
-      });
-    };
-
     const open = (service?: string) => {
-      setProjectType(serviceToType(service));
+      setService(isServiceId(service) ? service : serviceId);
       modal.open();
     };
 
-    typeButtons.forEach((button) => {
-      button.addEventListener('click', () => setProjectType(button.dataset.projectType ?? ''), { signal });
-    });
-
-    pagesRange.addEventListener('input', render, { signal });
-
-    addonInputs.forEach((input) => {
-      input.addEventListener(
-        'change',
+    serviceButtons.forEach((button) => {
+      button.addEventListener(
+        'click',
         () => {
-          syncAddonStyles();
-          render();
+          const id = button.dataset.service;
+          if (isServiceId(id)) setService(id);
         },
         { signal },
       );
+    });
+
+    [...extraInputs, ...publishingInputs, maintenanceInput].forEach((input) => {
+      input.addEventListener('change', render, { signal });
+    });
+    root.querySelectorAll<HTMLInputElement>('[data-extra-qty]').forEach((input) => {
+      input.addEventListener('input', render, { signal });
     });
 
     root.querySelectorAll<HTMLElement>('[data-quote-close]').forEach((button) => {
@@ -314,18 +390,7 @@ const initialWeeks = initialType.weeks;
 
     root.querySelector<HTMLElement>('[data-quote-whatsapp]')?.addEventListener(
       'click',
-      () => {
-        const { pages, total, weeks, typeLabel, extras } = compute();
-        const text = [
-          '¡Hola Bit & Byte Studio! Quisiera cotizar un proyecto:',
-          `- Tipo: ${typeLabel}`,
-          `- Páginas: ${pages}`,
-          `- Extras: ${extras.length ? extras.join('; ') : 'Ninguno'}`,
-          `>>> Estimación en cotizador: ~$${money(total)} USD (aprox. ${weeks} semanas)`,
-        ].join('\n');
-
-        window.open(whatsappLink(text), '_blank', 'noopener,noreferrer');
-      },
+      () => window.open(whatsappLink(quoteToMessage(currentQuote())), '_blank', 'noopener,noreferrer'),
       { signal },
     );
 
@@ -345,8 +410,7 @@ const initialWeeks = initialType.weeks;
       { signal },
     );
 
-    syncAddonStyles();
-    render();
+    setService(serviceId);
   }
 
   mountAll('[data-quote-modal]', initQuoteModal);
