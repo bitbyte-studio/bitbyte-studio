@@ -145,17 +145,22 @@ function buildLogoGroup() {
   return logo;
 }
 
-export function mountLogo3D(canvas: HTMLCanvasElement): LogoHandle {
+export function mountLogo3D(canvas: HTMLCanvasElement, visibilityTarget: Element = canvas): LogoHandle {
   const scene = new Scene();
   const camera = new PerspectiveCamera(30, 1, 0.1, 100);
   camera.position.set(0, 0.08, 7.4);
 
-  const renderer = new WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: true,
-    powerPreference: 'high-performance',
-  });
+  let renderer: WebGLRenderer;
+  try {
+    renderer = new WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+    });
+  } catch {
+    return { dispose: () => {} };
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
 
@@ -169,9 +174,11 @@ export function mountLogo3D(canvas: HTMLCanvasElement): LogoHandle {
   const logo = buildLogoGroup();
   scene.add(logo);
 
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let animationId = 0;
   const start = performance.now();
   let disposed = false;
+  let visible = true;
 
   const resize = () => {
     const width = canvas.clientWidth || 256;
@@ -179,13 +186,15 @@ export function mountLogo3D(canvas: HTMLCanvasElement): LogoHandle {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    if (reduceMotion && !disposed) animate(performance.now());
   };
 
   const animate = (now: number) => {
-    if (disposed) return;
+    if (disposed || !visible) return;
     animationId = requestAnimationFrame(animate);
 
-    const elapsed = (now - start) / 1000;
+    // With reduced motion, render the assembled logo once and keep it still.
+    const elapsed = reduceMotion ? 10 : (now - start) / 1000;
     const pieces = logo.userData.pieces as Object3D[];
 
     pieces.forEach((piece) => {
@@ -199,10 +208,25 @@ export function mountLogo3D(canvas: HTMLCanvasElement): LogoHandle {
         Math.sin(elapsed * 1.4 + (piece.userData.delay as number) * 7) * 0.028;
     });
 
-    logo.rotation.y = Math.sin(elapsed * 0.48) * 0.18;
-    logo.rotation.x = Math.sin(elapsed * 0.3) * 0.06;
+    logo.rotation.y = reduceMotion ? 0 : Math.sin(elapsed * 0.48) * 0.18;
+    logo.rotation.x = reduceMotion ? 0 : Math.sin(elapsed * 0.3) * 0.06;
     renderer.render(scene, camera);
+
+    if (reduceMotion) {
+      cancelAnimationFrame(animationId);
+      animationId = 0;
+    }
   };
+
+  const observer = new IntersectionObserver(([entry]) => {
+    const wasVisible = visible;
+    visible = entry.isIntersecting;
+    if (visible && !wasVisible && !disposed && !reduceMotion) {
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(animate);
+    }
+  });
+  observer.observe(visibilityTarget);
 
   resize();
   window.addEventListener('resize', resize);
@@ -211,6 +235,7 @@ export function mountLogo3D(canvas: HTMLCanvasElement): LogoHandle {
   return {
     dispose: () => {
       disposed = true;
+      observer.disconnect();
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resize);
 

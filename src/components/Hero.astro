@@ -68,47 +68,41 @@
 </section>
 
 <script>
-  import { openQuote } from '../lib/events';
+  import { mountAll, prefersReducedMotion } from '../lib/lifecycle';
 
-  type Cell = { char: string; opacity: number; speed: number; y: number };
+  type Cell = { char: string; opacity: number };
 
-  function initHeroCanvas(canvas: HTMLCanvasElement) {
+  const CELL = 26;
+
+  function initHeroCanvas(canvas: HTMLCanvasElement, root: HTMLElement, signal: AbortSignal) {
     const ctx = canvas.getContext('2d');
-    if (!ctx) return () => {};
+    if (!ctx) return;
 
+    const reduceMotion = prefersReducedMotion();
     let animationFrameId = 0;
-    let width = (canvas.width = canvas.clientWidth || window.innerWidth);
-    let height = (canvas.height = canvas.clientHeight || window.innerHeight);
+    let visible = true;
+    let width = 0;
+    let height = 0;
+    let columns = 0;
+    let rows = 0;
+    let grid: Cell[] = [];
+    let mouseX = -1000;
+    let mouseY = -1000;
 
-    const buildGrid = (): Cell[] => {
-      const columns = Math.floor(width / 26);
-      const rows = Math.floor(height / 26);
-      const next: Cell[] = [];
-      for (let i = 0; i < columns * rows; i++) {
-        next.push({
-          char: Math.random() > 0.5 ? '1' : '0',
-          opacity: Math.random() * 0.18 + 0.03,
-          speed: Math.random() * 0.015 + 0.005,
-          y: Math.random() * height,
-        });
-      }
-      return next;
-    };
+    const buildGrid = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = canvas.clientWidth || window.innerWidth;
+      height = canvas.clientHeight || window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    let grid = buildGrid();
-    let mouseX = width / 2;
-    let mouseY = height / 2;
-
-    const handleResize = () => {
-      width = canvas.width = canvas.clientWidth || window.innerWidth;
-      height = canvas.height = canvas.clientHeight || window.innerHeight;
-      grid = buildGrid();
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = event.clientX - rect.left;
-      mouseY = event.clientY - rect.top;
+      columns = Math.floor(width / CELL);
+      rows = Math.floor(height / CELL);
+      grid = Array.from({ length: columns * rows }, () => ({
+        char: Math.random() > 0.5 ? '1' : '0',
+        opacity: Math.random() * 0.18 + 0.03,
+      }));
     };
 
     const render = () => {
@@ -116,16 +110,11 @@
       ctx.fillRect(0, 0, width, height);
       ctx.font = '700 13px "JetBrains Mono", monospace';
 
-      const cols = Math.floor(width / 26);
-      const rowCount = Math.floor(height / 26);
-
-      for (let c = 0; c < cols; c++) {
-        for (let r = 0; r < rowCount; r++) {
-          const cell = grid[c * rowCount + r];
-          if (!cell) continue;
-
-          const x = c * 26 + 12;
-          const y = r * 26 + 18;
+      for (let c = 0; c < columns; c++) {
+        for (let r = 0; r < rows; r++) {
+          const cell = grid[c * rows + r];
+          const x = c * CELL + 12;
+          const y = r * CELL + 18;
           const dist = Math.hypot(x - mouseX, y - mouseY);
 
           let alpha = cell.opacity;
@@ -139,52 +128,74 @@
           ctx.fillStyle = `rgba(${color}, ${alpha})`;
           ctx.fillText(cell.char, x, y);
 
-          if (Math.random() < 0.003) {
+          if (!reduceMotion && Math.random() < 0.003) {
             cell.char = cell.char === '1' ? '0' : '1';
           }
         }
       }
-
-      animationFrameId = requestAnimationFrame(render);
     };
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
-    render();
+    const loop = () => {
+      if (!visible) return;
+      render();
+      animationFrameId = requestAnimationFrame(loop);
+    };
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
+    const start = () => {
       cancelAnimationFrame(animationFrameId);
+      if (reduceMotion) render();
+      else loop();
     };
-  }
 
-  const cleanups: Array<() => void> = [];
+    buildGrid();
+    start();
 
-  function boot() {
-    cleanups.splice(0).forEach((fn) => fn());
+    window.addEventListener(
+      'resize',
+      () => {
+        buildGrid();
+        start();
+      },
+      { signal },
+    );
 
-    document.querySelectorAll<HTMLElement>('[data-hero]').forEach((root) => {
-      const bgCanvas = root.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
-      if (bgCanvas) cleanups.push(initHeroCanvas(bgCanvas));
+    if (!reduceMotion) {
+      window.addEventListener(
+        'mousemove',
+        (event) => {
+          const rect = canvas.getBoundingClientRect();
+          mouseX = event.clientX - rect.left;
+          mouseY = event.clientY - rect.top;
+        },
+        { passive: true, signal },
+      );
+    }
 
-      const logoCanvas = root.querySelector<HTMLCanvasElement>('[data-logo-canvas]');
-      if (logoCanvas) {
-        void import('../lib/logo3d').then(({ mountLogo3D }) => {
-          if (!logoCanvas.isConnected) return;
-          const logo = mountLogo3D(logoCanvas);
-          cleanups.push(logo.dispose);
-        });
-      }
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && !reduceMotion) start();
+    });
+    observer.observe(root);
 
-      root.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
-        if (button.dataset.bound === 'true') return;
-        button.dataset.bound = 'true';
-        button.addEventListener('click', () => openQuote());
-      });
+    signal.addEventListener('abort', () => {
+      observer.disconnect();
+      cancelAnimationFrame(animationFrameId);
     });
   }
 
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  function initLogo(canvas: HTMLCanvasElement, root: HTMLElement, signal: AbortSignal) {
+    void import('../lib/logo3d').then(({ mountLogo3D }) => {
+      if (signal.aborted || !canvas.isConnected) return;
+      const logo = mountLogo3D(canvas, root);
+      signal.addEventListener('abort', logo.dispose);
+    });
+  }
+
+  mountAll('[data-hero]', (root, signal) => {
+    const bgCanvas = root.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+    if (bgCanvas) initHeroCanvas(bgCanvas, root, signal);
+
+    const logoCanvas = root.querySelector<HTMLCanvasElement>('[data-logo-canvas]');
+    if (logoCanvas) initLogo(logoCanvas, root, signal);
+  });
 </script>
