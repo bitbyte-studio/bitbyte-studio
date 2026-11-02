@@ -22,6 +22,7 @@ import { SERVICES } from '../data';
           <div
             role="button"
             tabindex="0"
+            aria-expanded="false"
             data-service-card={service.id}
             class="service-card bg-white p-8 rounded-xl border border-[#E5E0D8] hover-lift transition-all cursor-pointer relative overflow-hidden group flex flex-col justify-between"
           >
@@ -117,15 +118,16 @@ import { SERVICES } from '../data';
 </section>
 
 <script>
-  import { openQuote } from '../lib/events';
+  import { mountAll } from '../lib/lifecycle';
 
-  function initServices(root: HTMLElement) {
+  function initServices(root: HTMLElement, signal: AbortSignal) {
     const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-service-card]'));
     const details = Array.from(root.querySelectorAll<HTMLElement>('[data-service-detail]'));
 
     const showService = (id: string | null) => {
       cards.forEach((card) => {
         const active = card.dataset.serviceCard === id;
+        card.setAttribute('aria-expanded', String(active));
         card.classList.toggle('border-[#fd625d]', active);
         card.classList.toggle('shadow-xl', active);
         card.classList.toggle('-translate-y-1', active);
@@ -142,35 +144,30 @@ import { SERVICES } from '../data';
 
     cards.forEach((card) => {
       const activate = () => showService(card.dataset.serviceCard || null);
-      card.addEventListener('click', activate);
-      card.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          activate();
-        }
-      });
+      card.addEventListener('click', activate, { signal });
+      card.addEventListener(
+        'keydown',
+        (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
+        },
+        { signal },
+      );
     });
 
     root.querySelectorAll<HTMLElement>('[data-service-close]').forEach((button) => {
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        showService(null);
-      });
-    });
-
-    root.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
-      if (button.dataset.bound === 'true') return;
-      button.dataset.bound = 'true';
-      button.addEventListener('click', () => {
-        openQuote(button.getAttribute('data-open-quote') || undefined);
-      });
+      button.addEventListener(
+        'click',
+        (event) => {
+          event.stopPropagation();
+          showService(null);
+        },
+        { signal },
+      );
     });
   }
 
-  function boot() {
-    document.querySelectorAll<HTMLElement>('[data-services]').forEach(initServices);
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-services]', initServices);
 </script>

@@ -7,7 +7,13 @@ import { PROJECTS } from '../data';
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn hidden"
   hidden
 >
-  <div class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl text-white relative">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-label="Estudio de caso del proyecto"
+    tabindex="-1"
+    class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl text-white relative outline-none"
+  >
     {
       PROJECTS.map((project) => (
         <div data-project-panel={project.id} class="project-panel hidden" hidden>
@@ -65,6 +71,10 @@ import { PROJECTS } from '../data';
                 <img
                   src={project.image}
                   alt={project.title}
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
                   referrerpolicy="no-referrer"
                   class="w-full h-auto max-h-[360px] object-cover"
                 />
@@ -99,7 +109,7 @@ import { PROJECTS } from '../data';
                   <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
                   <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
                   <span class="font-technical text-xs text-[#9CA3AF] ml-2">
-                    {project.liveUrl || 'https://demo.bitandbyte.studio'}
+                    {project.liveUrl || 'Demo del proyecto'}
                   </span>
                 </div>
                 <span class="text-xs font-technical text-[#58ddb0] bg-[#58ddb0]/10 px-2.5 py-0.5 rounded">
@@ -158,20 +168,13 @@ import { PROJECTS } from '../data';
 
 <script>
   import { OPEN_PROJECT_EVENT, openQuote, type OpenProjectDetail } from '../lib/events';
+  import { mountAll } from '../lib/lifecycle';
+  import { createModal, setVisible } from '../lib/modal';
 
-  function setVisible(el: HTMLElement | null, visible: boolean) {
-    if (!el) return;
-    el.classList.toggle('hidden', !visible);
-    el.hidden = !visible;
-  }
-
-  function initProjectModal(modal: HTMLElement) {
+  function initProjectModal(modal: HTMLElement, signal: AbortSignal) {
     const panels = Array.from(modal.querySelectorAll<HTMLElement>('[data-project-panel]'));
-
-    const close = () => {
-      setVisible(modal, false);
-      document.body.style.overflow = '';
-    };
+    const dialog = modal.querySelector<HTMLElement>('[role="dialog"]');
+    const { open: openModal, close } = createModal(modal, signal);
 
     const setTab = (panel: HTMLElement, tab: 'overview' | 'simulation') => {
       panel.querySelectorAll<HTMLElement>('[data-project-tab]').forEach((button) => {
@@ -189,53 +192,52 @@ import { PROJECTS } from '../data';
       });
     };
 
-    const open = (projectId: string) => {
+    const open = (projectId: string, title?: string) => {
       panels.forEach((panel) => {
         const active = panel.dataset.projectPanel === projectId;
         setVisible(panel, active);
         if (active) setTab(panel, 'overview');
       });
-      setVisible(modal, true);
-      document.body.style.overflow = 'hidden';
+      if (title) dialog?.setAttribute('aria-label', `Estudio de caso: ${title}`);
+      openModal();
     };
 
     modal.querySelectorAll<HTMLElement>('[data-project-close]').forEach((button) => {
-      button.addEventListener('click', close);
+      button.addEventListener('click', close, { signal });
     });
 
     modal.querySelectorAll<HTMLElement>('[data-project-tab]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const panel = button.closest<HTMLElement>('[data-project-panel]');
-        const tab = button.dataset.projectTab as 'overview' | 'simulation';
-        if (panel && tab) setTab(panel, tab);
-      });
+      button.addEventListener(
+        'click',
+        () => {
+          const panel = button.closest<HTMLElement>('[data-project-panel]');
+          const tab = button.dataset.projectTab as 'overview' | 'simulation';
+          if (panel && tab) setTab(panel, tab);
+        },
+        { signal },
+      );
     });
 
     modal.querySelectorAll<HTMLElement>('[data-quote-similar]').forEach((button) => {
-      button.addEventListener('click', () => {
-        close();
-        openQuote(button.dataset.quoteSimilar || undefined);
-      });
+      button.addEventListener(
+        'click',
+        () => {
+          close();
+          openQuote(button.dataset.quoteSimilar || undefined);
+        },
+        { signal },
+      );
     });
 
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) close();
-    });
-
-    window.addEventListener(OPEN_PROJECT_EVENT, (event) => {
-      const detail = (event as CustomEvent<OpenProjectDetail>).detail;
-      if (detail?.project?.id) open(detail.project.id);
-    });
-
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !modal.hidden) close();
-    });
+    window.addEventListener(
+      OPEN_PROJECT_EVENT,
+      (event) => {
+        const project = (event as CustomEvent<OpenProjectDetail>).detail?.project;
+        if (project?.id) open(project.id, project.title);
+      },
+      { signal },
+    );
   }
 
-  function boot() {
-    document.querySelectorAll<HTMLElement>('[data-project-modal]').forEach(initProjectModal);
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-project-modal]', initProjectModal);
 </script>

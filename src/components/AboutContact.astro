@@ -1,4 +1,12 @@
-<div id="contacto" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch" data-about-contact>
+---
+import { SERVICES } from '../data';
+import { EMAIL, EMAIL_URL, TELEGRAM_HANDLE, TELEGRAM_URL } from '../config/contact';
+
+const inputClass =
+  'w-full bg-[#F7F5F2] border border-[#E5E0D8] rounded-xl px-4 py-3.5 text-[#1A1A1A] placeholder:text-[#6A6A6E] focus:ring-2 focus:ring-[#fd625d] focus:border-[#fd625d] aria-[invalid=true]:border-red-600 transition-all font-inter text-sm outline-none';
+---
+
+<div id="contacto" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch scroll-mt-24" data-about-contact>
   <div class="bg-[#1A1A1A] p-8 md:p-12 rounded-3xl text-white relative binary-texture overflow-hidden flex flex-col justify-between border border-[#2A2A2A]">
     <div class="relative z-10">
       <p class="font-technical text-sm font-bold text-[#fd625d] mb-6 uppercase tracking-widest">// nosotros</p>
@@ -12,7 +20,7 @@
 
     <div class="relative z-10 pt-6 border-t border-[#2A2A2A] flex items-center gap-4">
       <div class="w-12 h-12 bg-[#fd625d] rounded-full flex items-center justify-center shrink-0 glow-coral">
-        <span class="material-symbols-outlined text-white text-2xl">bolt</span>
+        <span class="material-symbols-outlined text-white text-2xl" aria-hidden="true">bolt</span>
       </div>
       <span class="font-technical text-sm md:text-base text-white font-bold">
         Hecho con precisión técnica.
@@ -27,64 +35,113 @@
         ¿Tienes un proyecto?
       </h2>
 
-      <div data-contact-success class="p-8 rounded-2xl bg-[#58ddb0]/10 border border-[#58ddb0] text-[#003828] text-center my-6 animate-fadeIn hidden" hidden>
+      <div
+        data-contact-success
+        role="status"
+        class="p-8 rounded-2xl bg-[#58ddb0]/10 border border-[#58ddb0] text-[#003828] text-center my-6 animate-fadeIn hidden"
+        hidden
+      >
         <div class="w-12 h-12 rounded-full bg-[#58ddb0] text-white flex items-center justify-center mx-auto mb-4">
-          <span class="material-symbols-outlined text-3xl">check</span>
+          <span class="material-symbols-outlined text-3xl" aria-hidden="true">check</span>
         </div>
-        <h4 class="font-sora text-xl font-bold mb-2">¡Mensaje recibido con éxito!</h4>
-        <p class="font-inter text-sm">
-          Nuestro equipo de ingeniería en Bit &amp; Byte Studio revisará tu propuesta y te responderemos en menos de 24 horas.
+        <h3 class="font-sora text-xl font-bold mb-2">¡Listo! Continúa en WhatsApp</h3>
+        <p class="font-inter text-sm mb-4">
+          Abrimos WhatsApp con tu mensaje ya redactado. Solo tienes que enviarlo.
         </p>
+        <a
+          data-contact-fallback
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-inter text-sm font-semibold underline underline-offset-2"
+        >
+          ¿No se abrió? Haz clic aquí
+        </a>
+        <button
+          type="button"
+          data-contact-reset
+          class="block mx-auto mt-4 font-technical text-xs uppercase tracking-wider text-[#003828]/70 hover:text-[#003828]"
+        >
+          Enviar otro mensaje
+        </button>
       </div>
 
-      <form data-contact-form class="space-y-5">
+      <form data-contact-form class="space-y-5" novalidate>
         <div>
+          <label for="contact-name" class="sr-only">Nombre completo</label>
           <input
+            id="contact-name"
             type="text"
             name="name"
             placeholder="Nombre completo"
-            class="w-full bg-[#F7F5F2] border border-[#E5E0D8] rounded-xl px-4 py-3.5 text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#fd625d] focus:border-[#fd625d] transition-all font-inter text-sm outline-none"
+            autocomplete="name"
+            required
+            class={inputClass}
           />
         </div>
         <div>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            class="w-full bg-[#F7F5F2] border border-[#E5E0D8] rounded-xl px-4 py-3.5 text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#fd625d] focus:border-[#fd625d] transition-all font-inter text-sm outline-none"
-          />
+          <label for="contact-service" class="sr-only">Servicio de interés</label>
+          <select id="contact-service" name="service" class={inputClass}>
+            <option value="">Servicio de interés (opcional)</option>
+            {SERVICES.map((service) => <option value={service.title}>{service.title}</option>)}
+            <option value="Otro">Otro / No estoy seguro</option>
+          </select>
         </div>
         <div>
+          <label for="contact-message" class="sr-only">Mensaje</label>
           <textarea
+            id="contact-message"
             name="message"
             rows="4"
             placeholder="Cuéntanos sobre tu proyecto..."
-            class="w-full bg-[#F7F5F2] border border-[#E5E0D8] rounded-xl px-4 py-3.5 text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#fd625d] focus:border-[#fd625d] transition-all font-inter text-sm outline-none resize-none"
+            required
+            class:list={[inputClass, 'resize-none']}
           ></textarea>
         </div>
 
-        <p data-contact-error class="text-xs font-technical text-red-600 font-bold hidden" hidden>
-          * Por favor completa tu nombre, email y un mensaje sobre tu proyecto.
+        <p data-contact-error role="alert" class="text-xs font-technical text-red-700 font-bold hidden" hidden>
+          * Por favor completa tu nombre y un mensaje sobre tu proyecto.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 pt-2">
           <button
             type="submit"
             data-contact-submit
-            class="bg-[#131315] text-white px-8 py-3.5 rounded-full font-sora text-sm font-semibold flex-grow hover:bg-[#1A1A1A] transition-all disabled:opacity-50"
+            aria-label="Enviar mensaje por WhatsApp (se abre en una pestaña nueva)"
+            class="bg-[#25D366] text-[#003818] px-8 py-3.5 rounded-full font-sora text-sm font-semibold flex-grow flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-md"
           >
-            Enviar mensaje
-          </button>
-          <button
-            type="button"
-            data-contact-whatsapp
-            class="bg-[#25D366] text-white px-8 py-3.5 rounded-full font-sora text-sm font-semibold flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-md"
-          >
-            <span class="material-symbols-outlined text-lg">chat</span>
-            <span>WhatsApp</span>
+            <span class="material-symbols-outlined text-lg" aria-hidden="true">chat</span>
+            <span>Enviar por WhatsApp</span>
           </button>
         </div>
       </form>
+
+      <div class="mt-6 pt-6 border-t border-[#E5E0D8]">
+        <p class="font-technical text-xs text-[#6A6A6E] uppercase tracking-wider mb-3">
+          O escríbenos directamente
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Escribir por Telegram a ${TELEGRAM_HANDLE} (se abre en una pestaña nueva)`}
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#1A1A1A] text-[#1A1A1A] font-sora text-sm font-semibold hover:bg-[#1A1A1A] hover:text-white transition-colors"
+          >
+            <span class="material-symbols-outlined text-lg" aria-hidden="true">send</span>
+            <span>Telegram</span>
+          </a>
+          <a
+            data-contact-email
+            href={EMAIL_URL}
+            aria-label={`Enviar un correo a ${EMAIL}`}
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#1A1A1A] text-[#1A1A1A] font-sora text-sm font-semibold hover:bg-[#1A1A1A] hover:text-white transition-colors"
+          >
+            <span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span>
+            <span>Email</span>
+          </a>
+        </div>
+      </div>
     </div>
 
     <div class="mt-8 pt-6 border-t border-[#E5E0D8] flex items-center justify-between text-xs font-technical text-[#6A6A6E]">
@@ -95,72 +152,100 @@
 </div>
 
 <script>
-  function initAboutContact(root: HTMLElement) {
+  import { emailLink, whatsappLink } from '../config/contact';
+  import { mountAll } from '../lib/lifecycle';
+
+  function buildMessage(name: string, service: string, message: string) {
+    return [
+      '¡Hola Bit & Byte Studio!',
+      `Soy ${name}.`,
+      service ? `Servicio de interés: ${service}` : '',
+      '',
+      `Mi proyecto: ${message}`,
+    ]
+      .filter((line, index, lines) => line !== '' || (index > 0 && lines[index - 1] !== ''))
+      .join('\n');
+  }
+
+  function initAboutContact(root: HTMLElement, signal: AbortSignal) {
     const form = root.querySelector<HTMLFormElement>('[data-contact-form]');
     const success = root.querySelector<HTMLElement>('[data-contact-success]');
     const error = root.querySelector<HTMLElement>('[data-contact-error]');
-    const submit = root.querySelector<HTMLButtonElement>('[data-contact-submit]');
-    const whatsapp = root.querySelector<HTMLButtonElement>('[data-contact-whatsapp]');
+    const fallback = root.querySelector<HTMLAnchorElement>('[data-contact-fallback]');
+    const reset = root.querySelector<HTMLElement>('[data-contact-reset]');
+    const emailLinkEl = root.querySelector<HTMLAnchorElement>('[data-contact-email]');
 
-    if (!form || !success || !error || !submit || !whatsapp) return;
+    if (!form || !success || !error || !fallback || !reset) return;
 
-    const setErrorVisible = (visible: boolean) => {
-      error.classList.toggle('hidden', !visible);
-      error.hidden = !visible;
+    const setHidden = (el: HTMLElement, hidden: boolean) => {
+      el.classList.toggle('hidden', hidden);
+      el.hidden = hidden;
     };
 
-    const setSuccessVisible = (visible: boolean) => {
-      success.classList.toggle('hidden', !visible);
-      success.hidden = !visible;
-      form.classList.toggle('hidden', visible);
-      form.hidden = visible;
+    const field = (name: string) =>
+      form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+    const values = () => ({
+      name: field('name').value.trim(),
+      service: field('service').value.trim(),
+      message: field('message').value.trim(),
+    });
+
+    const showForm = (show: boolean) => {
+      setHidden(form, !show);
+      setHidden(success, show);
     };
 
-    form.addEventListener('input', () => setErrorVisible(false));
+    form.addEventListener(
+      'input',
+      () => {
+        setHidden(error, true);
+        form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+        if (emailLinkEl) {
+          const { name, service, message } = values();
+          emailLinkEl.href = emailLink(
+            service ? `Proyecto: ${service}` : 'Consulta desde la web',
+            name || message ? `${message}\n\n— ${name}` : undefined,
+          );
+        }
+      },
+      { signal },
+    );
 
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const data = new FormData(form);
-      const name = String(data.get('name') || '').trim();
-      const email = String(data.get('email') || '').trim();
-      const message = String(data.get('message') || '').trim();
+    form.addEventListener(
+      'submit',
+      (event) => {
+        event.preventDefault();
+        const { name, service, message } = values();
 
-      if (!name || !email || !message) {
-        setErrorVisible(true);
-        return;
-      }
+        const missing = (['name', 'message'] as const).filter((key) => !values()[key]);
+        if (missing.length) {
+          missing.forEach((key) => field(key).setAttribute('aria-invalid', 'true'));
+          setHidden(error, false);
+          field(missing[0]).focus();
+          return;
+        }
 
-      submit.disabled = true;
-      submit.textContent = 'Enviando mensaje...';
+        const url = whatsappLink(buildMessage(name, service, message));
+        fallback.href = url;
+        window.open(url, '_blank', 'noopener,noreferrer');
 
-      window.setTimeout(() => {
         form.reset();
-        setErrorVisible(false);
-        setSuccessVisible(true);
-        submit.disabled = false;
-        submit.textContent = 'Enviar mensaje';
+        showForm(false);
+        fallback.focus();
+      },
+      { signal },
+    );
 
-        window.setTimeout(() => {
-          setSuccessVisible(false);
-        }, 6000);
-      }, 900);
-    });
-
-    whatsapp.addEventListener('click', () => {
-      const data = new FormData(form);
-      const name = String(data.get('name') || '').trim();
-      const message = String(data.get('message') || '').trim();
-      const text = message
-        ? `Hola Bit & Byte Studio, mi nombre es ${name || 'un cliente'}. Mi proyecto: ${message}`
-        : '¡Hola Bit & Byte Studio! Quisiera información para desarrollar un proyecto.';
-      window.open(`https://wa.me/5350000000?text=${encodeURIComponent(text)}`, '_blank');
-    });
+    reset.addEventListener(
+      'click',
+      () => {
+        showForm(true);
+        field('name').focus();
+      },
+      { signal },
+    );
   }
 
-  function boot() {
-    document.querySelectorAll<HTMLElement>('[data-about-contact]').forEach(initAboutContact);
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-about-contact]', initAboutContact);
 </script>

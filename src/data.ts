@@ -89,8 +89,7 @@ export const PROJECTS: Project[] = [
       { label: 'Lighthouse SEO', value: '100/100' }
     ],
     client: 'Lola Gastronomía S.A.',
-    year: '2025',
-    liveUrl: 'https://demo-sazondelola.bitandbyte.studio'
+    year: '2025'
   },
   {
     id: 'barba-negra',
@@ -109,8 +108,7 @@ export const PROJECTS: Project[] = [
       { label: 'Fidelización Suscritos', value: '89%' }
     ],
     client: 'Barba Negra Grooming Co.',
-    year: '2025',
-    liveUrl: 'https://demo-barbanegra.bitandbyte.studio'
+    year: '2025'
   },
   {
     id: 'tropical-vibes',
@@ -129,8 +127,7 @@ export const PROJECTS: Project[] = [
       { label: 'Cotizaciones Directas', value: '+210%' }
     ],
     client: 'Tropical Vibes Resort & Spa',
-    year: '2026',
-    liveUrl: 'https://demo-tropicalvibes.bitandbyte.studio'
+    year: '2026'
   }
 ];
 

@@ -1,3 +1,14 @@
+---
+import {
+  EMAIL,
+  EMAIL_URL,
+  TELEGRAM_HANDLE,
+  TELEGRAM_URL,
+  WHATSAPP_DISPLAY,
+  WHATSAPP_URL,
+} from '../config/contact';
+---
+
 <footer class="bg-[#1f1f21] dark:bg-[#0e0e10] border-t border-[#59413f] dark:border-[#353437] py-16 md:py-[120px] text-[#e5e1e4]">
   <div class="grid grid-cols-1 md:grid-cols-4 gap-8 w-full px-4 md:px-6 max-w-[1280px] mx-auto">
     <div class="col-span-1 md:col-span-1">
@@ -35,8 +46,39 @@
 
     <div>
       <h4 class="font-technical text-xs font-bold text-[#fd625d] mb-6 uppercase tracking-wider">Contacto</h4>
-      <p class="text-[#9CA3AF] font-inter text-sm mb-3">info@bitandbyte.studio</p>
-      <p class="text-[#9CA3AF] font-inter text-sm mb-8">+53 5 000 0000</p>
+      <ul class="space-y-3 mb-8">
+        <li>
+          <a
+            href={EMAIL_URL}
+            aria-label={`Enviar un correo a ${EMAIL}`}
+            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm break-all"
+          >
+            {EMAIL}
+          </a>
+        </li>
+        <li>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Escribir por WhatsApp al ${WHATSAPP_DISPLAY} (se abre en una pestaña nueva)`}
+            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm"
+          >
+            WhatsApp · {WHATSAPP_DISPLAY}
+          </a>
+        </li>
+        <li>
+          <a
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Escribir por Telegram a ${TELEGRAM_HANDLE} (se abre en una pestaña nueva)`}
+            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm"
+          >
+            Telegram · {TELEGRAM_HANDLE}
+          </a>
+        </li>
+      </ul>
       <div class="p-4 bg-[#131315] rounded-xl border border-[#2A2A2A]">
         <p class="font-technical text-[10px] text-[#fd625d] mb-2 uppercase font-bold tracking-wider">SISTEMA STATUS</p>
         <div class="flex items-center gap-2">

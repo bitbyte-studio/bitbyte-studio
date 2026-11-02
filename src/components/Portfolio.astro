@@ -23,6 +23,7 @@ const filters = [
             <button
               type="button"
               data-filter={item.value}
+              aria-pressed={item.value === 'all' ? 'true' : 'false'}
               class:list={[
                 'portfolio-filter px-4 py-1.5 rounded-full font-sora text-xs font-semibold transition-all',
                 item.value === 'all'
@@ -97,6 +98,7 @@ const filters = [
               <div
                 role="button"
                 tabindex="0"
+                aria-label={`Ver proyecto ${project.title}`}
                 data-open-project={project.id}
                 class:list={[
                   'rounded-2xl overflow-hidden border border-[#2A2A2A] group cursor-pointer bg-[#1A1A1A] relative',
@@ -106,6 +108,10 @@ const filters = [
                 <img
                   src={project.image}
                   alt={project.title}
+                  width="800"
+                  height="400"
+                  loading="lazy"
+                  decoding="async"
                   referrerpolicy="no-referrer"
                   class="w-full h-[320px] sm:h-[380px] lg:h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
@@ -127,14 +133,16 @@ const filters = [
 <script>
   import { PROJECTS } from '../data';
   import { openProject } from '../lib/events';
+  import { mountAll } from '../lib/lifecycle';
 
-  function initPortfolio(root: HTMLElement) {
+  function initPortfolio(root: HTMLElement, signal: AbortSignal) {
     const filters = Array.from(root.querySelectorAll<HTMLElement>('[data-filter]'));
     const items = Array.from(root.querySelectorAll<HTMLElement>('[data-project-item]'));
 
     const setFilter = (value: string) => {
       filters.forEach((button) => {
         const active = button.dataset.filter === value;
+        button.setAttribute('aria-pressed', String(active));
         button.classList.toggle('is-active', active);
         button.classList.toggle('bg-[#fd625d]', active);
         button.classList.toggle('text-white', active);
@@ -169,33 +177,29 @@ const filters = [
     };
 
     filters.forEach((button) => {
-      button.addEventListener('click', () => setFilter(button.dataset.filter || 'all'));
+      button.addEventListener('click', () => setFilter(button.dataset.filter || 'all'), { signal });
     });
 
     root.querySelectorAll<HTMLElement>('[data-open-project]').forEach((el) => {
-      if (el.dataset.bound === 'true') return;
-      el.dataset.bound = 'true';
-
       const open = () => {
         const id = el.dataset.openProject;
         const project = PROJECTS.find((item) => item.id === id);
         if (project) openProject(project);
       };
 
-      el.addEventListener('click', open);
-      el.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          open();
-        }
-      });
+      el.addEventListener('click', open, { signal });
+      el.addEventListener(
+        'keydown',
+        (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            open();
+          }
+        },
+        { signal },
+      );
     });
   }
 
-  function boot() {
-    document.querySelectorAll<HTMLElement>('[data-portfolio]').forEach(initPortfolio);
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-portfolio]', initPortfolio);
 </script>

@@ -43,13 +43,3 @@ export interface TechItem {
   category: string;
   description: string;
 }
-
-export interface QuoteConfig {
-  projectType: 'landing' | 'webapp' | 'ecommerce' | 'custom_hardware';
-  pagesCount: number;
-  cms: boolean;
-  seoAdvanced: boolean;
-  customAnimations: boolean;
-  hardwareIntegration: boolean;
-  priorityDelivery: boolean;
-}

@@ -1,34 +1,51 @@
 ---
 const projectTypes = [
-  { id: 'landing', label: 'Landing Page', base: '$499' },
-  { id: 'webapp', label: 'Web App / SaaS', base: '$999' },
-  { id: 'ecommerce', label: 'E-commerce', base: '$1,499' },
-  { id: 'hardware', label: 'Hardware / IoT', base: '$1,800' },
+  { id: 'landing', label: 'Landing Page', base: 499, weeks: 3 },
+  { id: 'webapp', label: 'Web App / SaaS', base: 999, weeks: 5 },
+  { id: 'ecommerce', label: 'E-commerce', base: 1499, weeks: 6 },
+  { id: 'hardware', label: 'Hardware / IoT', base: 1800, weeks: 8 },
 ] as const;
 
 const addons = [
-  { id: 'cms', label: 'CMS Auto-gestionable (Sanity / Headless)', price: '+$200', checked: true },
-  { id: 'seo', label: 'SEO Técnico Avanzado & Schema OpenGraph', price: '+$150', checked: false },
-  { id: 'animations', label: 'Animaciones 3D (Three.js / GSAP en capas)', price: '+$300', checked: false },
-  { id: 'automation', label: 'Integración APIs y Flujos Automatizados', price: '+$250', checked: false },
-  { id: 'priority', label: 'Entrega Prioritaria (Sprint Ágil en 14 días)', price: '+$400', checked: false },
+  { id: 'cms', label: 'CMS Auto-gestionable (Sanity / Headless)', price: 200, checked: true },
+  { id: 'seo', label: 'SEO Técnico Avanzado & Schema OpenGraph', price: 150, checked: false },
+  { id: 'animations', label: 'Animaciones 3D (Three.js / GSAP en capas)', price: 300, checked: false },
+  { id: 'automation', label: 'Integración APIs y Flujos Automatizados', price: 250, checked: false },
+  { id: 'priority', label: 'Entrega Prioritaria (Sprint Ágil en 14 días)', price: 400, checked: false },
 ] as const;
 
-// Defaults must match the calculator: landing + 3 pages + CMS
+const PAGE_PRICE = 80;
+const PRIORITY_WEEKS = 2;
 const initialPages = 3;
-const initialTotal = 499 + (initialPages - 1) * 80 + 200; // 859
-const initialWeeks = 3;
+
+const money = (value: number) => value.toLocaleString('en-US');
+
+// Defaults must match the calculator: first project type + initial pages + pre-checked add-ons
+const initialType = projectTypes[0];
+const initialTotal =
+  initialType.base +
+  (initialPages - 1) * PAGE_PRICE +
+  addons.filter((addon) => addon.checked).reduce((sum, addon) => sum + addon.price, 0);
+const initialWeeks = initialType.weeks;
 ---
 
 <div
   data-quote-modal
+  data-page-price={PAGE_PRICE}
+  data-priority-weeks={PRIORITY_WEEKS}
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn hidden"
   hidden
 >
-  <div class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl text-white">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="quote-title"
+    tabindex="-1"
+    class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl text-white outline-none"
+  >
     <div class="sticky top-0 bg-[#1A1A1A]/95 backdrop-blur-md border-b border-[#2A2A2A] px-6 py-4 flex items-center justify-between z-10">
       <div class="flex items-center gap-3">
-        <span class="w-3 h-3 rounded-full bg-[#58ddb0]"></span>
+        <span class="w-3 h-3 rounded-full bg-[#58ddb0]" aria-hidden="true"></span>
         <span class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider">
           // COTIZADOR INTERACTIVO DE INGENIERÍA · BIT &amp; BYTE
         </span>
@@ -39,13 +56,13 @@ const initialWeeks = 3;
         class="w-8 h-8 rounded-full bg-[#2A2A2A] hover:bg-[#353437] flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors"
         aria-label="Cerrar cotizador"
       >
-        <span class="material-symbols-outlined text-xl">close</span>
+        <span class="material-symbols-outlined text-xl" aria-hidden="true">close</span>
       </button>
     </div>
 
     <div class="p-6 md:p-8 space-y-8">
       <div>
-        <h2 class="font-sora text-2xl md:text-3xl font-bold text-white mb-2">
+        <h2 id="quote-title" class="font-sora text-2xl md:text-3xl font-bold text-white mb-2">
           Calcula tu Presupuesto al Instante
         </h2>
         <p class="font-inter text-sm text-[#9CA3AF]">
@@ -54,24 +71,28 @@ const initialWeeks = 3;
       </div>
 
       <div>
-        <label class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3">
+        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-type-label">
           1. Tipo de Solución Principal
-        </label>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        </span>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" role="group" aria-labelledby="quote-type-label">
           {
             projectTypes.map((item) => (
               <button
                 type="button"
                 data-project-type={item.id}
+                data-label={item.label}
+                data-base={item.base}
+                data-weeks={item.weeks}
+                aria-pressed={item.id === initialType.id ? 'true' : 'false'}
                 class:list={[
                   'quote-type p-4 rounded-xl border text-left transition-all',
-                  item.id === 'landing'
+                  item.id === initialType.id
                     ? 'is-active bg-[#fd625d]/10 border-[#fd625d] text-white shadow-md'
                     : 'bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] hover:border-[#353437]',
                 ]}
               >
                 <div class="font-sora font-semibold text-sm mb-1">{item.label}</div>
-                <div class="font-technical text-xs text-[#fd625d]">{item.base} base</div>
+                <div class="font-technical text-xs text-[#fd625d]">${money(item.base)} base</div>
               </button>
             ))
           }
@@ -104,31 +125,33 @@ const initialWeeks = 3;
       </div>
 
       <div>
-        <label class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3">
+        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-addons-label">
           2. Características de Ingeniería &amp; Optimización
-        </label>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        </span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-labelledby="quote-addons-label">
           {
             addons.map((addon) => (
               <label
                 data-addon-label={addon.id}
                 class:list={[
-                  'quote-addon flex items-start justify-between p-3.5 rounded-xl border cursor-pointer transition-all',
+                  'quote-addon flex items-start justify-between p-3.5 rounded-xl border bg-[#131315] cursor-pointer transition-all',
                   addon.checked
-                    ? 'is-active bg-[#131315] border-[#fd625d] text-white'
-                    : 'bg-[#131315] border-[#2A2A2A] text-[#9CA3AF]',
+                    ? 'is-active border-[#fd625d] text-white'
+                    : 'border-[#2A2A2A] text-[#9CA3AF]',
                 ]}
               >
                 <div class="flex items-start gap-3">
                   <input
                     type="checkbox"
                     data-addon={addon.id}
+                    data-label={addon.label}
+                    data-price={addon.price}
                     checked={addon.checked}
                     class="mt-0.5 w-4 h-4 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
                   />
                   <span class="text-sm font-inter">{addon.label}</span>
                 </div>
-                <span class="font-technical text-xs font-bold text-[#edc157] ml-2">{addon.price}</span>
+                <span class="font-technical text-xs font-bold text-[#edc157] ml-2">+${money(addon.price)}</span>
               </label>
             ))
           }
@@ -141,7 +164,7 @@ const initialWeeks = 3;
             INVERSIÓN ESTIMADA DE INGENIERÍA
           </div>
           <div class="font-sora text-3xl md:text-4xl font-bold text-white flex items-baseline gap-2">
-            $<span data-quote-total>{initialTotal.toLocaleString('en-US')}</span>
+            $<span data-quote-total>{money(initialTotal)}</span>
             <span class="text-sm font-normal text-[#9CA3AF] font-inter">USD</span>
           </div>
           <div class="text-xs font-technical text-[#58ddb0] mt-1">
@@ -160,9 +183,10 @@ const initialWeeks = 3;
           <button
             type="button"
             data-quote-whatsapp
+            aria-label="Enviar la cotización por WhatsApp (se abre en una pestaña nueva)"
             class="px-6 py-3 rounded-full bg-[#fd625d] text-white font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral flex items-center justify-center gap-2"
           >
-            <span class="material-symbols-outlined text-lg">send</span>
+            <span class="material-symbols-outlined text-lg" aria-hidden="true">send</span>
             <span>Enviar cotización por WhatsApp</span>
           </button>
         </div>
@@ -172,169 +196,158 @@ const initialWeeks = 3;
 </div>
 
 <script>
-  import { OPEN_QUOTE_EVENT, type OpenQuoteDetail } from '../lib/events';
+  import { OPEN_QUOTE_EVENT, openQuote, type OpenQuoteDetail } from '../lib/events';
+  import { whatsappLink } from '../config/contact';
+  import { mountAll } from '../lib/lifecycle';
+  import { createModal } from '../lib/modal';
 
-  type ProjectType = 'landing' | 'webapp' | 'ecommerce' | 'hardware';
+  const TYPE_ACTIVE = ['is-active', 'bg-[#fd625d]/10', 'border-[#fd625d]', 'text-white', 'shadow-md'];
+  const TYPE_INACTIVE = ['bg-[#131315]', 'border-[#2A2A2A]', 'text-[#9CA3AF]'];
+  const ADDON_ACTIVE = ['is-active', 'border-[#fd625d]', 'text-white'];
+  const ADDON_INACTIVE = ['border-[#2A2A2A]', 'text-[#9CA3AF]'];
 
-  function setVisible(el: HTMLElement | null, visible: boolean) {
-    if (!el) return;
-    el.classList.toggle('hidden', !visible);
-    el.hidden = !visible;
+  const money = (value: number) => value.toLocaleString('en-US');
+
+  // Maps the label of whatever opened the quote (service card, pricing plan...) to a project type.
+  function serviceToType(service?: string): string {
+    switch (service) {
+      case 'E-commerce':
+        return 'ecommerce';
+      case 'Hardware':
+        return 'hardware';
+      case 'Automation':
+      case 'Profesional':
+        return 'webapp';
+      default:
+        return 'landing';
+    }
   }
 
-  function serviceToType(service?: string): ProjectType {
-    if (service === 'E-commerce') return 'ecommerce';
-    if (service === 'Hardware') return 'hardware';
-    if (service === 'Automation') return 'webapp';
-    return 'landing';
-  }
+  function initQuoteModal(root: HTMLElement, signal: AbortSignal) {
+    const pagesRange = root.querySelector<HTMLInputElement>('[data-pages-range]');
+    const pagesLabel = root.querySelector<HTMLElement>('[data-pages-label]');
+    const totalEl = root.querySelector<HTMLElement>('[data-quote-total]');
+    const weeksEl = root.querySelector<HTMLElement>('[data-quote-weeks]');
+    const typeButtons = Array.from(root.querySelectorAll<HTMLElement>('[data-project-type]'));
+    const addonInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-addon]'));
 
-  function initQuoteModal(modal: HTMLElement) {
-    const pagesRange = modal.querySelector<HTMLInputElement>('[data-pages-range]');
-    const pagesLabel = modal.querySelector<HTMLElement>('[data-pages-label]');
-    const totalEl = modal.querySelector<HTMLElement>('[data-quote-total]');
-    const weeksEl = modal.querySelector<HTMLElement>('[data-quote-weeks]');
-    const typeButtons = Array.from(modal.querySelectorAll<HTMLElement>('[data-project-type]'));
-    const addonInputs = Array.from(modal.querySelectorAll<HTMLInputElement>('[data-addon]'));
+    if (!pagesRange || !typeButtons.length) return;
 
-    let projectType: ProjectType = 'landing';
+    const pagePrice = Number(root.dataset.pagePrice);
+    const priorityWeeks = Number(root.dataset.priorityWeeks);
+    const modal = createModal(root, signal);
 
-    const close = () => {
-      setVisible(modal, false);
-      document.body.style.overflow = '';
+    let activeType = typeButtons[0];
+
+    const compute = () => {
+      const pages = Number(pagesRange.value);
+      const checked = addonInputs.filter((input) => input.checked);
+      const total =
+        Number(activeType.dataset.base) +
+        (pages - 1) * pagePrice +
+        checked.reduce((sum, input) => sum + Number(input.dataset.price), 0);
+      const weeks = checked.some((input) => input.dataset.addon === 'priority')
+        ? priorityWeeks
+        : Number(activeType.dataset.weeks);
+
+      return {
+        pages,
+        total,
+        weeks,
+        typeLabel: activeType.dataset.label ?? '',
+        extras: checked.map((input) => input.dataset.label ?? ''),
+      };
     };
 
-    const setProjectType = (type: ProjectType) => {
-      projectType = type;
+    const render = () => {
+      const { pages, total, weeks } = compute();
+      if (pagesLabel) pagesLabel.textContent = `${pages} ${pages === 1 ? 'página' : 'páginas'}`;
+      if (totalEl) totalEl.textContent = money(total);
+      if (weeksEl) weeksEl.textContent = String(weeks);
+    };
+
+    const setProjectType = (type: string) => {
+      activeType = typeButtons.find((button) => button.dataset.projectType === type) ?? typeButtons[0];
       typeButtons.forEach((button) => {
-        const active = button.dataset.projectType === type;
-        button.classList.toggle('is-active', active);
-        button.classList.toggle('bg-[#fd625d]/10', active);
-        button.classList.toggle('border-[#fd625d]', active);
-        button.classList.toggle('text-white', active);
-        button.classList.toggle('shadow-md', active);
-        button.classList.toggle('bg-[#131315]', !active);
-        button.classList.toggle('border-[#2A2A2A]', !active);
-        button.classList.toggle('text-[#9CA3AF]', !active);
+        const active = button === activeType;
+        button.classList.remove(...(active ? TYPE_INACTIVE : TYPE_ACTIVE));
+        button.classList.add(...(active ? TYPE_ACTIVE : TYPE_INACTIVE));
+        button.setAttribute('aria-pressed', String(active));
       });
-      updateEstimate();
+      render();
     };
-
-    const getAddon = (id: string) =>
-      addonInputs.find((input) => input.dataset.addon === id)?.checked ?? false;
 
     const syncAddonStyles = () => {
       addonInputs.forEach((input) => {
         const label = input.closest<HTMLElement>('[data-addon-label]');
         if (!label) return;
-        label.classList.toggle('is-active', input.checked);
-        label.classList.toggle('border-[#fd625d]', input.checked);
-        label.classList.toggle('text-white', input.checked);
-        label.classList.toggle('text-[#9CA3AF]', !input.checked);
+        label.classList.remove(...(input.checked ? ADDON_INACTIVE : ADDON_ACTIVE));
+        label.classList.add(...(input.checked ? ADDON_ACTIVE : ADDON_INACTIVE));
       });
-    };
-
-    const updateEstimate = () => {
-      const pagesCount = Number(pagesRange?.value || 3);
-      const basePrice =
-        projectType === 'landing'
-          ? 499
-          : projectType === 'webapp'
-            ? 999
-            : projectType === 'ecommerce'
-              ? 1499
-              : 1800;
-
-      const total =
-        basePrice +
-        (pagesCount - 1) * 80 +
-        (getAddon('cms') ? 200 : 0) +
-        (getAddon('seo') ? 150 : 0) +
-        (getAddon('animations') ? 300 : 0) +
-        (getAddon('automation') ? 250 : 0) +
-        (getAddon('priority') ? 400 : 0);
-
-      const weeks = getAddon('priority')
-        ? 2
-        : projectType === 'landing'
-          ? 3
-          : projectType === 'webapp'
-            ? 5
-            : projectType === 'ecommerce'
-              ? 6
-              : 8;
-
-      if (pagesLabel) {
-        pagesLabel.textContent = `${pagesCount} ${pagesCount === 1 ? 'página' : 'páginas'}`;
-      }
-      if (totalEl) totalEl.textContent = total.toLocaleString();
-      if (weeksEl) weeksEl.textContent = String(weeks);
     };
 
     const open = (service?: string) => {
       setProjectType(serviceToType(service));
-      setVisible(modal, true);
-      document.body.style.overflow = 'hidden';
-      updateEstimate();
+      modal.open();
     };
 
     typeButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        setProjectType((button.dataset.projectType || 'landing') as ProjectType);
-      });
+      button.addEventListener('click', () => setProjectType(button.dataset.projectType ?? ''), { signal });
     });
 
-    pagesRange?.addEventListener('input', updateEstimate);
+    pagesRange.addEventListener('input', render, { signal });
 
     addonInputs.forEach((input) => {
-      input.addEventListener('change', () => {
-        syncAddonStyles();
-        updateEstimate();
-      });
+      input.addEventListener(
+        'change',
+        () => {
+          syncAddonStyles();
+          render();
+        },
+        { signal },
+      );
     });
 
-    modal.querySelectorAll<HTMLElement>('[data-quote-close]').forEach((button) => {
-      button.addEventListener('click', close);
+    root.querySelectorAll<HTMLElement>('[data-quote-close]').forEach((button) => {
+      button.addEventListener('click', modal.close, { signal });
     });
 
-    modal.querySelector<HTMLElement>('[data-quote-whatsapp]')?.addEventListener('click', () => {
-      const pagesCount = Number(pagesRange?.value || 3);
-      const total = Number((totalEl?.textContent || '0').replace(/,/g, ''));
-      const weeks = Number(weeksEl?.textContent || '0');
-      const text = `¡Hola Bit & Byte Studio! Quisiera cotizar un proyecto:
-- Tipo: ${projectType.toUpperCase()}
-- Páginas: ${pagesCount}
-- CMS incluido: ${getAddon('cms') ? 'Sí' : 'No'}
-- SEO Técnico: ${getAddon('seo') ? 'Sí' : 'No'}
-- Animaciones 3D/GSAP: ${getAddon('animations') ? 'Sí' : 'No'}
-- Automatización APIs: ${getAddon('automation') ? 'Sí' : 'No'}
-- Entrega Prioritaria: ${getAddon('priority') ? 'Sí' : 'No'}
->>> Estimación en cotizador: ~$${total} USD (Aprox ${weeks} semanas)`;
+    root.querySelector<HTMLElement>('[data-quote-whatsapp]')?.addEventListener(
+      'click',
+      () => {
+        const { pages, total, weeks, typeLabel, extras } = compute();
+        const text = [
+          '¡Hola Bit & Byte Studio! Quisiera cotizar un proyecto:',
+          `- Tipo: ${typeLabel}`,
+          `- Páginas: ${pages}`,
+          `- Extras: ${extras.length ? extras.join('; ') : 'Ninguno'}`,
+          `>>> Estimación en cotizador: ~$${money(total)} USD (aprox. ${weeks} semanas)`,
+        ].join('\n');
 
-      window.open(`https://wa.me/5350000000?text=${encodeURIComponent(text)}`, '_blank');
-    });
+        window.open(whatsappLink(text), '_blank', 'noopener,noreferrer');
+      },
+      { signal },
+    );
 
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) close();
-    });
+    // Single delegated trigger for every [data-open-quote] element on the page.
+    document.addEventListener(
+      'click',
+      (event) => {
+        const trigger = (event.target as Element | null)?.closest<HTMLElement>('[data-open-quote]');
+        if (trigger) openQuote(trigger.getAttribute('data-open-quote') || undefined);
+      },
+      { signal },
+    );
 
-    window.addEventListener(OPEN_QUOTE_EVENT, (event) => {
-      const detail = (event as CustomEvent<OpenQuoteDetail>).detail;
-      open(detail?.service);
-    });
-
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !modal.hidden) close();
-    });
+    window.addEventListener(
+      OPEN_QUOTE_EVENT,
+      (event) => open((event as CustomEvent<OpenQuoteDetail>).detail?.service),
+      { signal },
+    );
 
     syncAddonStyles();
-    updateEstimate();
+    render();
   }
 
-  function boot() {
-    document.querySelectorAll<HTMLElement>('[data-quote-modal]').forEach(initQuoteModal);
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-quote-modal]', initQuoteModal);
 </script>

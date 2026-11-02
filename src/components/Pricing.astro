@@ -94,20 +94,3 @@ import { PRICING_PLANS } from '../data';
   </div>
 </section>
 
-<script>
-  import { openQuote } from '../lib/events';
-
-  function bindQuoteButtons() {
-    document.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
-      if (button.dataset.bound === 'true') return;
-      button.dataset.bound = 'true';
-      button.addEventListener('click', () => {
-        const service = button.getAttribute('data-open-quote') || undefined;
-        openQuote(service || undefined);
-      });
-    });
-  }
-
-  bindQuoteButtons();
-  document.addEventListener('astro:page-load', bindQuoteButtons);
-</script>

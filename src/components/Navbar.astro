@@ -117,30 +117,26 @@ const navLinks = [
 </header>
 
 <script>
-  import { openQuote } from '../lib/events';
+  import { whatsappLink } from '../config/contact';
+  import { mountAll } from '../lib/lifecycle';
 
   const SECTIONS = ['inicio', 'servicios', 'portafolio', 'proceso', 'precios', 'contacto'];
-  const WA_MESSAGE = encodeURIComponent(
-    '¡Hola Bit & Byte Studio! Estoy interesado en construir una solución digital con ustedes.',
-  );
+  const WA_MESSAGE =
+    '¡Hola Bit & Byte Studio! Estoy interesado en construir una solución digital con ustedes.';
 
-  const cleanups: Array<() => void> = [];
-
-  function initNavbar(root: HTMLElement) {
+  function initNavbar(root: HTMLElement, signal: AbortSignal) {
     const menu = root.querySelector<HTMLElement>('[data-mobile-menu]');
     const toggle = root.querySelector<HTMLButtonElement>('[data-menu-toggle]');
     const icon = root.querySelector<HTMLElement>('[data-menu-icon]');
     const links = Array.from(root.querySelectorAll<HTMLElement>('[data-nav-link]'));
 
-    if (!menu || !toggle || !icon) return () => {};
-
-    const controller = new AbortController();
-    const { signal } = controller;
+    if (!menu || !toggle || !icon) return;
 
     const setMenuOpen = (open: boolean) => {
       menu.classList.toggle('hidden', !open);
       menu.hidden = !open;
       toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
       icon.textContent = open ? 'close' : 'menu';
     };
 
@@ -184,29 +180,15 @@ const navLinks = [
       el.addEventListener('click', () => setMenuOpen(false), { signal });
     });
 
-    root.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => {
-      button.addEventListener('click', () => openQuote(), { signal });
-    });
-
     root.querySelectorAll<HTMLElement>('[data-whatsapp]').forEach((button) => {
       button.addEventListener('click', () => {
-        window.open(`https://wa.me/5350000000?text=${WA_MESSAGE}`, '_blank');
+        window.open(whatsappLink(WA_MESSAGE), '_blank', 'noopener,noreferrer');
       }, { signal });
     });
 
     window.addEventListener('scroll', onScroll, { passive: true, signal });
     onScroll();
-
-    return () => controller.abort();
   }
 
-  function boot() {
-    cleanups.splice(0).forEach((fn) => fn());
-    document.querySelectorAll<HTMLElement>('[data-navbar]').forEach((root) => {
-      cleanups.push(initNavbar(root));
-    });
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-navbar]', initNavbar);
 </script>
