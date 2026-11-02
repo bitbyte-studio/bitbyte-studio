@@ -5,6 +5,9 @@ export const WHATSAPP_URL: string = 'https://wa.me/5350328131';
 export const TELEGRAM_HANDLE: string = '@ItsJhonAlex';
 export const TELEGRAM_URL: string = 'https://t.me/ItsJhonAlex';
 
+export const FACEBOOK_URL: string = 'https://www.facebook.com/profile.php?id=61596391400852';
+export const GITHUB_URL: string = 'https://github.com/bitbyte-studio';
+
 export const EMAIL: string = 'itsjhonalex@gmail.com';
 export const EMAIL_URL: string = `mailto:${EMAIL}`;
 

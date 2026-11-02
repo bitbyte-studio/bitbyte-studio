@@ -1,18 +1,58 @@
 ---
 import '../styles/global.css';
+import {
+  EMAIL,
+  FACEBOOK_URL,
+  GITHUB_URL,
+  TELEGRAM_URL,
+  WHATSAPP_NUMBER,
+} from '../config/contact';
 
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 }
+
+const SITE_NAME = 'Bit & Byte Studio';
 
 const {
   title = 'Bit & Byte Studio | Building Digital Solutions',
   description = 'Estudio de desarrollo digital: Web Dev, Automatizaciones, E-commerce y Hardware con cotizador interactivo.',
+  image = '/og.png',
+  imageAlt = 'Bit & Byte Studio: webs y software a medida para negocios en Cuba',
+  imageWidth = 1200,
+  imageHeight = 630,
 } = Astro.props;
 
-const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
-const ogImage = Astro.site ? new URL('/logo-bit-byte.png', Astro.site).href : undefined;
+const site = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image, site).href;
+const logo = new URL('/logo-bit-byte.png', site).href;
+
+// summary_large_image needs a wide image; fall back to the compact card for anything else.
+const twitterCard = imageWidth === 1200 && imageHeight === 630 ? 'summary_large_image' : 'summary';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${site.origin}/#organization`,
+  name: SITE_NAME,
+  url: site.href,
+  logo,
+  image: ogImage,
+  description,
+  areaServed: 'Cuba',
+  email: EMAIL,
+  telephone: `+${WHATSAPP_NUMBER}`,
+  sameAs: [FACEBOOK_URL, TELEGRAM_URL, GITHUB_URL],
+};
+
+// "<" is escaped so the JSON can never close the script tag.
+const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -24,21 +64,28 @@ const ogImage = Astro.site ? new URL('/logo-bit-byte.png', Astro.site).href : un
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#131315" />
     <title>{title}</title>
-    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Bit & Byte Studio" />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    {canonical && <meta property="og:url" content={canonical} />}
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <script type="application/ld+json" set:html={jsonLdString} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
