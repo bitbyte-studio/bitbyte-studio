@@ -1,3 +1,7 @@
+---
+import { SITE_DESCRIPTION } from '../config/site';
+---
+
 <section
   id="inicio"
   class="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#131315] pt-24 pb-16"
@@ -22,7 +26,7 @@
     </p>
 
     <p class="font-technical text-xs md:text-sm text-[#fd625d] mb-6 uppercase tracking-wider font-semibold">
-      // BUILDING DIGITAL SOLUTIONS
+      // WEBS Y SOFTWARE A MEDIDA
     </p>
 
     <h1 class="font-sora text-4xl sm:text-5xl md:text-[64px] text-white mb-6 leading-tight font-bold tracking-tight">
@@ -30,7 +34,7 @@
     </h1>
 
     <p class="font-inter text-base md:text-lg text-[#9CA3AF] mb-10 max-w-2xl">
-      Desarrollo web · Tiendas online · Automatizaciones · Gestión
+      {SITE_DESCRIPTION}
     </p>
 
     <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center">
@@ -49,12 +53,6 @@
       >
         Cotizar proyecto
       </button>
-    </div>
-
-    <div class="mt-12 inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-xs font-technical text-[#e5e1e4]">
-      <span class="w-2 h-2 rounded-full bg-[#58ddb0] animate-pulse"></span>
-      <span>SISTEMA DE DISEÑO RESPONSIVO</span>
-      <span class="text-[#9CA3AF]">| v2.0.4 - STABLE</span>
     </div>
   </div>
 

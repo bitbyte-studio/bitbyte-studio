@@ -9,15 +9,15 @@ const initial = TECH_STACK[0];
     <div>
       <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// stack</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A]">
-        Tecnologías que dominamos
+        Tecnologías con las que trabajamos
       </h2>
     </div>
     <p class="font-inter text-sm text-[#4A4A4A] max-w-sm">
-      Selecciona cualquier tecnología para ver cómo la aplicamos en los proyectos que construimos.
+      Selecciona cualquier tecnología para ver para qué la usamos.
     </p>
   </div>
 
-  <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-3 md:gap-4 mb-8">
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4 mb-8">
     {
       TECH_STACK.map((tech) => (
         <button
@@ -41,7 +41,7 @@ const initial = TECH_STACK[0];
               tech.name === initial.name ? 'text-[#ffb3ad]' : 'text-[#9CA3AF]',
             ]}
           >
-            {tech.category.split(' ')[0]}
+            {tech.category}
           </span>
         </button>
       ))
@@ -64,7 +64,7 @@ const initial = TECH_STACK[0];
       </div>
     </div>
     <div class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider bg-[#58ddb0]/10 px-3 py-1.5 rounded border border-[#58ddb0]/30 shrink-0">
-      STACK PRODUCCIÓN ACTIVO
+      Más tecnologías según el proyecto
     </div>
   </div>
 </div>

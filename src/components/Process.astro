@@ -10,12 +10,12 @@ const initial = PROCESS_STEPS[0];
       <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// proceso</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A]">Cómo trabajamos</h2>
       <p class="font-inter text-sm text-[#5B5B5E] mt-3 max-w-lg">
-        Metodología ágil y predecible. Selecciona cada paso para conocer los puntos de control y entregables.
+        Así trabajamos de principio a fin. Selecciona cada paso para ver los detalles.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-      <div class="hidden md:block absolute top-6 left-0 w-full h-0.5 bg-[#E5E0D8] z-0"></div>
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6 relative">
+      <div class="hidden lg:block absolute top-12 -translate-y-1/2 left-[10%] right-[10%] h-0.5 bg-[#E5E0D8] z-0"></div>
 
       {
         PROCESS_STEPS.map((item) => (
@@ -42,10 +42,10 @@ const initial = PROCESS_STEPS[0];
             >
               {item.step}
             </div>
-            <h4 class="font-sora text-xl md:text-2xl font-bold text-[#1A1A1A] mb-2">{item.title}</h4>
+            <h4 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2">{item.title}</h4>
             <p class="text-sm font-inter text-[#4A4A4A] leading-relaxed">{item.description}</p>
             <div class="mt-4 text-xs font-technical text-[#fd625d] uppercase font-bold flex items-center gap-1">
-              <span class="process-label">{item.step === initial.step ? 'Estando Aquí' : 'Ver Detalle'}</span>
+              <span class="process-label">{item.step === initial.step ? 'Paso seleccionado' : 'Ver detalle'}</span>
               <span class="material-symbols-outlined text-sm process-icon">
                 {item.step === initial.step ? 'expand_less' : 'expand_more'}
               </span>
@@ -62,7 +62,7 @@ const initial = PROCESS_STEPS[0];
         </div>
         <div>
           <div class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider mb-1">
-            FASA DE INGENIERÍA // METODOLOGÍA BIT &amp; BYTE
+            FASE DEL PROYECTO // BIT &amp; BYTE
           </div>
           <h3 class="process-detail-title font-sora text-xl md:text-2xl font-bold text-white mb-1">
             {initial.title}
@@ -117,7 +117,7 @@ const initial = PROCESS_STEPS[0];
 
         const label = el.querySelector('.process-label');
         const icon = el.querySelector('.process-icon');
-        if (label) label.textContent = active ? 'Estando Aquí' : 'Ver Detalle';
+        if (label) label.textContent = active ? 'Paso seleccionado' : 'Ver detalle';
         if (icon) icon.textContent = active ? 'expand_less' : 'expand_more';
 
         if (active) {
