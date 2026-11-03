@@ -117,7 +117,14 @@ const initialQuote = calculateQuote(initialService.id);
                     <span class="text-sm font-inter">{option.name}</span>
                   </div>
                   {option.price && (
-                    <span class="font-technical text-xs font-bold text-[#edc157] text-right">{option.price}</span>
+                    <span class="font-technical text-xs font-bold text-[#edc157] text-right shrink-0">
+                      {option.price.split(' · ').map((part, index, parts) => (
+                        <>
+                          <span class="whitespace-nowrap">{index < parts.length - 1 ? `${part} ·` : part}</span>
+                          {index < parts.length - 1 && ' '}
+                        </>
+                      ))}
+                    </span>
                   )}
                 </label>
               ))
@@ -164,8 +171,10 @@ const initialQuote = calculateQuote(initialService.id);
                       />
                     </label>
                   )}
-                  <span class="font-technical text-xs font-bold text-[#edc157] whitespace-nowrap">
-                    {`+${money(extra.price ?? 0)} ${CURRENCY}${extra.unit ? ` ${extra.unit}` : ''}`}
+                  <span class="font-technical text-xs font-bold text-[#edc157] whitespace-nowrap shrink-0">
+                    {extra.price === undefined
+                      ? 'precio a consultar'
+                      : `+${money(extra.price)} ${CURRENCY}${extra.unit ? ` ${extra.unit}` : ''}`}
                   </span>
                 </div>
               </div>
@@ -203,7 +212,10 @@ const initialQuote = calculateQuote(initialService.id);
                     </span>
                   </span>
                 </div>
-                <span data-hosting-price class="font-technical text-xs font-bold text-[#edc157] text-right">
+                <span
+                  data-hosting-price
+                  class="font-technical text-xs font-bold text-[#edc157] text-right whitespace-nowrap shrink-0"
+                >
                   {publishingOptionPrice(option, initialService.id)}
                 </span>
               </label>
@@ -227,7 +239,7 @@ const initialQuote = calculateQuote(initialService.id);
                 </span>
               </span>
             </div>
-            <span class="font-technical text-xs font-bold text-[#edc157] text-right">
+            <span class="font-technical text-xs font-bold text-[#edc157] text-right whitespace-nowrap shrink-0">
               {publishingOptionPrice(DOMAIN_OPTION, initialService.id)}
             </span>
           </label>

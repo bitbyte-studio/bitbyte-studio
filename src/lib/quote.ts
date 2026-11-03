@@ -144,7 +144,7 @@ export function calculateQuote(
       kind: 'extra',
       label: extra.quantity ? `${extra.name} × ${quantity}` : extra.name,
       billing: 'once',
-      amount: (extra.price ?? 0) * quantity,
+      amount: extra.price === undefined ? null : extra.price * quantity,
     });
   }
 
@@ -242,15 +242,20 @@ export function publishingSummary(quote: Quote): string[] {
 
 /**
  * Totals for a recurring period, only when the period has more than one line
- * (a single line already shows its own amount). Keeps the "desde" of its lines.
+ * (a single line already shows its own amount) and every one of them has a price:
+ * a total that skips an "a consultar" line would understate the cost. Keeps the "desde" of its lines.
  */
 export function recurringTotals(quote: Quote): string[] {
-  const count = (billing: Billing) => recurringLines(quote).filter((line) => line.billing === billing).length;
+  const periodLines = (billing: Billing) => recurringLines(quote).filter((line) => line.billing === billing);
+  const showTotal = (billing: Billing) => {
+    const lines = periodLines(billing);
+    return lines.length > 1 && lines.every((line) => line.amount !== null);
+  };
   const totals: string[] = [];
-  if (count('monthly') > 1) {
+  if (showTotal('monthly')) {
     totals.push(`Total mensual: ${formatLineAmount({ amount: quote.monthly, billing: 'monthly', from: quote.monthlyFrom })}`);
   }
-  if (count('yearly') > 1) {
+  if (showTotal('yearly')) {
     totals.push(`Total anual: ${formatLineAmount({ amount: quote.yearly, billing: 'yearly', from: quote.yearlyFrom })}`);
   }
   return totals;
