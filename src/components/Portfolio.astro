@@ -1,41 +1,18 @@
 ---
+import { Picture } from 'astro:assets';
 import { PROJECTS } from '../data';
-
-const filters = [
-  { label: 'Todos', value: 'all' },
-  { label: 'Web Dev', value: 'web' },
-  { label: 'E-commerce', value: 'ecommerce' },
-  { label: '3D / Interactivo', value: 'interactive' },
-] as const;
 ---
 
 <section id="portafolio" class="bg-[#131315] py-20 md:py-[120px]" data-portfolio>
   <div class="max-w-[1280px] mx-auto px-4 md:px-6">
-    <div class="mb-12 text-center flex flex-col items-center">
+    <div class="mb-12 md:mb-16 text-center flex flex-col items-center">
       <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// portafolio</p>
-      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-white mb-6">
+      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-white mb-4">
         Nuestros Proyectos
       </h2>
-
-      <div class="flex flex-wrap items-center justify-center gap-2 bg-[#1A1A1A] p-1.5 rounded-full border border-[#2A2A2A]">
-        {
-          filters.map((item) => (
-            <button
-              type="button"
-              data-filter={item.value}
-              aria-pressed={item.value === 'all' ? 'true' : 'false'}
-              class:list={[
-                'portfolio-filter px-4 py-1.5 rounded-full font-sora text-xs font-semibold transition-all',
-                item.value === 'all'
-                  ? 'is-active bg-[#fd625d] text-white shadow-md'
-                  : 'text-[#9CA3AF] hover:text-white',
-              ]}
-            >
-              {item.label}
-            </button>
-          ))
-        }
-      </div>
+      <p class="font-inter text-sm md:text-base text-[#9CA3AF] max-w-xl">
+        Demos hechas por Bit &amp; Byte Studio para mostrar lo que podemos hacer por tu negocio. Puedes abrirlas y probarlas.
+      </p>
     </div>
 
     <div class="flex flex-col gap-16 md:gap-24" data-project-list>
@@ -45,15 +22,16 @@ const filters = [
           return (
             <article
               data-project-item
-              data-category={project.category}
               data-project-id={project.id}
               class="project-item grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"
             >
               <div class:list={[isEven ? 'order-1 lg:order-2' : 'order-2 lg:order-1']}>
                 <div class="flex items-center gap-3 mb-3">
-                  <span class="w-2 h-2 rounded-full bg-[#58ddb0]"></span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#58ddb0]/10 border border-[#58ddb0]/40 text-[#58ddb0] font-technical text-xs font-bold uppercase tracking-wider">
+                    {project.badge}
+                  </span>
                   <span class="font-technical text-xs text-[#9CA3AF] uppercase tracking-wider">
-                    CLIENTE: {project.client || 'Bit & Byte Partner'} · {project.year || '2025'}
+                    {project.category}
                   </span>
                 </div>
 
@@ -72,24 +50,14 @@ const filters = [
                   ))}
                 </div>
 
-                {project.metrics && (
-                  <div class="grid grid-cols-3 gap-3 mb-8 p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A]">
-                    {project.metrics.map((metric) => (
-                      <div class="text-center">
-                        <div class="font-sora text-base md:text-lg font-bold text-[#edc157]">{metric.value}</div>
-                        <div class="font-technical text-[10px] text-[#9CA3AF] uppercase mt-0.5">{metric.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 <button
                   type="button"
                   data-open-project={project.id}
+                  data-project-title={project.title}
                   class="text-white font-technical text-sm uppercase tracking-wider inline-flex items-center gap-2 hover:text-[#fd625d] transition-colors group cursor-pointer"
                 >
                   <span>VER PROYECTO</span>
-                  <span class="material-symbols-outlined text-lg group-hover:translate-x-2 transition-transform">
+                  <span class="material-symbols-outlined text-lg group-hover:translate-x-2 transition-transform" aria-hidden="true">
                     arrow_forward
                   </span>
                 </button>
@@ -100,25 +68,27 @@ const filters = [
                 tabindex="0"
                 aria-label={`Ver proyecto ${project.title}`}
                 data-open-project={project.id}
+                data-project-title={project.title}
                 class:list={[
                   'rounded-2xl overflow-hidden border border-[#2A2A2A] group cursor-pointer bg-[#1A1A1A] relative',
                   isEven ? 'order-2 lg:order-1' : 'order-1 lg:order-2',
                 ]}
               >
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  width="800"
-                  height="400"
+                <Picture
+                  src={project.image.card}
+                  alt={`Vista previa de la demo ${project.title}`}
+                  formats={['avif', 'webp']}
+                  fallbackFormat="webp"
+                  widths={[400, 800, 1200]}
+                  sizes="(min-width: 1024px) 592px, calc(100vw - 2rem)"
                   loading="lazy"
                   decoding="async"
-                  referrerpolicy="no-referrer"
-                  class="w-full h-[320px] sm:h-[380px] lg:h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
+                  class="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span class="px-5 py-2.5 rounded-full bg-[#fd625d] text-white font-sora text-sm font-semibold glow-coral flex items-center gap-2">
-                    <span class="material-symbols-outlined text-base">open_in_new</span>
-                    Explorar Estudio de Caso
+                    <span class="material-symbols-outlined text-base" aria-hidden="true">open_in_new</span>
+                    Ver detalles
                   </span>
                 </div>
               </div>
@@ -131,60 +101,14 @@ const filters = [
 </section>
 
 <script>
-  import { PROJECTS } from '../data';
   import { openProject } from '../lib/events';
   import { mountAll } from '../lib/lifecycle';
 
   function initPortfolio(root: HTMLElement, signal: AbortSignal) {
-    const filters = Array.from(root.querySelectorAll<HTMLElement>('[data-filter]'));
-    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-project-item]'));
-
-    const setFilter = (value: string) => {
-      filters.forEach((button) => {
-        const active = button.dataset.filter === value;
-        button.setAttribute('aria-pressed', String(active));
-        button.classList.toggle('is-active', active);
-        button.classList.toggle('bg-[#fd625d]', active);
-        button.classList.toggle('text-white', active);
-        button.classList.toggle('shadow-md', active);
-        button.classList.toggle('text-[#9CA3AF]', !active);
-      });
-
-      const visible = items.filter((item) => value === 'all' || item.dataset.category === value);
-
-      items.forEach((item) => {
-        const show = visible.includes(item);
-        item.classList.toggle('hidden', !show);
-        item.hidden = !show;
-      });
-
-      visible.forEach((item, index) => {
-        const isEven = index % 2 === 1;
-        const textCol = item.children[0] as HTMLElement | undefined;
-        const imageCol = item.children[1] as HTMLElement | undefined;
-        if (!textCol || !imageCol) return;
-
-        textCol.classList.toggle('order-1', isEven);
-        textCol.classList.toggle('lg:order-2', isEven);
-        textCol.classList.toggle('order-2', !isEven);
-        textCol.classList.toggle('lg:order-1', !isEven);
-
-        imageCol.classList.toggle('order-2', isEven);
-        imageCol.classList.toggle('lg:order-1', isEven);
-        imageCol.classList.toggle('order-1', !isEven);
-        imageCol.classList.toggle('lg:order-2', !isEven);
-      });
-    };
-
-    filters.forEach((button) => {
-      button.addEventListener('click', () => setFilter(button.dataset.filter || 'all'), { signal });
-    });
-
     root.querySelectorAll<HTMLElement>('[data-open-project]').forEach((el) => {
       const open = () => {
-        const id = el.dataset.openProject;
-        const project = PROJECTS.find((item) => item.id === id);
-        if (project) openProject(project);
+        const { openProject: id, projectTitle: title } = el.dataset;
+        if (id) openProject({ id, title: title ?? id });
       };
 
       el.addEventListener('click', open, { signal });

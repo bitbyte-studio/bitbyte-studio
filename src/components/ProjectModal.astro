@@ -1,4 +1,5 @@
 ---
+import { Picture } from 'astro:assets';
 import { PROJECTS } from '../data';
 ---
 
@@ -10,7 +11,6 @@ import { PROJECTS } from '../data';
   <div
     role="dialog"
     aria-modal="true"
-    aria-label="Estudio de caso del proyecto"
     tabindex="-1"
     class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl text-white relative outline-none"
   >
@@ -21,7 +21,7 @@ import { PROJECTS } from '../data';
             <div class="flex items-center gap-3">
               <span class="w-3 h-3 rounded-full bg-[#fd625d]"></span>
               <span class="font-technical text-xs text-[#9CA3AF] uppercase">
-                // ESTUDIO DE CASO · {project.client || 'BIT & BYTE STUDIO'}
+                // PROYECTO DEMO · BIT &amp; BYTE STUDIO
               </span>
             </div>
             <button
@@ -30,119 +30,90 @@ import { PROJECTS } from '../data';
               class="w-9 h-9 rounded-full bg-[#2A2A2A] hover:bg-[#353437] flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors"
               aria-label="Cerrar modal"
             >
-              <span class="material-symbols-outlined text-xl">close</span>
+              <span class="material-symbols-outlined text-xl" aria-hidden="true">close</span>
             </button>
           </div>
 
-          <div class="p-6 md:p-8">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <div>
-                <h2 class="font-sora text-2xl md:text-3xl font-bold text-white mb-2">{project.title}</h2>
-                <div class="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span class="px-2.5 py-0.5 rounded bg-[#2A2A2A] text-xs font-technical text-[#fd625d]">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div class="flex items-center gap-2 bg-[#131315] p-1 rounded-full border border-[#2A2A2A]">
-                <button
-                  type="button"
-                  data-project-tab="overview"
-                  class="project-tab is-active px-4 py-1.5 rounded-full font-sora text-xs font-semibold transition-all bg-[#fd625d] text-white"
-                >
-                  Resumen Técnico
-                </button>
-                <button
-                  type="button"
-                  data-project-tab="simulation"
-                  class="project-tab px-4 py-1.5 rounded-full font-sora text-xs font-semibold transition-all flex items-center gap-1.5 text-[#9CA3AF] hover:text-white"
-                >
-                  <span class="material-symbols-outlined text-sm">play_circle</span>
-                  <span>Vista Previa Simulación</span>
-                </button>
-              </div>
+          <div class="p-6 md:p-8 space-y-6">
+            <div class="rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#131315]">
+              <Picture
+                src={project.image.modal}
+                alt={`Vista previa de la demo ${project.title}`}
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
+                widths={[640, 960, 1440, 1800]}
+                sizes="(min-width: 928px) 832px, (min-width: 768px) calc(100vw - 6rem), calc(100vw - 5rem)"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-auto"
+              />
             </div>
 
-            <div data-tab-panel="overview" class="space-y-6">
-              <div class="rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#131315]">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  width="1200"
-                  height="675"
-                  loading="lazy"
-                  decoding="async"
-                  referrerpolicy="no-referrer"
-                  class="w-full h-auto max-h-[360px] object-cover"
-                />
-              </div>
-              <div class="space-y-4">
-                <h3 class="font-sora text-lg font-bold text-white">Desafío y Solución Tecnológica</h3>
-                <p class="font-inter text-sm md:text-base text-[#9CA3AF] leading-relaxed">
-                  {project.longDescription || project.description}
-                </p>
-              </div>
-              {project.metrics && (
-                <div>
-                  <h4 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-3">
-                    // RESULTADOS MEDIBLES DE INGENIERÍA
-                  </h4>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {project.metrics.map((metric) => (
-                      <div class="p-4 rounded-xl bg-[#131315] border border-[#2A2A2A] text-center">
-                        <div class="font-sora text-2xl font-bold text-[#edc157] mb-1">{metric.value}</div>
-                        <div class="font-technical text-xs text-[#9CA3AF] uppercase">{metric.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div data-tab-panel="simulation" class="bg-[#131315] border border-[#2A2A2A] rounded-xl p-6 text-center hidden" hidden>
-              <div class="mb-4 flex items-center justify-between border-b border-[#2A2A2A] pb-3">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                  <span class="font-technical text-xs text-[#9CA3AF] ml-2">
-                    {project.liveUrl || 'Demo del proyecto'}
-                  </span>
-                </div>
-                <span class="text-xs font-technical text-[#58ddb0] bg-[#58ddb0]/10 px-2.5 py-0.5 rounded">
-                  SANDBOX INTERACTIVO ACTIVADO
+            <div>
+              <div class="flex flex-wrap items-center gap-3 mb-3">
+                <h2 id={`project-title-${project.id}`} class="font-sora text-2xl md:text-3xl font-bold text-white">{project.title}</h2>
+                <span class="px-2.5 py-0.5 rounded-full bg-[#58ddb0]/10 border border-[#58ddb0]/40 text-[#58ddb0] font-technical text-xs font-bold uppercase tracking-wider">
+                  {project.badge}
                 </span>
+                <span class="font-technical text-xs text-[#9CA3AF] uppercase tracking-wider">{project.category}</span>
               </div>
-              <div class="py-12 px-6 space-y-6 max-w-xl mx-auto">
-                <div class="w-16 h-16 rounded-full bg-[#fd625d]/20 text-[#fd625d] flex items-center justify-center mx-auto">
-                  <span class="material-symbols-outlined text-4xl">devices</span>
-                </div>
-                <h4 class="font-sora text-xl font-bold text-white">Vista Previa en Vivo: {project.title}</h4>
-                <p class="font-inter text-sm text-[#9CA3AF]">
-                  El proyecto ha sido renderizado con {project.tags.join(' + ')}. Rendimiento verificado para dispositivos móviles, escritorio y cargas concurrentes de alto volumen.
-                </p>
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#2A2A2A] hover:bg-[#353437] text-white text-sm font-sora font-semibold transition-colors"
-                  >
-                    <span>Abrir Demo en Nueva Pestaña</span>
-                    <span class="material-symbols-outlined text-sm">open_in_new</span>
-                  </a>
-                )}
-              </div>
+              <p class="font-inter text-sm md:text-base text-[#9CA3AF] leading-relaxed">{project.description}</p>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 class="font-technical text-xs font-bold text-[#58ddb0] uppercase tracking-wider mb-3">
+                // FUNCIONALIDADES
+              </h3>
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {project.features.map((feature) => (
+                  <li class="flex items-start gap-3 font-inter text-sm text-white">
+                    <span class="material-symbols-outlined text-[#fd625d] shrink-0 text-xl" aria-hidden="true">
+                      check_circle
+                    </span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <ul class="flex flex-wrap gap-2" aria-label="Tecnologías">
+              {project.tags.map((tag) => (
+                <li class="px-2.5 py-0.5 rounded bg-[#2A2A2A] text-xs font-technical text-[#fd625d]">{tag}</li>
+              ))}
+            </ul>
+
+            <div>
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Ver demo de ${project.title} (se abre en una pestaña nueva)`}
+                class="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 rounded-full bg-white text-[#131315] hover:bg-[#ffb3ad] transition-colors font-sora text-sm font-bold"
+              >
+                <span>Ver demo</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  class="w-4 h-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M15 3h6v6" />
+                  <path d="M10 14 21 3" />
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                </svg>
+              </a>
+            </div>
+
+            <div class="pt-6 border-t border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-4">
               <div class="text-sm font-inter text-[#9CA3AF]">
-                ¿Te gustaría un sistema similar al de <strong class="text-white">{project.title}</strong>?
+                ¿Te gustaría algo similar a <strong class="text-white">{project.title}</strong>?
               </div>
-              <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                 <button
                   type="button"
                   data-project-close
@@ -153,7 +124,7 @@ import { PROJECTS } from '../data';
                 <button
                   type="button"
                   data-quote-similar={project.serviceId}
-                  class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#fd625d] text-white font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral"
+                  class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#fd625d] text-white font-sora text-sm font-semibold whitespace-nowrap hover:scale-105 transition-transform glow-coral"
                 >
                   Cotizar Proyecto Similar
                 </button>
@@ -173,49 +144,20 @@ import { PROJECTS } from '../data';
 
   function initProjectModal(modal: HTMLElement, signal: AbortSignal) {
     const panels = Array.from(modal.querySelectorAll<HTMLElement>('[data-project-panel]'));
-    const dialog = modal.querySelector<HTMLElement>('[role="dialog"]');
     const { open: openModal, close } = createModal(modal, signal);
 
-    const setTab = (panel: HTMLElement, tab: 'overview' | 'simulation') => {
-      panel.querySelectorAll<HTMLElement>('[data-project-tab]').forEach((button) => {
-        const active = button.dataset.projectTab === tab;
-        button.classList.toggle('is-active', active);
-        button.classList.toggle('bg-[#fd625d]', active && tab === 'overview');
-        button.classList.toggle('text-white', active && tab === 'overview');
-        button.classList.toggle('bg-[#58ddb0]', active && tab === 'simulation');
-        button.classList.toggle('text-[#131315]', active && tab === 'simulation');
-        button.classList.toggle('text-[#9CA3AF]', !active);
-      });
+    const dialog = modal.querySelector<HTMLElement>('[role="dialog"]')!;
 
-      panel.querySelectorAll<HTMLElement>('[data-tab-panel]').forEach((tabPanel) => {
-        setVisible(tabPanel, tabPanel.dataset.tabPanel === tab);
-      });
-    };
-
-    const open = (projectId: string, title?: string) => {
-      panels.forEach((panel) => {
-        const active = panel.dataset.projectPanel === projectId;
-        setVisible(panel, active);
-        if (active) setTab(panel, 'overview');
-      });
-      if (title) dialog?.setAttribute('aria-label', `Estudio de caso: ${title}`);
+    const open = (projectId: string) => {
+      panels.forEach((panel) => setVisible(panel, panel.dataset.projectPanel === projectId));
+      dialog.setAttribute('aria-labelledby', `project-title-${projectId}`);
       openModal();
+      // scrollTop only applies once the modal is visible (display: none has no layout).
+      dialog.scrollTop = 0;
     };
 
     modal.querySelectorAll<HTMLElement>('[data-project-close]').forEach((button) => {
       button.addEventListener('click', close, { signal });
-    });
-
-    modal.querySelectorAll<HTMLElement>('[data-project-tab]').forEach((button) => {
-      button.addEventListener(
-        'click',
-        () => {
-          const panel = button.closest<HTMLElement>('[data-project-panel]');
-          const tab = button.dataset.projectTab as 'overview' | 'simulation';
-          if (panel && tab) setTab(panel, tab);
-        },
-        { signal },
-      );
     });
 
     modal.querySelectorAll<HTMLElement>('[data-quote-similar]').forEach((button) => {
@@ -233,7 +175,7 @@ import { PROJECTS } from '../data';
       OPEN_PROJECT_EVENT,
       (event) => {
         const project = (event as CustomEvent<OpenProjectDetail>).detail?.project;
-        if (project?.id) open(project.id, project.title);
+        if (project?.id) open(project.id);
       },
       { signal },
     );

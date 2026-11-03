@@ -8,7 +8,8 @@ export type OpenQuoteDetail = {
 };
 
 export type OpenProjectDetail = {
-  project: Project;
+  /** Only what the modal needs, so the client bundle never imports the project data (and its images). */
+  project: Pick<Project, 'id' | 'title'>;
 };
 
 export function openQuote(service?: string) {
@@ -20,7 +21,7 @@ export function openQuote(service?: string) {
   );
 }
 
-export function openProject(project: Project) {
+export function openProject(project: OpenProjectDetail['project']) {
   if (typeof window === 'undefined') return;
   window.dispatchEvent(
     new CustomEvent<OpenProjectDetail>(OPEN_PROJECT_EVENT, {

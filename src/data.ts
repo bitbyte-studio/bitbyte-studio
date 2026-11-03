@@ -1,5 +1,11 @@
 import type { Project, TechItem } from './types';
-import { MAINTENANCE, type ServiceId } from './config/pricing';
+import { MAINTENANCE, PAYMENT, type ServiceId } from './config/pricing';
+import barbaNegraCard from './assets/portfolio/barba-negra-card.webp';
+import barbaNegraModal from './assets/portfolio/barba-negra-modal.webp';
+import sazonLolaCard from './assets/portfolio/sazon-lola-card.webp';
+import sazonLolaModal from './assets/portfolio/sazon-lola-modal.webp';
+import tropicalVibesCard from './assets/portfolio/tropical-vibes-card.webp';
+import tropicalVibesModal from './assets/portfolio/tropical-vibes-modal.webp';
 
 /** Detail copy for each service. Names, prices and lead times live in config/pricing.ts. */
 export interface ServiceDetail {
@@ -77,139 +83,147 @@ export const SERVICE_DETAILS: Record<ServiceId, ServiceDetail> = {
   },
 };
 
-export const PROJECTS: Project[] = [
+const DEMO_TAGS = ['React', 'TypeScript', 'Vite', 'Tailwind CSS'] as const;
+
+/** Demos built by Bit & Byte Studio to show what we make. They are not client projects. */
+export const PROJECTS: readonly Project[] = [
   {
     id: 'sazon-de-lola',
-    serviceId: 'gestion',
+    serviceId: 'catalogo',
     title: 'La Sazón de Lola',
+    category: 'Restaurante',
     description:
-      'Plataforma gastronómica de vanguardia con sistema de reservas en tiempo real y gestión de inventario automatizada.',
-    longDescription:
-      'Para La Sazón de Lola creamos una experiencia digital a la altura de su cocina de autor. El sitio combina fotografía culinaria de alta definición con un motor de reservas instantáneo sincronizado en tiempo real y un panel para la gestión de mesas e inventario de cocina.',
-    tags: ['Astro', 'Tailwind', 'Sanity'],
-    category: 'web',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDqN2MYa9bhnwvjDiJdBGtwYrYYKW9Zv7KWdJqNO4MzX9BnfciFoqSJQxdmcWNkC_s8HdxYTKqVqlJV2R0G0az7cKuwIXBS9YxGhunY_hPm9JKE-5eVZcuAwVa6tYt1LUOMlLgpqM96XWiJe3kXPsjjKjKPiyKANUR7L4U1K2tsXmXDzKrFyJSpDmoR1OO_wK4dELRd09z63kb_Y2MMpIz6o9K3kTAaQ1WsoNJHnMNesElnQzfyemg7rQ',
-    metrics: [
-      { label: 'Tiempo de Carga', value: '0.4s' },
-      { label: 'Reservas Automáticas', value: '+340% mo.' },
-      { label: 'Lighthouse SEO', value: '100/100' }
+      'Web para restaurante de comida criolla: el cliente ve el menú por categorías, arma su pedido y reserva mesa directo por WhatsApp.',
+    features: [
+      'Menú por categorías con filtros',
+      'Pedido y reserva por WhatsApp',
+      'Detalle de plato',
+      'Ubicación con mapa',
     ],
-    client: 'Lola Gastronomía S.A.',
-    year: '2025'
+    tags: DEMO_TAGS,
+    image: { card: sazonLolaCard, modal: sazonLolaModal },
+    liveUrl: 'https://sazon-lola.vercel.app',
+    badge: 'Demo',
   },
   {
     id: 'barba-negra',
-    serviceId: 'tienda',
+    serviceId: 'landing',
     title: 'Barba Negra',
+    category: 'Barbería',
     description:
-      'E-commerce premium para productos de cuidado personal masculino, con una experiencia de usuario cinematográfica.',
-    longDescription:
-      'Un e-commerce brutalista y oscuro para una firma de cuidado de barba de alta gama. Integramos una experiencia inmersiva que permite a los usuarios previsualizar kits en 360°, suscribirse a envíos mensuales y disfrutar de un checkout fluido.',
-    tags: ['React', 'Shopify'],
-    category: 'ecommerce',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAsLCU_o6ScBjxQNsDRU1Xgrr4RC_ikLvCwRwuwrnEDZwW-uQ-OG0JLfeshduRZJrxOP-CsZPyrYdywHbVpWhVB_AJVOkM93n9m9UE8xdnZrYguiTlO6ACEtBVGqdvuA62Pt6UqfUjqlLsynYBjAz6KZDkS9pVeUUXd0lL8oukUSH7Zu7cIo68LEbcKa0jn09RDlDTvQTcBCIOiQGAlifOQ_NVZT7li4Dc-llHbn6DktXe0wz8fBSr_6Q',
-    metrics: [
-      { label: 'Tasa de Conversión', value: '4.8%' },
-      { label: 'Ticket Promedio', value: '+42%' },
-      { label: 'Fidelización Suscritos', value: '89%' }
+      'Web para barbería con servicios y precios, galería de trabajos y reserva de turnos que llega directo al WhatsApp del negocio.',
+    features: [
+      'Servicios y precios',
+      'Galería de trabajos',
+      'Reserva de turnos por WhatsApp',
+      'Recomendador de estilo',
     ],
-    client: 'Barba Negra Grooming Co.',
-    year: '2025'
+    tags: DEMO_TAGS,
+    image: { card: barbaNegraCard, modal: barbaNegraModal },
+    liveUrl: 'https://barba-negra-one.vercel.app',
+    badge: 'Demo',
   },
   {
     id: 'tropical-vibes',
-    serviceId: 'landing',
+    serviceId: 'tienda',
     title: 'Tropical Vibes',
+    category: 'Tienda de ropa',
     description:
-      'Landing page interactiva para un resort de lujo, integrando visuales 3D y una navegación fluida por capas.',
-    longDescription:
-      'Desarrollamos el portal inmersivo para un resort ecológico en el Caribe. Mediante visualizaciones con Three.js y transiciones orgánicas con GSAP, los visitantes pueden recorrer villas tropicales, consultar el pronóstico local del mar y cotizar su estadía.',
-    tags: ['Three.js', 'GSAP'],
-    category: 'interactive',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCboIh_L9uC8mIkqvkC8Xn-cUOtsxnFyMUN_TzRXW60jxJOv5Hb_IGYmQj_tW_42UkvT6t2DkIGD1Pebtk1Pxx7PZ38FLwcsMLAzKBXGKrkRR8dBRYWNA90o_bG4OoaQEGZSO2T8B6IvZVxcOXqh_GkMznySsGP2ijxNK8Rt8R_jBE9P76saiCTuVakh-je7YHJC4q5D1mXBzB9p2zNV9P_rrJUvoaH3yjyNbVKCPqr9uWpIoHUX2wTCA',
-    metrics: [
-      { label: 'Tiempo en página', value: '4m 15s' },
-      { label: 'Interacción con 3D', value: '92%' },
-      { label: 'Cotizaciones Directas', value: '+210%' }
+      'Tienda online de moda con catálogo filtrable y carrito; el cliente elige talla y color y hace el pedido por WhatsApp.',
+    features: [
+      'Catálogo filtrable (17 productos)',
+      'Carrito',
+      'Selección de talla y color',
+      'Pedido por WhatsApp',
     ],
-    client: 'Tropical Vibes Resort & Spa',
-    year: '2026'
-  }
+    tags: DEMO_TAGS,
+    image: { card: tropicalVibesCard, modal: tropicalVibesModal },
+    liveUrl: 'https://tropical-vibes.vercel.app',
+    badge: 'Demo',
+  },
 ];
 
-export const TECH_STACK: TechItem[] = [
+export const TECH_STACK: readonly TechItem[] = [
   {
     name: 'Astro',
-    category: 'Framework Web',
-    description: 'Cero JS innecesario por defecto, velocidad de carga instantánea para webs estáticas e híbridas.'
+    category: 'Webs',
+    description: 'Para webs que cargan rápido, incluso con conexión lenta. Es la base de este mismo sitio.',
   },
   {
     name: 'Tailwind',
-    category: 'Estilos & UI',
-    description: 'Diseño arquitectónico con CSS utilitario de ultra alto rendimiento y consistencia.'
+    category: 'Diseño',
+    description: 'Nos permite dar a cada web un diseño propio y coherente, que se ve bien en el móvil.',
   },
   {
     name: 'React',
-    category: 'UI Dinámica',
-    description: 'El estándar industrial para crear interfaces y dashboards interactivos complejos.'
+    category: 'Interfaces',
+    description: 'Para pantallas con las que se interactúa: filtros, carritos de compra y formularios. Lo usamos en las demos del portafolio.',
+  },
+  {
+    name: 'Vue',
+    category: 'Interfaces',
+    description: 'Otra opción para webs y paneles interactivos, cuando el proyecto lo pide.',
   },
   {
     name: 'Next.js',
-    category: 'Full-Stack Web',
-    description: 'Server-Side Rendering, API Routes e infraestructura escalable para apps empresariales.'
+    category: 'Aplicaciones',
+    description: 'Para webs que necesitan algo más que páginas fijas, como cuentas de usuario o datos que cambian.',
   },
   {
     name: 'Node.js',
-    category: 'Backend & APIs',
-    description: 'Servidores de alto rendimiento, microservicios y conectores de automatización.'
+    category: 'Servidor',
+    description: 'Para la parte que el visitante no ve: guardar datos, conectar servicios y automatizar procesos.',
   },
   {
     name: 'Python',
-    category: 'Automation & AI',
-    description: 'Scripts de automatización industrial, análisis de datos y conectividad inteligente.'
+    category: 'Automatización',
+    description: 'Para bots, reportes y tareas repetitivas que no tiene sentido hacer a mano.',
   },
   {
-    name: 'Shopify',
-    category: 'E-commerce',
-    description: 'Integraciones Headless y personalizadas para tiendas que facturan a gran escala.'
+    name: 'Django',
+    category: 'Gestión',
+    description: 'Con Python, nos sirve para sistemas de gestión: inventario, clientes, reservas y paneles de administración.',
   },
-  {
-    name: 'Sanity',
-    category: 'Headless CMS',
-    description: 'Gestor de contenido estructurado que le otorga control total a tu equipo sin romper el código.'
-  }
 ];
 
 export const PROCESS_STEPS = [
   {
     step: 1,
     number: '01',
-    title: 'Escuchamos',
-    description: 'Entendemos tus metas, tu usuario objetivo y los desafíos de tu negocio.',
-    detail: 'Sesión de discovery técnico donde identificamos cuellos de botella y trazamos requerimientos funcionales claros.'
+    title: 'Conversamos',
+    description: 'Nos cuentas qué necesitas por WhatsApp.',
+    detail:
+      'Hablamos de tu negocio, de lo que quieres lograr y de cuánto quieres invertir. Sin formularios largos ni reuniones eternas.',
   },
   {
     step: 2,
     number: '02',
-    title: 'Diseñamos',
-    description: 'Creamos la arquitectura y experiencia visual en alta fidelidad.',
-    detail: 'Prototipos en Figma con sistema de diseño modular, pruebas de usabilidad y aprobación antes del primer commit.'
+    title: 'Propuesta',
+    description: 'Te enviamos precio, plazo y alcance.',
+    detail: `Te explicamos qué incluye el proyecto, cuánto cuesta y en cuánto tiempo lo entregamos. Para empezar se paga un anticipo del ${PAYMENT.depositPercent} %.`,
   },
   {
     step: 3,
     number: '03',
-    title: 'Construimos',
-    description: 'Código limpio, robusto y escalable con el mejor stack actual.',
-    detail: 'Desarrollo ágil con entregas incrementales, CI/CD, auditorías automáticas de velocidad y seguridad.'
+    title: 'Diseño y desarrollo',
+    description: 'Hacemos tu web y te la vamos mostrando.',
+    detail:
+      'Te enseñamos avances para que nos digas qué cambiar. Incluimos revisiones, así el resultado queda como lo imaginabas.',
   },
   {
     step: 4,
     number: '04',
-    title: 'Lanzamos',
-    description: 'Despliegue, monitoreo continuo y soporte técnico prioritario.',
-    detail: 'Puesta en producción sin tiempo de caída, optimización de infraestructura y telemetría activa en tiempo real.'
-  }
+    title: 'Publicación y entrega',
+    description: 'Publicamos tu web y te la entregamos.',
+    detail:
+      'Dejamos tu web en línea y funcionando, y te explicamos cómo usarla. El resto del pago se hace al entregar.',
+  },
+  {
+    step: 5,
+    number: '05',
+    title: 'Mantenimiento (opcional)',
+    description: 'Si quieres, seguimos cuidando tu web.',
+    detail:
+      'Con el plan de mantenimiento hacemos cambios menores, copias de seguridad y te atendemos por WhatsApp. Es opcional y se paga aparte.',
+  },
 ];
