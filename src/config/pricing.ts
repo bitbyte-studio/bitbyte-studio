@@ -213,6 +213,6 @@ const DEPOSIT_PERCENT = 50;
 
 export const PAYMENT = {
   depositPercent: DEPOSIT_PERCENT,
-  terms: `Anticipo del ${DEPOSIT_PERCENT}% para empezar y el resto al entregar.`,
+  terms: `Anticipo del ${DEPOSIT_PERCENT} % para empezar y el resto al entregar.`,
   methods: ['Efectivo', 'Transferencia CUP', 'Qvapay', 'USDT'],
 } as const;

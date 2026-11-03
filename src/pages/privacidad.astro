@@ -1,0 +1,85 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { EMAIL, EMAIL_URL, TELEGRAM_HANDLE, TELEGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_URL } from '../config/contact';
+
+const h2 = 'font-sora text-xl md:text-2xl font-bold text-white mb-3';
+const link = 'text-[#fd625d] underline underline-offset-2 hover:text-[#ffb3ad]';
+---
+
+<LegalLayout
+  title="Política de privacidad"
+  description="Qué datos recoge esta web (ninguno) y qué hacemos con los que nos envías por WhatsApp, Telegram o correo."
+>
+  <section>
+    <h2 class={h2}>Esta web no guarda tus datos</h2>
+    <p>
+      Esta web es estática y está alojada en Vercel. No tiene base de datos ni cuentas de usuario. Como cualquier
+      hosting, Vercel puede registrar datos técnicos de la visita (como la IP y el navegador) para servir y proteger la
+      página; nosotros no usamos esos datos.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>El formulario y el cotizador</h2>
+    <p class="mb-3">
+      Cuando envías el formulario de contacto o el cotizador, la web solo abre WhatsApp, Telegram o tu correo con el
+      mensaje ya escrito. Lo que pasa después depende de ti: el mensaje no sale hasta que lo envías tú desde esa
+      aplicación.
+    </p>
+    <p>
+      La web no envía lo que escribes a ningún servidor nuestro: lo pasa a WhatsApp, Telegram o tu app de correo para
+      que lo revises. Solo lo recibimos si tú lo envías.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Qué hacemos con lo que nos envías</h2>
+    <p class="mb-3">
+      Si nos escribes por WhatsApp, Telegram o correo, recibimos tu mensaje y los datos que incluyas en él (por ejemplo,
+      tu nombre, tu número o lo que cuentes de tu negocio).
+    </p>
+    <ul class="list-disc pl-6 space-y-2">
+      <li>Los usamos para responderte, preparar tu cotización y trabajar en tu proyecto.</li>
+      <li>No los vendemos ni los compartimos con terceros para publicidad.</li>
+      <li>
+        Si quieres que borremos tu conversación o tus datos de nuestros dispositivos y cuentas, pídenoslo, salvo lo que
+        necesitemos conservar de un proyecto en curso o de sus pagos.
+      </li>
+    </ul>
+    <p class="mt-3">
+      Esos canales tienen sus propias políticas de privacidad, que no controlamos: WhatsApp, Telegram y tu proveedor de
+      correo.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Cookies y analítica</h2>
+    <p>
+      Esta web no usa cookies propias ni herramientas de analítica o seguimiento. Para mostrar los textos con su tipo de
+      letra y los iconos, la página carga fuentes desde Google Fonts, por lo que tu navegador se conecta a los servidores
+      de Google para descargarlas, y Google puede ver tu IP.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Enlaces a otras webs</h2>
+    <p>
+      Las demos del portafolio y las redes sociales son webs distintas, con sus propias normas. Al abrirlas sales de esta
+      web.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Contacto</h2>
+    <p class="mb-3">Para cualquier duda sobre esta política o sobre tus datos:</p>
+    <ul class="space-y-2">
+      <li>Correo: <a href={EMAIL_URL} class={link}>{EMAIL}</a></li>
+      <li>
+        WhatsApp: <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" class={link}>{WHATSAPP_DISPLAY}</a>
+      </li>
+      <li>
+        Telegram: <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" class={link}>{TELEGRAM_HANDLE}</a>
+      </li>
+    </ul>
+  </section>
+</LegalLayout>

@@ -1,0 +1,69 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { SITE_NAME } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const pages = [
+  { label: 'Privacidad', href: '/privacidad' },
+  { label: 'Términos', href: '/terminos' },
+  { label: 'Seguridad', href: '/seguridad' },
+];
+const current = Astro.url.pathname.replace(/\/$/, '');
+---
+
+<BaseLayout title={`${title} | ${SITE_NAME}`} description={description}>
+  <div class="min-h-screen bg-[#131315] text-[#e5e1e4] flex flex-col font-inter">
+    <header class="border-b border-[#353437] bg-[#131315]/90">
+      <div class="flex justify-between items-center w-full px-4 md:px-6 max-w-[1280px] mx-auto h-20">
+        <a href="/" class="font-sora text-2xl md:text-[32px] font-bold text-[#e5e1e4] hover:opacity-90 transition-opacity">
+          Bit <span class="ampersand text-[#ffb3ad]">&amp;</span> Byte
+        </a>
+        <a href="/" class="font-sora text-sm font-semibold text-[#ffb3ad] hover:text-white transition-colors">
+          Volver al inicio
+        </a>
+      </div>
+    </header>
+
+    <main class="flex-1 py-16 md:py-24 px-4 md:px-6">
+      <div class="max-w-3xl mx-auto">
+        <nav aria-label="Páginas legales" class="flex flex-wrap gap-2 mb-10">
+          {
+            pages.map((page) => (
+              <a
+                href={page.href}
+                aria-current={page.href === current ? 'page' : undefined}
+                class:list={[
+                  'px-4 py-1.5 rounded-full border font-sora text-xs font-semibold transition-colors',
+                  page.href === current
+                    ? 'bg-[#fd625d] border-[#fd625d] text-white'
+                    : 'border-[#2A2A2A] text-[#9CA3AF] hover:text-white hover:border-[#353437]',
+                ]}
+              >
+                {page.label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// legal</p>
+        <h1 class="font-sora text-3xl md:text-4xl font-bold text-white mb-3">{title}</h1>
+        <p class="font-technical text-xs text-[#9CA3AF] uppercase tracking-wider mb-10">
+          Última actualización: noviembre 2026
+        </p>
+
+        <div class="space-y-10 font-inter text-base text-[#9CA3AF] leading-relaxed">
+          <slot />
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-[#2A2A2A] py-8 px-4 md:px-6">
+      <p class="max-w-3xl mx-auto text-sm text-[#9CA3AF]">© 2026 Bit &amp; Byte Studio. Hecho en Cuba.</p>
+    </footer>
+  </div>
+</BaseLayout>

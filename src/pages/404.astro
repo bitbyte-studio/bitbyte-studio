@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_NAME } from '../config/site';
+---
+
+<BaseLayout
+  title={`Página no encontrada | ${SITE_NAME}`}
+  description="La página que buscas no existe o cambió de lugar."
+  noindex
+>
+  <main class="min-h-screen bg-[#131315] text-[#e5e1e4] flex items-center justify-center px-4 py-16 relative overflow-hidden">
+    <div class="binary-texture absolute inset-0 opacity-40 pointer-events-none" aria-hidden="true"></div>
+
+    <div class="relative z-10 text-center max-w-xl mx-auto flex flex-col items-center">
+      <p class="font-sora text-2xl font-bold text-[#e5e1e4] mb-10">
+        Bit <span class="ampersand text-[#ffb3ad]">&amp;</span> Byte
+      </p>
+      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// error 404</p>
+      <h1 class="font-sora text-4xl md:text-5xl font-bold text-white mb-4">Esta página no existe</h1>
+      <p class="font-inter text-base md:text-lg text-[#9CA3AF] mb-10">
+        Puede que el enlace esté mal escrito o que la página haya cambiado de lugar.
+      </p>
+      <a
+        href="/"
+        class="bg-[#fd625d] text-white px-8 py-4 rounded-full font-sora text-base font-semibold hover:scale-105 transition-all glow-coral"
+      >
+        Volver al inicio
+      </a>
+    </div>
+  </main>
+</BaseLayout>

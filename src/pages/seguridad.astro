@@ -1,0 +1,61 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { EMAIL, EMAIL_URL, TELEGRAM_HANDLE, TELEGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_URL } from '../config/contact';
+
+const h2 = 'font-sora text-xl md:text-2xl font-bold text-white mb-3';
+const link = 'text-[#fd625d] underline underline-offset-2 hover:text-[#ffb3ad]';
+---
+
+<LegalLayout
+  title="Seguridad"
+  description="Cómo cuidamos la seguridad de esta web y de los proyectos que entregamos, y cómo reportar un problema."
+>
+  <section>
+    <h2 class={h2}>Conexión segura</h2>
+    <p>
+      Esta web se sirve por HTTPS, así que lo que viaja entre tu navegador y la web va cifrado. Las demos y los proyectos
+      que publicamos en Vercel también usan HTTPS.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Una web con pocas piezas</h2>
+    <p>
+      Esta web es estática: no tiene base de datos, cuentas de usuario ni panel de administración, así que hay muy poco
+      que proteger del lado de la web.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>En los proyectos que entregamos</h2>
+    <p class="mb-3">Intentamos seguir buenas prácticas básicas:</p>
+    <ul class="list-disc pl-6 space-y-2">
+      <li>Publicar siempre con HTTPS.</li>
+      <li>Entregar con versiones actualizadas y, si contratas mantenimiento, mantenerlas al día.</li>
+      <li>No dejar contraseñas ni claves dentro del código de la web.</li>
+      <li>Pedir solo los datos que el proyecto necesita.</li>
+    </ul>
+    <p class="mt-3">
+      Ninguna web es invulnerable. Si tu proyecto maneja datos de clientes, lo hablamos antes de empezar para decidir qué
+      cuidados necesita.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Cómo reportar un problema</h2>
+    <p class="mb-3">
+      Si encuentras un fallo de seguridad en esta web o en un proyecto nuestro, avísanos con los pasos para reproducirlo.
+      Lo revisamos lo antes posible. Por favor, no compartas el problema públicamente hasta que lo hayamos podido
+      corregir.
+    </p>
+    <ul class="space-y-2">
+      <li>Correo: <a href={EMAIL_URL} class={link}>{EMAIL}</a></li>
+      <li>
+        WhatsApp: <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" class={link}>{WHATSAPP_DISPLAY}</a>
+      </li>
+      <li>
+        Telegram: <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" class={link}>{TELEGRAM_HANDLE}</a>
+      </li>
+    </ul>
+  </section>
+</LegalLayout>

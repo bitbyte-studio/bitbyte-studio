@@ -1,0 +1,129 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { WHATSAPP_DISPLAY, WHATSAPP_URL } from '../config/contact';
+import {
+  CURRENCY,
+  DOMAIN_OPTION,
+  HOSTING_OPTIONS,
+  MAINTENANCE,
+  PAYMENT,
+  PROJECT_SERVICES,
+  type PublishingOption,
+} from '../config/pricing';
+import { publishingOptionPrice } from '../lib/quote';
+
+const h2 = 'font-sora text-xl md:text-2xl font-bold text-white mb-3';
+const link = 'text-[#fd625d] underline underline-offset-2 hover:text-[#ffb3ad]';
+const money = (value: number) => value.toLocaleString('en-US');
+
+/** Price tag for the default case; options with a per-service price list it in `serviceNote`. */
+const publishingPrice = (option: PublishingOption) => publishingOptionPrice(option, PROJECT_SERVICES[0].id);
+const serviceNote = (option: PublishingOption) => {
+  const overrides = Object.entries(option.priceByService ?? {});
+  return overrides
+    .map(([serviceId, { price, from }]) => {
+      const service = PROJECT_SERVICES.find((item) => item.id === serviceId);
+      return service ? `${service.name}: ${from ? 'desde ' : ''}${money(price)} ${CURRENCY}/mes` : '';
+    })
+    .filter(Boolean)
+    .join('; ');
+};
+---
+
+<LegalLayout
+  title="Términos del servicio"
+  description="Cómo trabajamos: precios en USD, cotización final por WhatsApp, anticipo, formas de pago, hosting, dominio y mantenimiento."
+>
+  <section>
+    <h2 class={h2}>Precios</h2>
+    <p class="mb-3">
+      Los precios son de partida ("desde") y están en {CURRENCY}; también aceptamos CUP al cambio del día. El precio
+      final depende de lo que necesites y lo cerramos contigo por WhatsApp antes de empezar.
+    </p>
+    <ul class="space-y-2">
+      {
+        PROJECT_SERVICES.map((service) => (
+          <li class="flex flex-wrap justify-between gap-x-4 border-b border-[#2A2A2A] pb-2">
+            <span class="text-white">{service.name}</span>
+            <span>
+              desde {money(service.from)} {CURRENCY}
+              {service.suffix ? ` · ${service.suffix}` : ''} · plazo {service.leadTime.toLowerCase()}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-3">Los plazos son orientativos: dependen del alcance y de lo rápido que nos envíes la información.</p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Cotización</h2>
+    <p>
+      El cotizador de la web da un estimado, no una oferta cerrada. Lo que vale es la cotización que te confirmamos por
+      WhatsApp: ahí quedan el alcance, el precio y el plazo.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Pago</h2>
+    <p class="mb-3">{PAYMENT.terms}</p>
+    <p>Métodos de pago: {PAYMENT.methods.join(', ')}.</p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Hosting y dominio</h2>
+    <p class="mb-3">El hosting y el dominio no están incluidos en el precio del proyecto y se pagan aparte:</p>
+    <ul class="list-disc pl-6 space-y-2">
+      {
+        HOSTING_OPTIONS.map((option) => (
+          <li>
+            {option.price === 0 ? (
+              <>
+                <span class="text-white">{option.name}</span> ({option.description}):{' '}
+                {publishingPrice(option).toLowerCase()}.
+              </>
+            ) : (
+              <>
+                <span class="text-white">{option.name}:</span> {publishingPrice(option)}. {option.description}
+                {serviceNote(option) && ` (${serviceNote(option)}.)`}
+              </>
+            )}
+          </li>
+        ))
+      }
+      <li>
+        <span class="text-white">{DOMAIN_OPTION.name}:</span> {publishingPrice(DOMAIN_OPTION)}. {DOMAIN_OPTION.description}.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class={h2}>Mantenimiento</h2>
+    <p class="mb-3">
+      El mantenimiento es opcional y se paga aparte: desde {money(MAINTENANCE.from)} {CURRENCY}{MAINTENANCE.suffix}
+      {
+        MAINTENANCE.annualFrom !== undefined &&
+          `, o ${money(MAINTENANCE.annualFrom)} ${CURRENCY}${MAINTENANCE.suffix} (${money(MAINTENANCE.annualFrom * 12)} ${CURRENCY} al año) pagando el año completo`
+      }.
+    </p>
+    <ul class="list-disc pl-6 space-y-2">
+      {MAINTENANCE.includes?.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+
+  <section>
+    <h2 class={h2}>Revisiones y entrega</h2>
+    <p>
+      Te mostramos avances y hacemos las revisiones que acordemos en la cotización. Los cambios fuera de lo acordado se
+      cotizan aparte.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Dudas</h2>
+    <p>
+      Escríbenos por WhatsApp al <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" class={link}>{WHATSAPP_DISPLAY}</a>{' '}
+      y lo aclaramos antes de empezar.
+    </p>
+  </section>
+</LegalLayout>
