@@ -67,24 +67,24 @@ const socials = [
 
     <div>
       <h3 class="font-technical text-xs font-bold text-[#fd625d] mb-6 uppercase tracking-wider">Explora</h3>
-      <ul class="space-y-4">
-        <li><a href="#inicio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-1">Inicio</a></li>
-        <li><a href="#servicios" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-1">Servicios y precios</a></li>
-        <li><a href="#portafolio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-1">Portafolio</a></li>
-        <li><a href="#proceso" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-1">Proceso</a></li>
-        <li><a href="#contacto" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-1">Contacto</a></li>
+      <ul>
+        <li><a href="#inicio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Inicio</a></li>
+        <li><a href="#servicios" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Servicios y precios</a></li>
+        <li><a href="#portafolio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Portafolio</a></li>
+        <li><a href="#proceso" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Proceso</a></li>
+        <li><a href="#contacto" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Contacto</a></li>
       </ul>
     </div>
 
     <div>
       <h3 class="font-technical text-xs font-bold text-[#fd625d] mb-6 uppercase tracking-wider">Legal</h3>
-      <ul class="space-y-4">
+      <ul>
         {
           legalLinks.map((link) => (
             <li>
               <a
                 href={link.href}
-                class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm"
+                class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2"
               >
                 {link.label}
               </a>
@@ -96,12 +96,12 @@ const socials = [
 
     <div>
       <h3 class="font-technical text-xs font-bold text-[#fd625d] mb-6 uppercase tracking-wider">Contacto</h3>
-      <ul class="space-y-3 mb-8">
+      <ul class="mb-8">
         <li>
           <a
             href={EMAIL_URL}
             aria-label={`Enviar un correo a ${EMAIL}`}
-            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm break-all"
+            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm break-all inline-block py-2"
           >
             {EMAIL}
           </a>
@@ -114,7 +114,7 @@ const socials = [
             data-track="whatsapp"
             data-track-source="footer"
             aria-label={`WhatsApp · ${WHATSAPP_DISPLAY} (se abre en una pestaña nueva)`}
-            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm"
+            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm inline-block py-2"
           >
             WhatsApp · {WHATSAPP_DISPLAY}
           </a>
@@ -125,7 +125,7 @@ const socials = [
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Telegram · ${TELEGRAM_HANDLE} (se abre en una pestaña nueva)`}
-            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm"
+            class="text-[#9CA3AF] hover:text-[#fd625d] transition-colors font-inter text-sm inline-block py-2"
           >
             Telegram · {TELEGRAM_HANDLE}
           </a>
