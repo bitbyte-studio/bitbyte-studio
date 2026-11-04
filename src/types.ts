@@ -10,7 +10,7 @@ export interface ProjectImages {
 
 export interface Project {
   id: string;
-  /** Quotable service from config/pricing.ts that "Cotizar Proyecto Similar" preselects (never maintenance). */
+  /** Quotable service from config/pricing.ts that "Calcular algo similar" preselects (never maintenance). */
   serviceId: ProjectServiceId;
   title: string;
   /** Free-text label shown on the card, e.g. "Restaurante". */

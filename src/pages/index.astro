@@ -10,25 +10,29 @@ import TechStack from '../components/TechStack.astro';
 import AboutContact from '../components/AboutContact.astro';
 import Footer from '../components/Footer.astro';
 import SiteModals from '../components/SiteModals.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 ---
 
 <BaseLayout>
   <div class="min-h-screen bg-[#131315] text-[#e5e1e4] flex flex-col font-inter">
     <Navbar />
-    <Hero />
-    <Services />
-    <Portfolio />
-    <Process />
-    <Pricing />
+    <main id="contenido" tabindex="-1" class="outline-none">
+      <Hero />
+      <Services />
+      <Portfolio />
+      <Process />
+      <Pricing />
 
-    <section class="bg-[#F7F5F2] py-20 md:py-[120px]">
-      <div class="max-w-[1280px] mx-auto px-4 md:px-6">
-        <TechStack />
-        <AboutContact />
-      </div>
-    </section>
+      <section class="surface-light bg-[#F7F5F2] py-20 md:py-[120px]">
+        <div class="max-w-[1280px] mx-auto px-4 md:px-6">
+          <TechStack />
+          <AboutContact />
+        </div>
+      </section>
+    </main>
 
     <Footer />
     <SiteModals />
+    <WhatsAppFloat />
   </div>
 </BaseLayout>

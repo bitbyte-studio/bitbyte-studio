@@ -4,10 +4,10 @@ import { PROCESS_STEPS } from '../data';
 const initial = PROCESS_STEPS[0];
 ---
 
-<section id="proceso" class="bg-[#F7F5F2] py-20 md:py-[120px]" data-process>
+<section id="proceso" class="surface-light bg-[#F7F5F2] py-20 md:py-[120px]" data-process>
   <div class="max-w-[1280px] mx-auto px-4 md:px-6">
     <div class="mb-14 md:mb-16 text-center flex flex-col items-center">
-      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// proceso</p>
+      <p class="font-technical text-sm font-bold text-coral-ink mb-2 uppercase tracking-widest">// proceso</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A]">Cómo trabajamos</h2>
       <p class="font-inter text-sm text-[#5B5B5E] mt-3 max-w-lg">
         Así trabajamos de principio a fin. Selecciona cada paso para ver los detalles.
@@ -36,17 +36,17 @@ const initial = PROCESS_STEPS[0];
               class:list={[
                 'process-badge w-12 h-12 rounded-full flex items-center justify-center font-sora font-bold text-lg mb-6 transition-transform',
                 item.step === initial.step
-                  ? 'bg-[#fd625d] text-white scale-110 shadow-md'
+                  ? 'bg-coral-strong text-white scale-110 shadow-md'
                   : 'bg-[#1A1A1A] text-white',
               ]}
             >
               {item.step}
             </div>
-            <h4 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2">{item.title}</h4>
+            <h3 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2">{item.title}</h3>
             <p class="text-sm font-inter text-[#4A4A4A] leading-relaxed">{item.description}</p>
-            <div class="mt-4 text-xs font-technical text-[#fd625d] uppercase font-bold flex items-center gap-1">
+            <div class="mt-4 text-xs font-technical text-coral-ink uppercase font-bold flex items-center gap-1">
               <span class="process-label">{item.step === initial.step ? 'Paso seleccionado' : 'Ver detalle'}</span>
-              <span class="material-symbols-outlined text-sm process-icon">
+              <span class="material-symbols-outlined text-sm process-icon" aria-hidden="true">
                 {item.step === initial.step ? 'expand_less' : 'expand_more'}
               </span>
             </div>
@@ -78,11 +78,16 @@ const initial = PROCESS_STEPS[0];
               type="button"
               data-step-dot={item.step}
               aria-label={`Ir al paso ${item.step}`}
-              class:list={[
-                'process-dot w-3 h-3 rounded-full transition-colors',
-                item.step === initial.step ? 'bg-[#fd625d]' : 'bg-[#353437]',
-              ]}
-            />
+              class="process-dot w-6 h-6 flex items-center justify-center rounded-full"
+            >
+              <span
+                aria-hidden="true"
+                class:list={[
+                  'process-dot-fill block w-3 h-3 rounded-full transition-colors',
+                  item.step === initial.step ? 'bg-[#fd625d]' : 'bg-[#353437]',
+                ]}
+              />
+            </button>
           ))
         }
       </div>
@@ -110,7 +115,7 @@ const initial = PROCESS_STEPS[0];
         el.classList.toggle('bg-transparent', !active);
 
         const badge = el.querySelector('.process-badge');
-        badge?.classList.toggle('bg-[#fd625d]', active);
+        badge?.classList.toggle('bg-coral-strong', active);
         badge?.classList.toggle('scale-110', active);
         badge?.classList.toggle('shadow-md', active);
         badge?.classList.toggle('bg-[#1A1A1A]', !active);
@@ -129,8 +134,9 @@ const initial = PROCESS_STEPS[0];
 
       dots.forEach((dot) => {
         const active = Number(dot.dataset.stepDot) === step;
-        dot.classList.toggle('bg-[#fd625d]', active);
-        dot.classList.toggle('bg-[#353437]', !active);
+        const fill = dot.querySelector('.process-dot-fill');
+        fill?.classList.toggle('bg-[#fd625d]', active);
+        fill?.classList.toggle('bg-[#353437]', !active);
       });
     };
 

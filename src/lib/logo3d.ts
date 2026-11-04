@@ -25,6 +25,8 @@ const OUTLINE_STROKE = 0.13;
 
 type LogoHandle = {
   dispose: () => void;
+  /** False when WebGL is unavailable and nothing was drawn on the canvas. */
+  ready: boolean;
 };
 
 function createCoralMaterial(emissiveIntensity = 0.34) {
@@ -159,7 +161,7 @@ export function mountLogo3D(canvas: HTMLCanvasElement, visibilityTarget: Element
       powerPreference: 'high-performance',
     });
   } catch {
-    return { dispose: () => {} };
+    return { dispose: () => {}, ready: false };
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
@@ -233,6 +235,7 @@ export function mountLogo3D(canvas: HTMLCanvasElement, visibilityTarget: Element
   animationId = requestAnimationFrame(animate);
 
   return {
+    ready: true,
     dispose: () => {
       disposed = true;
       observer.disconnect();

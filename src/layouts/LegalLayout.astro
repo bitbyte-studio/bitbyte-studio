@@ -29,7 +29,7 @@ const current = Astro.url.pathname.replace(/\/$/, '');
       </div>
     </header>
 
-    <main class="flex-1 py-16 md:py-24 px-4 md:px-6">
+    <main id="contenido" tabindex="-1" class="flex-1 py-16 md:py-24 px-4 md:px-6 outline-none">
       <div class="max-w-3xl mx-auto">
         <nav aria-label="Páginas legales" class="flex flex-wrap gap-2 mb-10">
           {
@@ -40,7 +40,7 @@ const current = Astro.url.pathname.replace(/\/$/, '');
                 class:list={[
                   'px-4 py-1.5 rounded-full border font-sora text-xs font-semibold transition-colors',
                   page.href === current
-                    ? 'bg-[#fd625d] border-[#fd625d] text-white'
+                    ? 'bg-coral-strong border-coral-strong text-white'
                     : 'border-[#2A2A2A] text-[#9CA3AF] hover:text-white hover:border-[#353437]',
                 ]}
               >

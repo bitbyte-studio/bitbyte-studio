@@ -5,11 +5,11 @@ import { CURRENCY, SERVICES } from '../config/pricing';
 const money = (value: number) => value.toLocaleString('en-US');
 ---
 
-<section id="servicios" class="bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A] scroll-mt-20" data-services>
+<section id="servicios" class="surface-light bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A] scroll-mt-20" data-services>
   <div class="max-w-[1280px] mx-auto">
     <div class="mb-14 md:mb-16 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
       <div>
-        <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// servicios</p>
+        <p class="font-technical text-sm font-bold text-coral-ink mb-2 uppercase tracking-widest">// servicios</p>
         <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A] leading-tight">
           Lo que hacemos
         </h2>
@@ -21,7 +21,7 @@ const money = (value: number) => value.toLocaleString('en-US');
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {
-        SERVICES.map((service, index) => (
+        SERVICES.map((service) => (
           <div
             role="button"
             tabindex="0"
@@ -30,9 +30,6 @@ const money = (value: number) => value.toLocaleString('en-US');
             class="service-card bg-white p-7 rounded-xl border border-[#E5E0D8] hover-lift transition-all cursor-pointer relative overflow-hidden group flex flex-col justify-between"
           >
             <div>
-              <div class="absolute top-0 right-0 p-3 opacity-10 font-technical text-3xl text-[#1A1A1A] font-bold" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}/
-              </div>
               <div class="w-14 h-14 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-5 text-[#FD625D] group-hover:bg-[#FD625D] group-hover:text-white transition-colors">
                 <span class="material-symbols-outlined text-3xl" aria-hidden="true">{service.icon}</span>
               </div>
@@ -88,9 +85,9 @@ const money = (value: number) => value.toLocaleString('en-US');
                   <button
                     type="button"
                     data-open-quote={service.id}
-                    class="bg-[#fd625d] text-white px-6 py-3 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral inline-flex items-center gap-2"
+                    class="bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-3 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral inline-flex items-center gap-2"
                   >
-                    <span>Cotizar {service.name}</span>
+                    <span>Calcular presupuesto</span>
                     <span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
                   </button>
                 )}

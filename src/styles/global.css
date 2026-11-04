@@ -1,6 +1,24 @@
 @import "tailwindcss";
 
+@theme {
+  --color-coral: #fd625d;
+  /* Fill for buttons with white text: 4.8:1 (the plain coral only reaches 2.96:1). */
+  --color-coral-strong: #d4352f;
+  --color-coral-strong-hover: #b92d28;
+  /* Coral text on light surfaces: 5.4:1 on #F7F5F2. */
+  --color-coral-ink: #b8332f;
+}
+
 @layer base {
+  :focus-visible {
+    outline: 2px solid #fd625d;
+    outline-offset: 3px;
+  }
+
+  .surface-light :focus-visible {
+    outline-color: #b8332f;
+  }
+
   body {
     font-family: 'Inter', sans-serif;
     background-color: #131315;
@@ -123,4 +141,19 @@
 
 .animate-fadeIn {
   animation: fadeIn 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
 }

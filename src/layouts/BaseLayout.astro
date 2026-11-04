@@ -103,6 +103,12 @@ const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
     <slot name="head" />
   </head>
   <body class="bg-[#131315] text-[#e5e1e4] antialiased selection:bg-[#fd625d] selection:text-white">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-white focus:text-[#131315] focus:px-4 focus:py-2 focus:rounded-full focus:font-sora focus:text-sm focus:font-semibold"
+    >
+      Saltar al contenido
+    </a>
     <slot />
   </body>
 </html>

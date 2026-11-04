@@ -55,7 +55,7 @@ const money = (value: number) => value.toLocaleString('en-US');
               href={waLink(service.name)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Pedir ${service.name} por WhatsApp (se abre en una pestaña nueva)`}
+              aria-label={`Pedir por WhatsApp: ${service.name} (se abre en una pestaña nueva)`}
               class="w-full py-3.5 rounded-full font-sora text-sm font-semibold transition-all border border-white text-white hover:bg-white hover:text-[#131315] flex items-center justify-center gap-2"
             >
               <span>Pedir por WhatsApp</span>
@@ -105,8 +105,8 @@ const money = (value: number) => value.toLocaleString('en-US');
         href={waLink(MAINTENANCE.name)}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Pedir ${MAINTENANCE.name} por WhatsApp (se abre en una pestaña nueva)`}
-        class="w-full py-3.5 rounded-full font-sora text-sm font-semibold transition-all bg-[#fd625d] text-white glow-coral hover:scale-105 flex items-center justify-center gap-2"
+        aria-label={`Pedir por WhatsApp: ${MAINTENANCE.name} (se abre en una pestaña nueva)`}
+        class="w-full py-3.5 rounded-full font-sora text-sm font-semibold transition-all bg-coral-strong hover:bg-coral-strong-hover text-white glow-coral hover:scale-105 flex items-center justify-center gap-2"
       >
         <span>Pedir por WhatsApp</span>
       </a>
@@ -136,7 +136,7 @@ const money = (value: number) => value.toLocaleString('en-US');
           data-open-quote
           class="w-full sm:w-auto bg-white text-[#131315] px-8 py-3 rounded-full font-sora text-sm font-bold hover:bg-[#ffb3ad] transition-colors"
         >
-          Calcular mi presupuesto //
+          Calcular presupuesto
         </button>
       </div>
     </div>

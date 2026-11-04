@@ -1,4 +1,9 @@
 ---
+import { whatsappLink } from '../config/contact';
+
+const WA_MESSAGE = '¡Hola Bit & Byte Studio! Estoy interesado en construir una solución digital con ustedes.';
+const waHref = whatsappLink(WA_MESSAGE);
+
 const navLinks = [
   { label: 'Inicio', href: '#inicio', id: 'inicio' },
   { label: 'Servicios', href: '#servicios', id: 'servicios' },
@@ -42,36 +47,38 @@ const navLinks = [
       <button
         type="button"
         data-open-quote
-        class="border border-[#fd625d] text-[#fd625d] px-4 py-2 rounded-full font-sora text-sm font-semibold hover:bg-[#fd625d] hover:text-white transition-all ml-2"
+        class="border border-[#fd625d] text-[#ffb3ad] px-4 py-2 rounded-full font-sora text-sm font-semibold hover:bg-coral-strong hover:border-coral-strong hover:text-white transition-all ml-2"
       >
-        Cotizador <span class="font-technical text-xs">//</span>
+        Calcular presupuesto
       </button>
 
-      <button
-        type="button"
-        data-whatsapp
-        class="bg-[#fd625d] text-white px-6 py-2 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral flex items-center gap-2"
+      <a
+        href={waHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp (se abre en una pestaña nueva)"
+        class="bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-2 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral flex items-center gap-2"
       >
         <span>WhatsApp</span>
-      </button>
+      </a>
     </nav>
 
     <div class="flex items-center gap-2 lg:hidden">
       <button
         type="button"
         data-open-quote
-        class="bg-[#fd625d]/20 border border-[#fd625d] text-[#fd625d] px-3 py-1.5 rounded-full font-sora text-xs font-semibold"
+        class="bg-[#fd625d]/20 border border-[#fd625d] text-[#ffb3ad] px-3 py-2.5 rounded-full font-sora text-xs font-semibold"
       >
-        Cotizar
+        Presupuesto
       </button>
       <button
         type="button"
         data-menu-toggle
-        class="p-2 text-[#e5e1e4] hover:text-[#ffb3ad] focus:outline-none"
+        class="p-2 text-[#e5e1e4] hover:text-[#ffb3ad]"
         aria-label="Abrir menú"
         aria-expanded="false"
       >
-        <span class="material-symbols-outlined text-2xl" data-menu-icon>menu</span>
+        <span class="material-symbols-outlined text-2xl" data-menu-icon aria-hidden="true">menu</span>
       </button>
     </div>
   </div>
@@ -100,29 +107,28 @@ const navLinks = [
         type="button"
         data-open-quote
         data-close-menu
-        class="w-full text-center border-2 border-[#fd625d] text-[#fd625d] py-3 rounded-full font-sora text-sm font-semibold"
+        class="w-full text-center border-2 border-[#fd625d] text-[#ffb3ad] py-3 rounded-full font-sora text-sm font-semibold"
       >
-        Cotizar Proyecto Online
+        Calcular presupuesto
       </button>
-      <button
-        type="button"
-        data-whatsapp
+      <a
+        href={waHref}
+        target="_blank"
+        rel="noopener noreferrer"
         data-close-menu
-        class="w-full text-center bg-[#fd625d] text-white py-3 rounded-full font-sora text-sm font-semibold glow-coral"
+        aria-label="Hablar por WhatsApp (se abre en una pestaña nueva)"
+        class="w-full text-center bg-coral-strong hover:bg-coral-strong-hover text-white py-3 rounded-full font-sora text-sm font-semibold glow-coral"
       >
         Hablar por WhatsApp
-      </button>
+      </a>
     </div>
   </div>
 </header>
 
 <script>
-  import { whatsappLink } from '../config/contact';
   import { mountAll } from '../lib/lifecycle';
 
   const SECTIONS = ['inicio', 'servicios', 'portafolio', 'proceso', 'precios', 'contacto'];
-  const WA_MESSAGE =
-    '¡Hola Bit & Byte Studio! Estoy interesado en construir una solución digital con ustedes.';
 
   function initNavbar(root: HTMLElement, signal: AbortSignal) {
     const menu = root.querySelector<HTMLElement>('[data-mobile-menu]');
@@ -178,12 +184,6 @@ const navLinks = [
 
     root.querySelectorAll<HTMLElement>('[data-mobile-link], [data-close-menu]').forEach((el) => {
       el.addEventListener('click', () => setMenuOpen(false), { signal });
-    });
-
-    root.querySelectorAll<HTMLElement>('[data-whatsapp]').forEach((button) => {
-      button.addEventListener('click', () => {
-        window.open(whatsappLink(WA_MESSAGE), '_blank', 'noopener,noreferrer');
-      }, { signal });
     });
 
     window.addEventListener('scroll', onScroll, { passive: true, signal });

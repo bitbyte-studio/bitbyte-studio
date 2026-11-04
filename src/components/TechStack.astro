@@ -7,7 +7,7 @@ const initial = TECH_STACK[0];
 <div class="mb-20 md:mb-24" data-tech-stack>
   <div class="mb-10 md:mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
     <div>
-      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// stack</p>
+      <p class="font-technical text-sm font-bold text-coral-ink mb-2 uppercase tracking-widest">// stack</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A]">
         Tecnologías con las que trabajamos
       </h2>
@@ -37,8 +37,8 @@ const initial = TECH_STACK[0];
           </span>
           <span
             class:list={[
-              'tech-cat text-[9px] font-technical mt-1 uppercase',
-              tech.name === initial.name ? 'text-[#ffb3ad]' : 'text-[#9CA3AF]',
+              'tech-cat text-[11px] font-technical mt-1 uppercase',
+              tech.name === initial.name ? 'text-[#ffb3ad]' : 'text-[#6A6A6E]',
             ]}
           >
             {tech.category}
@@ -50,7 +50,7 @@ const initial = TECH_STACK[0];
 
   <div class="bg-[#1A1A1A] text-white p-6 md:p-8 rounded-2xl border border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl animate-fadeIn">
     <div class="flex items-center gap-5">
-      <div class="tech-abbr w-12 h-12 rounded-xl bg-[#fd625d]/20 text-[#fd625d] flex items-center justify-center font-technical font-bold text-lg shrink-0">
+      <div class="tech-abbr w-12 h-12 rounded-xl bg-[#fd625d]/20 text-[#ff8a85] flex items-center justify-center font-technical font-bold text-lg shrink-0">
         {initial.name.slice(0, 2).toUpperCase()}
       </div>
       <div>
@@ -92,7 +92,7 @@ const initial = TECH_STACK[0];
 
         const cat = btn.querySelector('.tech-cat');
         cat?.classList.toggle('text-[#ffb3ad]', active);
-        cat?.classList.toggle('text-[#9CA3AF]', !active);
+        cat?.classList.toggle('text-[#6A6A6E]', !active);
       });
 
       const techName = button.dataset.techName || '';
