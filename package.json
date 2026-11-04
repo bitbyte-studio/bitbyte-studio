@@ -12,6 +12,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "check": "astro check",
+    "test": "bun test",
     "og": "bun scripts/generate-og.ts"
   },
   "dependencies": {
@@ -22,7 +24,10 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/bun": "^1.4.4",
     "@types/three": "^0.185.3",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "typescript": "6"
   }
 }

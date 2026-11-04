@@ -182,7 +182,7 @@ const navLinks = [
     };
 
     toggle.addEventListener('click', () => {
-      setMenuOpen(menu.hidden);
+      setMenuOpen(Boolean(menu.hidden));
     }, { signal });
 
     root.querySelectorAll<HTMLElement>('[data-mobile-link], [data-close-menu]').forEach((el) => {
