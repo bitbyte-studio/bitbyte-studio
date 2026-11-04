@@ -69,7 +69,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     question: '¿Qué necesito enviar para empezar (fotos, textos, logo)?',
     answer:
-      'Tu logo (si tienes), fotos de tus productos, precios, textos básicos (quiénes sois, horario, dirección) y tu WhatsApp. Si no tienes fotos o logo, te ayudamos a resolverlo.',
+      'Tu logo (si tienes), fotos de tus productos, precios, textos básicos (quiénes son, horario, dirección) y tu WhatsApp. Si no tienes fotos o logo, te ayudamos a resolverlo.',
   },
   {
     question: '¿Quién es el dueño de la web cuando se entrega?',
@@ -80,7 +80,7 @@ export const FAQ: readonly FaqItem[] = [
     answer: `Las webs son ligeras y cargan bien con datos móviles. Para restaurantes, el ${DIGITAL_MENU_NAME.toLowerCase()} funciona sin internet, por la WiFi del local.`,
   },
   {
-    question: '¿Trabajáis con negocios fuera de Cuba?',
+    question: '¿Trabajan con negocios fuera de Cuba?',
     answer: `Sí. Trabajamos en remoto con negocios de cualquier país y aceptamos pago en ${CURRENCY}.`,
   },
   {
