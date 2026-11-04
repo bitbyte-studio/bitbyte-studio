@@ -1,5 +1,5 @@
 import type { Project, TechItem } from './types';
-import { MAINTENANCE, PAYMENT, type ServiceId } from './config/pricing';
+import { MAINTENANCE, PAYMENT, REVISION_ROUNDS, type ServiceId } from './config/pricing';
 import barbaNegraCard from './assets/portfolio/barba-negra-card.webp';
 import barbaNegraModal from './assets/portfolio/barba-negra-modal.webp';
 import sazonLolaCard from './assets/portfolio/sazon-lola-card.webp';
@@ -208,7 +208,7 @@ export const PROCESS_STEPS = [
     title: 'Diseño y desarrollo',
     description: 'Hacemos tu web y te la vamos mostrando.',
     detail:
-      'Te enseñamos avances para que nos digas qué cambiar. Incluimos revisiones, así el resultado queda como lo imaginabas.',
+      `Te enseñamos avances para que nos digas qué cambiar. Incluimos ${REVISION_ROUNDS} rondas de revisión, así el resultado queda como lo imaginabas.`,
   },
   {
     step: 4,

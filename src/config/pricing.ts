@@ -209,6 +209,9 @@ export const DOMAIN_OPTION: PublishingOption = {
   billing: 'yearly',
 };
 
+/** Revision rounds included in every project. Extra or out-of-scope changes are quoted separately. */
+export const REVISION_ROUNDS = 2;
+
 const DEPOSIT_PERCENT = 50;
 
 export const PAYMENT = {

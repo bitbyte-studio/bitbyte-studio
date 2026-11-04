@@ -6,6 +6,7 @@ import {
   MAINTENANCE,
   PAYMENT,
   PROJECT_SERVICES,
+  REVISION_ROUNDS,
 } from './pricing';
 
 export interface FaqItem {
@@ -16,6 +17,7 @@ export interface FaqItem {
 const money = (value: number) => value.toLocaleString('en-US');
 
 const freeHosting = HOSTING_OPTIONS.find((option) => option.price === 0);
+const DIGITAL_MENU_NAME = PROJECT_SERVICES.find((service) => service.id === 'digitalmenu')?.name ?? 'menú digital';
 const managedHosting = HOSTING_OPTIONS.find((option) => option.billing === 'monthly');
 
 /**
@@ -60,9 +62,26 @@ export const FAQ: readonly FaqItem[] = [
       .join(', ')}.`,
   },
   {
-    question: '¿Puedo pedir cambios durante el proyecto?',
+    question: '¿Cuántas revisiones incluye cada proyecto?',
+    answer: `Cada proyecto incluye ${REVISION_ROUNDS} rondas de revisión. Los cambios extra o de alcance se cotizan aparte.`,
+  },
+  {
+    question: '¿Qué necesito enviar para empezar (fotos, textos, logo)?',
     answer:
-      'Te mostramos avances y hacemos las revisiones que acordemos en la cotización. Los cambios fuera de lo acordado se cotizan aparte.',
+      'Tu logo (si tienes), fotos de tus productos, precios, textos básicos (quiénes sois, horario, dirección) y tu WhatsApp. Si no tienes fotos o logo, te ayudamos a resolverlo.',
+  },
+  {
+    question: '¿Quién es el dueño de la web cuando se entrega?',
+    answer:
+      'Tú. Al pagar el total, el contenido y el dominio quedan a tu nombre. El hosting y el mantenimiento son opcionales y se pagan aparte.',
+  },
+  {
+    question: '¿Funciona sin internet o con datos móviles limitados?',
+    answer: `Las webs son ligeras y cargan bien con datos móviles. Para restaurantes, el ${DIGITAL_MENU_NAME.toLowerCase()} funciona sin internet, por la WiFi del local.`,
+  },
+  {
+    question: '¿Trabajáis con negocios fuera de Cuba?',
+    answer: `Sí. Trabajamos en remoto con negocios de cualquier país y aceptamos pago en ${CURRENCY}.`,
   },
   {
     question: '¿El cotizador es un precio cerrado?',
@@ -75,10 +94,4 @@ export const FAQ: readonly FaqItem[] = [
  * Questions people usually ask that the site cannot answer yet. Fill in `answer` and move each one into FAQ;
  * they are not rendered on the page.
  */
-export const PENDING_FAQ: readonly { question: string; note: string }[] = [
-  { question: '¿Cuántas revisiones incluye cada proyecto?', note: 'Hoy solo consta "las que acordemos en la cotización".' },
-  { question: '¿Qué necesito enviarte para empezar (fotos, textos, logo)?', note: 'Sin política escrita.' },
-  { question: '¿Funciona sin internet o con datos móviles limitados?', note: 'Sin dato verificado.' },
-  { question: '¿Quién es dueño de la web cuando se entrega?', note: 'Sin política escrita.' },
-  { question: '¿Trabajan con negocios fuera de Cuba?', note: 'Sin dato verificado.' },
-];
+export const PENDING_FAQ: readonly { question: string; note: string }[] = [];

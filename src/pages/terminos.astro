@@ -8,6 +8,7 @@ import {
   MAINTENANCE,
   PAYMENT,
   PROJECT_SERVICES,
+  REVISION_ROUNDS,
   type PublishingOption,
 } from '../config/pricing';
 import { publishingOptionPrice } from '../lib/quote';
@@ -114,8 +115,16 @@ const serviceNote = (option: PublishingOption) => {
   <section>
     <h2 class={h2}>Revisiones y entrega</h2>
     <p>
-      Te mostramos avances y hacemos las revisiones que acordemos en la cotización. Los cambios fuera de lo acordado se
-      cotizan aparte.
+      Te mostramos avances y cada proyecto incluye {REVISION_ROUNDS} rondas de revisión. Los cambios extra o fuera del
+      alcance acordado se cotizan aparte.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}>Propiedad</h2>
+    <p>
+      Al pagar el total del proyecto, el contenido y el dominio quedan a tu nombre. El hosting y el mantenimiento son
+      opcionales y se pagan aparte.
     </p>
   </section>
 
