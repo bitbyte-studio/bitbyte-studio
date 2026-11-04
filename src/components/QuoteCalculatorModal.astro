@@ -302,6 +302,7 @@ const initialQuote = calculateQuote(initialService.id);
 <script>
   import { OPEN_QUOTE_EVENT, openQuote, type OpenQuoteDetail } from '../lib/events';
   import { whatsappLink } from '../config/contact';
+  import { mountTracking, track } from '../lib/analytics';
   import {
     DEFAULT_HOSTING_ID,
     HOSTING_OPTIONS,
@@ -516,7 +517,10 @@ const initialQuote = calculateQuote(initialService.id);
 
     root.querySelector<HTMLElement>('[data-quote-whatsapp]')?.addEventListener(
       'click',
-      () => window.open(whatsappLink(quoteToMessage(currentQuote())), '_blank', 'noopener,noreferrer'),
+      () => {
+        track('whatsapp_click', { source: 'cotizador', service: serviceId });
+        window.open(whatsappLink(quoteToMessage(currentQuote())), '_blank', 'noopener,noreferrer');
+      },
       { signal },
     );
 
@@ -530,9 +534,15 @@ const initialQuote = calculateQuote(initialService.id);
       { signal },
     );
 
+    mountTracking(signal);
+
     window.addEventListener(
       OPEN_QUOTE_EVENT,
-      (event) => open((event as CustomEvent<OpenQuoteDetail>).detail?.service),
+      (event) => {
+        const requested = (event as CustomEvent<OpenQuoteDetail>).detail?.service;
+        track('quote_open', { service: requested });
+        open(requested);
+      },
       { signal },
     );
 

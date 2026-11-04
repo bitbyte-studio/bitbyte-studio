@@ -152,6 +152,7 @@ const inputClass =
 
 <script>
   import { emailLink, whatsappLink } from '../config/contact';
+  import { track } from '../lib/analytics';
   import { mountAll } from '../lib/lifecycle';
 
   function buildMessage(name: string, service: string, message: string) {
@@ -226,6 +227,7 @@ const inputClass =
         }
 
         const url = whatsappLink(buildMessage(name, service, message));
+        track('contact_submit', { source: 'contacto', service: service || undefined });
         fallback.href = url;
         window.open(url, '_blank', 'noopener,noreferrer');
 
