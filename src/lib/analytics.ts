@@ -1,34 +1,43 @@
 /**
- * Event hook with no provider: nothing leaves the browser until `setAnalyticsProvider` is called.
- * To enable analytics, pick a provider, call `setAnalyticsProvider` once on load and update /privacidad.
+ * Every event goes through `track()`. It reaches Umami (loaded only in production, see BaseLayout) and is also
+ * re-emitted as a `bb:track` browser event. If the Umami script is missing (dev, ad blocker) nothing happens.
  */
 
-export type AnalyticsEvent = 'whatsapp_click' | 'quote_open' | 'contact_submit';
+export type AnalyticsEvent =
+  | 'whatsapp_click'
+  | 'quote_open'
+  | 'contact_submit'
+  | 'project_open'
+  | 'project_demo_click'
+  | 'project_quote_similar';
 
 export type AnalyticsProps = {
   /** Where the event came from, e.g. "nav", "flotante" or "servicio:catalogo". */
   source?: string;
   service?: string;
+  project?: string;
 };
 
-export type AnalyticsProvider = (event: AnalyticsEvent, props: AnalyticsProps) => void;
+type UmamiWindow = Window & {
+  umami?: { track?: (event: string, data?: Record<string, string>) => void };
+};
 
 export const TRACK_EVENT = 'bb:track';
-
-let provider: AnalyticsProvider | undefined;
-
-export function setAnalyticsProvider(next: AnalyticsProvider | undefined) {
-  provider = next;
-}
 
 export function track(event: AnalyticsEvent, props: AnalyticsProps = {}) {
   if (typeof window === 'undefined') return;
   window.dispatchEvent(new CustomEvent(TRACK_EVENT, { detail: { event, props } }));
   if (import.meta.env.DEV) console.debug('[analytics]', event, props);
+
+  // Umami only accepts defined values.
+  const data = Object.fromEntries(Object.entries(props).filter(([, value]) => value !== undefined)) as Record<
+    string,
+    string
+  >;
   try {
-    provider?.(event, props);
+    (window as UmamiWindow).umami?.track?.(event, data);
   } catch {
-    // A broken provider must never break the page.
+    // Analytics must never break the page.
   }
 }
 

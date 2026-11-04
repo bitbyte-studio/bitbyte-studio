@@ -8,7 +8,7 @@ import {
   TELEGRAM_URL,
   WHATSAPP_NUMBER,
 } from '../config/contact';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from '../config/site';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, UMAMI_SCRIPT_URL, UMAMI_WEBSITE_ID } from '../config/site';
 
 interface Props {
   title?: string;
@@ -90,6 +90,12 @@ const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
     <meta name="twitter:image:alt" content={imageAlt} />
 
     <script type="application/ld+json" set:html={jsonLdString} />
+
+    {
+      import.meta.env.PROD && (
+        <script is:inline defer src={UMAMI_SCRIPT_URL} data-website-id={UMAMI_WEBSITE_ID} />
+      )
+    }
 
     <Font cssVariable="--font-sora" preload={[{ weight: 700, style: 'normal', subset: 'latin' }]} />
     <Font cssVariable="--font-inter" preload={[{ weight: 400, style: 'normal', subset: 'latin' }]} />

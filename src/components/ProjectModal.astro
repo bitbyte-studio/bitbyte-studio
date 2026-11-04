@@ -85,6 +85,7 @@ import { PROJECTS } from '../data';
             <div>
               <a
                 href={project.liveUrl}
+                data-track-demo={project.id}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Ver demo de ${project.title} (se abre en una pestaña nueva)`}
@@ -138,6 +139,7 @@ import { PROJECTS } from '../data';
 </div>
 
 <script>
+  import { track } from '../lib/analytics';
   import { OPEN_PROJECT_EVENT, openQuote, type OpenProjectDetail } from '../lib/events';
   import { mountAll } from '../lib/lifecycle';
   import { createModal, setVisible } from '../lib/modal';
@@ -160,10 +162,16 @@ import { PROJECTS } from '../data';
       button.addEventListener('click', close, { signal });
     });
 
+    modal.querySelectorAll<HTMLElement>('[data-track-demo]').forEach((link) => {
+      link.addEventListener('click', () => track('project_demo_click', { project: link.dataset.trackDemo }), { signal });
+    });
+
     modal.querySelectorAll<HTMLElement>('[data-quote-similar]').forEach((button) => {
       button.addEventListener(
         'click',
         () => {
+          const panel = button.closest<HTMLElement>('[data-project-panel]');
+          track('project_quote_similar', { project: panel?.dataset.projectPanel, service: button.dataset.quoteSimilar });
           close();
           openQuote(button.dataset.quoteSimilar || undefined);
         },

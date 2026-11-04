@@ -35,7 +35,9 @@ Sitio corporativo de **Bit & Byte Studio**, estudio de desarrollo web y software
 
 ## 📈 Analítica
 
-`src/lib/analytics.ts` emite los eventos `whatsapp_click`, `quote_open` y `contact_submit` (también como evento `bb:track` del navegador), pero **no envía nada a ningún sitio**. Para activar un proveedor, llama a `setAnalyticsProvider(...)` una vez al cargar y actualiza `/privacidad`, que hoy dice que no hay analítica.
+Se usa **Umami Cloud**. El script se carga en `BaseLayout.astro` solo en producción (`import.meta.env.PROD`); el ID y la URL están en `src/config/site.ts`. Su dominio está permitido en la CSP de `vercel.json` (`cloud.umami.is` y `api-gateway.umami.dev`).
+
+Todos los eventos pasan por `track()` en `src/lib/analytics.ts`, que llama a `window.umami?.track(...)` (si Umami no está cargado, no hace nada) y emite también un evento `bb:track` del navegador. Eventos: `whatsapp_click`, `quote_open`, `contact_submit`, `project_open`, `project_demo_click` y `project_quote_similar`. Si cambias de proveedor, actualiza también `/privacidad` y la CSP.
 
 ## 🛠️ Desarrollo
 

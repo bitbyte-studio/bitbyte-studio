@@ -101,6 +101,7 @@ import { PROJECTS } from '../data';
 </section>
 
 <script>
+  import { track } from '../lib/analytics';
   import { openProject } from '../lib/events';
   import { mountAll } from '../lib/lifecycle';
 
@@ -108,7 +109,9 @@ import { PROJECTS } from '../data';
     root.querySelectorAll<HTMLElement>('[data-open-project]').forEach((el) => {
       const open = () => {
         const { openProject: id, projectTitle: title } = el.dataset;
-        if (id) openProject({ id, title: title ?? id });
+        if (!id) return;
+        track('project_open', { project: id });
+        openProject({ id, title: title ?? id });
       };
 
       el.addEventListener('click', open, { signal });
