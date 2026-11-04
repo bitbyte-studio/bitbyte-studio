@@ -87,13 +87,35 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
   type Cell = { char: string; opacity: number };
 
   const CELL = 26;
+  const GLOW_RADIUS = 120;
+  const FRAME_MS = 1000 / 30;
+  const BG = '#131315';
+
+  /** Touch screens, data saver and weak CPUs get the still pattern: no loop, no pointer to follow. */
+  function canAnimate() {
+    if (prefersReducedMotion()) return false;
+    if (window.matchMedia('(pointer: coarse)').matches) return false;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return false;
+    return (navigator.hardwareConcurrency ?? 4) >= 4;
+  }
 
   function initHeroCanvas(canvas: HTMLCanvasElement, root: HTMLElement, signal: AbortSignal) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const reduceMotion = prefersReducedMotion();
+    const animated = canAnimate();
+    const base = document.createElement('canvas');
+    const baseCtx = base.getContext('2d');
+    if (!baseCtx) return;
+
+    // Astro registers the font under a hashed name, so the canvas has to read it from the CSS variable.
+    const family =
+      getComputedStyle(document.documentElement).getPropertyValue('--font-jetbrains').trim() || 'monospace';
+    const font = `700 13px ${family}`;
+
     let animationFrameId = 0;
+    let lastFrame = 0;
     let visible = true;
     let width = 0;
     let height = 0;
@@ -103,13 +125,36 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
     let mouseX = -1000;
     let mouseY = -1000;
 
+    const cellX = (c: number) => c * CELL + 12;
+    const cellY = (r: number) => r * CELL + 18;
+
+    const drawBaseCell = (c: number, r: number) => {
+      const cell = grid[c * rows + r];
+      baseCtx.fillStyle = BG;
+      baseCtx.fillRect(c * CELL, r * CELL, CELL, CELL);
+      baseCtx.fillStyle = `rgba(160, 160, 160, ${cell.opacity})`;
+      baseCtx.fillText(cell.char, cellX(c), cellY(r));
+    };
+
+    const paintBase = () => {
+      baseCtx.fillStyle = BG;
+      baseCtx.fillRect(0, 0, width, height);
+      baseCtx.font = font;
+      for (let c = 0; c < columns; c++) {
+        for (let r = 0; r < rows; r++) drawBaseCell(c, r);
+      }
+    };
+
     const buildGrid = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.clientWidth || window.innerWidth;
       height = canvas.clientHeight || window.innerHeight;
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
+      for (const target of [canvas, base]) {
+        target.width = Math.floor(width * dpr);
+        target.height = Math.floor(height * dpr);
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      baseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       columns = Math.floor(width / CELL);
       rows = Math.floor(height / CELL);
@@ -117,63 +162,87 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
         char: Math.random() > 0.5 ? '1' : '0',
         opacity: Math.random() * 0.18 + 0.03,
       }));
+      paintBase();
+    };
+
+    const flipRandomCells = () => {
+      const flips = Math.max(1, Math.round(columns * rows * 0.003));
+      for (let i = 0; i < flips; i++) {
+        const c = Math.floor(Math.random() * columns);
+        const r = Math.floor(Math.random() * rows);
+        const cell = grid[c * rows + r];
+        cell.char = cell.char === '1' ? '0' : '1';
+        drawBaseCell(c, r);
+      }
     };
 
     const render = () => {
-      ctx.fillStyle = '#131315';
-      ctx.fillRect(0, 0, width, height);
-      ctx.font = '700 13px "JetBrains Mono", monospace';
+      ctx.drawImage(base, 0, 0, width, height);
+      ctx.font = font;
 
-      for (let c = 0; c < columns; c++) {
-        for (let r = 0; r < rows; r++) {
+      // Only the cells under the cursor glow, so there is no need to walk the whole grid.
+      const minC = Math.max(0, Math.floor((mouseX - GLOW_RADIUS) / CELL));
+      const maxC = Math.min(columns - 1, Math.ceil((mouseX + GLOW_RADIUS) / CELL));
+      const minR = Math.max(0, Math.floor((mouseY - GLOW_RADIUS) / CELL));
+      const maxR = Math.min(rows - 1, Math.ceil((mouseY + GLOW_RADIUS) / CELL));
+
+      for (let c = minC; c <= maxC; c++) {
+        for (let r = minR; r <= maxR; r++) {
           const cell = grid[c * rows + r];
-          const x = c * CELL + 12;
-          const y = r * CELL + 18;
+          const x = cellX(c);
+          const y = cellY(r);
           const dist = Math.hypot(x - mouseX, y - mouseY);
+          if (dist >= GLOW_RADIUS) continue;
 
-          let alpha = cell.opacity;
-          let color = '160, 160, 160';
-
-          if (dist < 120) {
-            alpha = Math.min(0.8, cell.opacity + (120 - dist) / 150);
-            color = cell.char === '1' ? '253, 98, 93' : '237, 193, 87';
-          }
-
+          const alpha = Math.min(0.8, cell.opacity + (GLOW_RADIUS - dist) / 150);
+          const color = cell.char === '1' ? '253, 98, 93' : '237, 193, 87';
+          ctx.fillStyle = BG;
+          ctx.fillRect(c * CELL, r * CELL, CELL, CELL);
           ctx.fillStyle = `rgba(${color}, ${alpha})`;
           ctx.fillText(cell.char, x, y);
-
-          if (!reduceMotion && Math.random() < 0.003) {
-            cell.char = cell.char === '1' ? '0' : '1';
-          }
         }
       }
     };
 
-    const loop = () => {
+    const loop = (now: number) => {
       if (!visible) return;
-      render();
       animationFrameId = requestAnimationFrame(loop);
+      if (now - lastFrame < FRAME_MS) return;
+      lastFrame = now;
+      flipRandomCells();
+      render();
     };
 
     const start = () => {
       cancelAnimationFrame(animationFrameId);
-      if (reduceMotion) render();
-      else loop();
+      if (animated) animationFrameId = requestAnimationFrame(loop);
+      else render();
     };
 
     buildGrid();
     start();
 
+    // The hashed font may still be downloading on the first paint; repaint once it is ready.
+    void document.fonts.load(font).then(() => {
+      if (signal.aborted) return;
+      paintBase();
+      render();
+    });
+
+    let resizeTimer = 0;
     window.addEventListener(
       'resize',
       () => {
-        buildGrid();
-        start();
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(() => {
+          buildGrid();
+          start();
+        }, 150);
       },
       { signal },
     );
 
-    if (!reduceMotion) {
+    if (animated) {
       window.addEventListener(
         'mousemove',
         (event) => {
@@ -186,13 +255,15 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
     }
 
     const observer = new IntersectionObserver(([entry]) => {
+      const wasVisible = visible;
       visible = entry.isIntersecting;
-      if (visible && !reduceMotion) start();
+      if (visible && !wasVisible && animated) start();
     });
     observer.observe(root);
 
     signal.addEventListener('abort', () => {
       observer.disconnect();
+      window.clearTimeout(resizeTimer);
       cancelAnimationFrame(animationFrameId);
     });
   }
@@ -203,7 +274,7 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
     void import('../lib/logo3d')
       .then(({ mountLogo3D }) => {
         if (signal.aborted || !canvas.isConnected) return;
-        const logo = mountLogo3D(canvas, root);
+        const logo = mountLogo3D(canvas, root, () => fallback?.classList.remove('hidden'));
         if (logo.ready) fallback?.classList.add('hidden');
         signal.addEventListener('abort', () => {
           logo.dispose();

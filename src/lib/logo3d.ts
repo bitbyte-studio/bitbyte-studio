@@ -147,7 +147,12 @@ function buildLogoGroup() {
   return logo;
 }
 
-export function mountLogo3D(canvas: HTMLCanvasElement, visibilityTarget: Element = canvas): LogoHandle {
+export function mountLogo3D(
+  canvas: HTMLCanvasElement,
+  visibilityTarget: Element = canvas,
+  /** Called when the WebGL context is lost and the logo stops rendering. */
+  onLost?: () => void,
+): LogoHandle {
   const scene = new Scene();
   const camera = new PerspectiveCamera(30, 1, 0.1, 100);
   camera.position.set(0, 0.08, 7.4);
@@ -230,8 +235,24 @@ export function mountLogo3D(canvas: HTMLCanvasElement, visibilityTarget: Element
   });
   observer.observe(visibilityTarget);
 
+  let resizeTimer = 0;
+  const onResize = () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(resize, 120);
+  };
+
+  // The browser can drop the GL context (GPU reset, too many contexts). Stop drawing and let the page show the SVG logo again.
+  const onContextLost = (event: Event) => {
+    event.preventDefault();
+    cancelAnimationFrame(animationId);
+    animationId = 0;
+    disposed = true;
+    onLost?.();
+  };
+  canvas.addEventListener('webglcontextlost', onContextLost);
+
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', onResize);
   animationId = requestAnimationFrame(animate);
 
   return {
@@ -240,7 +261,9 @@ export function mountLogo3D(canvas: HTMLCanvasElement, visibilityTarget: Element
       disposed = true;
       observer.disconnect();
       cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resize);
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('resize', onResize);
+      canvas.removeEventListener('webglcontextlost', onContextLost);
 
       scene.traverse((obj) => {
         if (obj instanceof Mesh) {
