@@ -1,0 +1,65 @@
+---
+import { FAQ } from '../config/faq';
+import { WHATSAPP_DISPLAY, whatsappLink } from '../config/contact';
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+// "<" is escaped so the JSON can never close the script tag.
+const faqJsonLdString = JSON.stringify(faqJsonLd).replace(/</g, '\\u003c');
+const helpLink = whatsappLink('¡Hola Bit & Byte Studio! Tengo una duda antes de empezar.');
+---
+
+<section id="preguntas" class="bg-[#131315] py-20 md:py-[120px] px-4 md:px-6 scroll-mt-20">
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-10 md:mb-12 text-center flex flex-col items-center">
+      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// preguntas</p>
+      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-white">Preguntas frecuentes</h2>
+    </div>
+
+    <div class="space-y-3">
+      {
+        FAQ.map((item) => (
+          <details class="group rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] open:border-[#fd625d]/60 transition-colors">
+            <summary class="flex items-center justify-between gap-4 cursor-pointer list-none p-5 md:p-6 font-sora text-base md:text-lg font-semibold text-white [&::-webkit-details-marker]:hidden">
+              <span>{item.question}</span>
+              <span
+                class="material-symbols-outlined text-2xl text-[#9CA3AF] shrink-0 transition-transform group-open:rotate-180"
+                aria-hidden="true"
+              >
+                expand_more
+              </span>
+            </summary>
+            <p class="px-5 md:px-6 pb-5 md:pb-6 font-inter text-sm md:text-base text-[#9CA3AF] leading-relaxed">
+              {item.answer}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+
+    <p class="mt-8 text-center font-inter text-sm text-[#9CA3AF]">
+      ¿Otra duda? Escríbenos por
+      <a
+        href={helpLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="whatsapp"
+        data-track-source="faq"
+        aria-label={`WhatsApp ${WHATSAPP_DISPLAY} (se abre en una pestaña nueva)`}
+        class="text-[#fd625d] underline underline-offset-2 hover:text-[#ffb3ad]"
+      >
+        WhatsApp
+      </a>
+      y la aclaramos antes de empezar.
+    </p>
+  </div>
+
+  <script type="application/ld+json" set:html={faqJsonLdString} />
+</section>
