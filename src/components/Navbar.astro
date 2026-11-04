@@ -6,10 +6,9 @@ const waHref = whatsappLink(WA_MESSAGE);
 
 const navLinks = [
   { label: 'Inicio', href: '#inicio', id: 'inicio' },
-  { label: 'Servicios', href: '#servicios', id: 'servicios' },
+  { label: 'Servicios y precios', href: '#servicios', id: 'servicios' },
   { label: 'Portafolio', href: '#portafolio', id: 'portafolio' },
   { label: 'Proceso', href: '#proceso', id: 'proceso' },
-  { label: 'Precios', href: '#precios', id: 'precios' },
   { label: 'Contacto', href: '#contacto', id: 'contacto' },
 ];
 ---
@@ -128,7 +127,7 @@ const navLinks = [
 <script>
   import { mountAll } from '../lib/lifecycle';
 
-  const SECTIONS = ['inicio', 'servicios', 'portafolio', 'proceso', 'precios', 'contacto'];
+  const SECTIONS = ['inicio', 'servicios', 'portafolio', 'proceso', 'contacto'];
 
   function initNavbar(root: HTMLElement, signal: AbortSignal) {
     const menu = root.querySelector<HTMLElement>('[data-mobile-menu]');
