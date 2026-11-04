@@ -8,6 +8,7 @@ import {
   MAINTENANCE,
   PAYMENT,
   PROJECT_SERVICES,
+  OWNERSHIP,
   REVISION_ROUNDS,
   type PublishingOption,
 } from '../config/pricing';
@@ -123,8 +124,9 @@ const serviceNote = (option: PublishingOption) => {
   <section>
     <h2 class={h2}>Propiedad</h2>
     <p>
-      Al pagar el total del proyecto, el contenido y el dominio quedan a tu nombre. El hosting y el mantenimiento son
-      opcionales y se pagan aparte.
+      {OWNERSHIP.summary}
+      {OWNERSHIP.freeAddress}
+      {OWNERSHIP.optional}
     </p>
   </section>
 

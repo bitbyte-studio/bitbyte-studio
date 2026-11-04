@@ -212,6 +212,13 @@ export const DOMAIN_OPTION: PublishingOption = {
 /** Revision rounds included in every project. Extra or out-of-scope changes are quoted separately. */
 export const REVISION_ROUNDS = 2;
 
+/** Ownership terms shared by the FAQ and /terminos. */
+export const OWNERSHIP = {
+  summary: 'Al pagar el total del proyecto, el contenido y el dominio propio quedan a tu nombre.',
+  freeAddress: `La dirección ${HOSTING_LIST[0].description} es un subdominio gratuito del servicio de alojamiento, no un dominio tuyo: si quieres una dirección a tu nombre, elige el dominio propio .com.`,
+  optional: 'El hosting y el mantenimiento son opcionales y se pagan aparte.',
+};
+
 const DEPOSIT_PERCENT = 50;
 
 export const PAYMENT = {

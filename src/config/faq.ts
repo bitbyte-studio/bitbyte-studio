@@ -6,6 +6,7 @@ import {
   MAINTENANCE,
   PAYMENT,
   PROJECT_SERVICES,
+  OWNERSHIP,
   REVISION_ROUNDS,
 } from './pricing';
 
@@ -72,8 +73,7 @@ export const FAQ: readonly FaqItem[] = [
   },
   {
     question: '¿Quién es el dueño de la web cuando se entrega?',
-    answer:
-      'Tú. Al pagar el total, el contenido y el dominio quedan a tu nombre. El hosting y el mantenimiento son opcionales y se pagan aparte.',
+    answer: `Tú. ${OWNERSHIP.summary} ${OWNERSHIP.freeAddress} ${OWNERSHIP.optional}`,
   },
   {
     question: '¿Funciona sin internet o con datos móviles limitados?',
