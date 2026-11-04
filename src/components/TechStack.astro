@@ -22,6 +22,7 @@ const initial = TECH_STACK[0];
       TECH_STACK.map((tech) => (
         <button
           type="button"
+          aria-pressed={tech.name === initial.name ? 'true' : 'false'}
           data-tech-name={tech.name}
           data-tech-category={tech.category}
           data-tech-description={tech.description}
@@ -48,7 +49,7 @@ const initial = TECH_STACK[0];
     }
   </div>
 
-  <div class="bg-[#1A1A1A] text-white p-6 md:p-8 rounded-2xl border border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl animate-fadeIn">
+  <div aria-live="polite" class="bg-[#1A1A1A] text-white p-6 md:p-8 rounded-2xl border border-[#2A2A2A] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl animate-fadeIn">
     <div class="flex items-center gap-5">
       <div class="tech-abbr w-12 h-12 rounded-xl bg-[#fd625d]/20 text-[#ff8a85] flex items-center justify-center font-technical font-bold text-lg shrink-0">
         {initial.name.slice(0, 2).toUpperCase()}
@@ -70,7 +71,9 @@ const initial = TECH_STACK[0];
 </div>
 
 <script>
-  function initTechStack(root: HTMLElement) {
+  import { mountAll } from '../lib/lifecycle';
+
+  function initTechStack(root: HTMLElement, signal: AbortSignal) {
     const buttons = Array.from(root.querySelectorAll<HTMLElement>('.tech-btn'));
     const abbr = root.querySelector<HTMLElement>('.tech-abbr');
     const name = root.querySelector<HTMLElement>('.tech-name');
@@ -81,6 +84,7 @@ const initial = TECH_STACK[0];
       buttons.forEach((btn) => {
         const active = btn === button;
         btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', String(active));
         btn.classList.toggle('bg-[#1A1A1A]', active);
         btn.classList.toggle('text-white', active);
         btn.classList.toggle('border-[#fd625d]', active);
@@ -103,15 +107,10 @@ const initial = TECH_STACK[0];
     };
 
     buttons.forEach((button) => {
-      button.addEventListener('click', () => setActive(button));
-      button.addEventListener('mouseenter', () => setActive(button));
+      button.addEventListener('click', () => setActive(button), { signal });
+      button.addEventListener('mouseenter', () => setActive(button), { signal });
     });
   }
 
-  function boot() {
-    document.querySelectorAll<HTMLElement>('[data-tech-stack]').forEach(initTechStack);
-  }
-
-  boot();
-  document.addEventListener('astro:page-load', boot);
+  mountAll('[data-tech-stack]', initTechStack);
 </script>
