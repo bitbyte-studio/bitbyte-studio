@@ -46,7 +46,7 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
     </p>
 
     <h1 class="font-sora text-4xl sm:text-5xl md:text-[64px] text-white mb-6 leading-tight font-bold tracking-tight">
-      Tu negocio en internet en <span class="text-gradient-coral">menos de una semana</span>
+      Tu negocio en internet en <span class="text-gradient-coral">pocos días</span>
     </h1>
 
     <p class="font-inter text-base md:text-lg text-[#9CA3AF] mb-10 max-w-2xl">
@@ -271,17 +271,32 @@ const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por 
   function initLogo(canvas: HTMLCanvasElement, root: HTMLElement, signal: AbortSignal) {
     const fallback = root.querySelector<SVGElement>('[data-logo-fallback]');
 
-    void import('../lib/logo3d')
-      .then(({ mountLogo3D }) => {
-        if (signal.aborted || !canvas.isConnected) return;
-        const logo = mountLogo3D(canvas, root, () => fallback?.classList.remove('hidden'));
-        if (logo.ready) fallback?.classList.add('hidden');
-        signal.addEventListener('abort', () => {
-          logo.dispose();
-          fallback?.classList.remove('hidden');
-        });
-      })
-      .catch(() => {});
+    // The SVG logo is visible by default. Data saver users keep it and never download Three.js (~550 kB).
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+
+    const load = () => {
+      void import('../lib/logo3d')
+        .then(({ mountLogo3D }) => {
+          if (signal.aborted || !canvas.isConnected) return;
+          const logo = mountLogo3D(canvas, root, () => fallback?.classList.remove('hidden'));
+          if (logo.ready) fallback?.classList.add('hidden');
+          signal.addEventListener('abort', () => {
+            logo.dispose();
+            fallback?.classList.remove('hidden');
+          });
+        })
+        .catch(() => {});
+    };
+
+    // Wait until the browser is idle so the download does not compete with the first paint.
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(load, { timeout: 2000 });
+      signal.addEventListener('abort', () => window.cancelIdleCallback(id));
+    } else {
+      const id = setTimeout(load, 300);
+      signal.addEventListener('abort', () => clearTimeout(id));
+    }
   }
 
   mountAll('[data-hero]', (root, signal) => {
