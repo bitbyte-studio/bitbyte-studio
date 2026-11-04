@@ -81,7 +81,7 @@ const SERVICE_LIST = [
   },
   {
     id: 'digitalmenu',
-    name: 'DigitalMenu',
+    name: 'Menú Digital',
     description: 'Carta digital para restaurantes y cafeterías, instalada y lista para usar.',
     from: 120,
     variablePrice: true,
