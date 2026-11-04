@@ -20,14 +20,14 @@
   }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter);
     background-color: #131315;
     color: #e5e1e4;
     overflow-x: hidden;
   }
 
   .material-symbols-outlined {
-    font-family: 'Material Symbols Outlined';
+    font-family: var(--font-material-symbols);
     font-weight: normal;
     font-style: normal;
     font-size: 24px;
@@ -43,25 +43,25 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Sora', sans-serif;
+    font-family: var(--font-sora);
   }
 
   code, pre, .font-mono, .font-technical {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-jetbrains);
   }
 }
 
 /* Custom Bit & Byte Utilities */
 .font-sora {
-  font-family: 'Sora', sans-serif;
+  font-family: var(--font-sora);
 }
 
 .font-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter);
 }
 
 .font-technical {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains);
 }
 
 .glow-coral {
