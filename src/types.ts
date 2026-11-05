@@ -10,23 +10,18 @@ export interface ProjectImages {
 
 export interface Project {
   id: string;
-  /** Quotable service from config/pricing.ts that "Calcular algo similar" preselects (never maintenance). */
+  /** Quotable service from config/pricing.ts that the estimate preselects (never maintenance). */
   serviceId: ProjectServiceId;
   title: string;
   /** Free-text label shown on the card, e.g. "Restaurante". */
   category: string;
   description: string;
   features: readonly string[];
+  /** Client-facing benefits shown on the card. Not a technology list. */
   tags: readonly string[];
   image: ProjectImages;
   /** Public demo of the project. */
   liveUrl: string;
   /** These are Bit & Byte demos, not client work. */
   badge: 'Demo';
-}
-
-export interface TechItem {
-  name: string;
-  category: string;
-  description: string;
 }

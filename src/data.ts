@@ -1,4 +1,4 @@
-import type { Project, TechItem } from './types';
+import type { Project } from './types';
 import { MAINTENANCE, PAYMENT, REVISION_ROUNDS, type ServiceId } from './config/pricing';
 import barbaNegraCard from './assets/portfolio/barba-negra-card.webp';
 import barbaNegraModal from './assets/portfolio/barba-negra-modal.webp';
@@ -77,13 +77,20 @@ export const SERVICE_DETAILS: Record<ServiceId, ServiceDetail> = {
     ],
     idealFor: 'Restaurantes, cafeterías y bares.',
   },
+  medida: {
+    highlights: [
+      'Webs especiales, paneles internos o programas para PC (con o sin internet)',
+      'Integraciones y funciones fuera de los planes fijos',
+      'Nos adaptamos a tu idea y a tu presupuesto',
+      'Precio y plazo cerrados por WhatsApp antes de empezar',
+    ],
+    idealFor: 'Quien necesita algo concreto que no encaja en ninguno de los paquetes anteriores.',
+  },
   mantenimiento: {
     highlights: MAINTENANCE.includes ?? [],
     idealFor: 'Quien ya tiene su web y prefiere olvidarse de lo técnico.',
   },
 };
-
-const DEMO_TAGS = ['React', 'TypeScript', 'Vite', 'Tailwind CSS'] as const;
 
 /** Demos built by Bit & Byte Studio to show what we make. They are not client projects. */
 export const PROJECTS: readonly Project[] = [
@@ -100,7 +107,7 @@ export const PROJECTS: readonly Project[] = [
       'Detalle de plato',
       'Ubicación con mapa',
     ],
-    tags: DEMO_TAGS,
+    tags: ['Pedidos por WhatsApp', 'Reserva de mesa', 'Pensado para móvil'],
     image: { card: sazonLolaCard, modal: sazonLolaModal },
     liveUrl: 'https://sazon-lola.vercel.app',
     badge: 'Demo',
@@ -118,7 +125,7 @@ export const PROJECTS: readonly Project[] = [
       'Reserva de turnos por WhatsApp',
       'Recomendador de estilo',
     ],
-    tags: DEMO_TAGS,
+    tags: ['Turnos por WhatsApp', 'Pensado para móvil', 'Carga rápida'],
     image: { card: barbaNegraCard, modal: barbaNegraModal },
     liveUrl: 'https://barba-negra-one.vercel.app',
     badge: 'Demo',
@@ -136,53 +143,10 @@ export const PROJECTS: readonly Project[] = [
       'Selección de talla y color',
       'Pedido por WhatsApp',
     ],
-    tags: DEMO_TAGS,
+    tags: ['Pedidos por WhatsApp', 'Pensado para móvil', 'Carga rápida'],
     image: { card: tropicalVibesCard, modal: tropicalVibesModal },
     liveUrl: 'https://tropical-vibes.vercel.app',
     badge: 'Demo',
-  },
-];
-
-export const TECH_STACK: readonly TechItem[] = [
-  {
-    name: 'Astro',
-    category: 'Webs',
-    description: 'Para webs que cargan rápido, incluso con conexión lenta. Es la base de este mismo sitio.',
-  },
-  {
-    name: 'Tailwind',
-    category: 'Diseño',
-    description: 'Nos permite dar a cada web un diseño propio y coherente, que se ve bien en el móvil.',
-  },
-  {
-    name: 'React',
-    category: 'Interfaces',
-    description: 'Para pantallas con las que se interactúa: filtros, carritos de compra y formularios. Lo usamos en las demos del portafolio.',
-  },
-  {
-    name: 'Vue',
-    category: 'Interfaces',
-    description: 'Otra opción para webs y paneles interactivos, cuando el proyecto lo pide.',
-  },
-  {
-    name: 'Next.js',
-    category: 'Aplicaciones',
-    description: 'Para webs que necesitan algo más que páginas fijas, como cuentas de usuario o datos que cambian.',
-  },
-  {
-    name: 'Node.js',
-    category: 'Servidor',
-    description: 'Para la parte que el visitante no ve: guardar datos, conectar servicios y automatizar procesos.',
-  },
-  {
-    name: 'Python',
-    category: 'Automatización',
-    description: 'Para bots, reportes y tareas repetitivas que no tiene sentido hacer a mano.',
-  },
-  {
-    name: 'Django',
-    category: 'Gestión',
-    description: 'Con Python, nos sirve para sistemas de gestión: inventario, clientes, reservas y paneles de administración.',
   },
 ];
 

@@ -1,6 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { SITE_NAME } from '../config/site';
+import { COPYRIGHT, SITE_NAME } from '../config/site';
 
 interface Props {
   title: string;
@@ -63,7 +63,7 @@ const current = Astro.url.pathname.replace(/\/$/, '');
     </main>
 
     <footer class="border-t border-[#2A2A2A] py-8 px-4 md:px-6">
-      <p class="max-w-3xl mx-auto text-sm text-[#9CA3AF]">© 2026 Bit &amp; Byte Studio. Hecho en Cuba.</p>
+      <p class="max-w-3xl mx-auto text-sm text-[#9CA3AF]">{COPYRIGHT}</p>
     </footer>
   </div>
 </BaseLayout>

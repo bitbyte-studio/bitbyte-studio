@@ -6,12 +6,12 @@ import { PROJECTS } from '../data';
 <section id="portafolio" class="bg-[#131315] py-20 md:py-[120px]" data-portfolio>
   <div class="max-w-[1280px] mx-auto px-4 md:px-6">
     <div class="mb-12 md:mb-16 text-center flex flex-col items-center">
-      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// portafolio</p>
+      <p class="font-technical text-sm font-bold text-[#fd625d] mb-2 uppercase tracking-widest">// ejemplos</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-white mb-4">
-        Nuestros Proyectos
+        Así se ven nuestros trabajos
       </h2>
       <p class="font-inter text-sm md:text-base text-[#9CA3AF] max-w-xl">
-        Demos hechas por Bit &amp; Byte Studio para mostrar lo que podemos hacer por tu negocio. Puedes abrirlas y probarlas.
+        Son demos para que veas cómo puede quedar tu negocio. Ábrelas y pruébalas: todavía no son clientes reales.
       </p>
     </div>
 
@@ -42,31 +42,41 @@ import { PROJECTS } from '../data';
                   {project.description}
                 </p>
 
-                <div class="flex flex-wrap gap-2 mb-8">
+                <ul class="flex flex-wrap gap-2 mb-8" aria-label="Beneficios">
                   {project.tags.map((tag) => (
-                    <span class="px-3 py-1 bg-[#fd625d]/10 border border-[#fd625d]/40 text-[#fd625d] rounded-full text-xs font-technical uppercase tracking-wider">
+                    <li class="px-3 py-1 bg-[#fd625d]/10 border border-[#fd625d]/40 text-[#ffb3ad] rounded-full text-xs font-inter">
                       {tag}
-                    </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
 
-                <button
-                  type="button"
-                  data-open-project={project.id}
-                  data-project-title={project.title}
-                  class="text-white font-technical text-sm uppercase tracking-wider inline-flex items-center gap-2 min-h-11 hover:text-[#fd625d] transition-colors group cursor-pointer"
-                >
-                  <span>VER PROYECTO</span>
-                  <span class="material-symbols-outlined text-lg group-hover:translate-x-2 transition-transform" aria-hidden="true">
-                    arrow_forward
-                  </span>
-                </button>
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-track-demo={project.id}
+                    aria-label={`Probar demo de ${project.title} (se abre en una pestaña nueva)`}
+                    class="inline-flex items-center justify-center gap-2 min-h-11 px-6 py-3 rounded-full bg-white text-[#131315] hover:bg-[#ffb3ad] transition-colors font-sora text-sm font-semibold"
+                  >
+                    <span>Probar demo</span>
+                    <span class="material-symbols-outlined text-base" aria-hidden="true">open_in_new</span>
+                  </a>
+                  <button
+                    type="button"
+                    data-open-project={project.id}
+                    data-project-title={project.title}
+                    class="font-inter text-sm text-[#9CA3AF] underline underline-offset-4 hover:text-white transition-colors min-h-11 cursor-pointer"
+                  >
+                    Ver detalles
+                  </button>
+                </div>
               </div>
 
               <div
                 role="button"
                 tabindex="0"
-                aria-label={`Ver proyecto ${project.title}`}
+                aria-label={`Ver detalles de ${project.title}`}
                 data-open-project={project.id}
                 data-project-title={project.title}
                 class:list={[
@@ -86,8 +96,7 @@ import { PROJECTS } from '../data';
                   class="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span class="px-5 py-2.5 rounded-full bg-coral-strong text-white font-sora text-sm font-semibold glow-coral flex items-center gap-2">
-                    <span class="material-symbols-outlined text-base" aria-hidden="true">open_in_new</span>
+                  <span class="px-5 py-2.5 rounded-full bg-white text-[#131315] font-sora text-sm font-semibold">
                     Ver detalles
                   </span>
                 </div>
@@ -123,6 +132,14 @@ import { PROJECTS } from '../data';
             open();
           }
         },
+        { signal },
+      );
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-track-demo]').forEach((link) => {
+      link.addEventListener(
+        'click',
+        () => track('project_demo_click', { project: link.dataset.trackDemo, source: 'tarjeta' }),
         { signal },
       );
     });

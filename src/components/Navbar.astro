@@ -1,13 +1,13 @@
 ---
 import { whatsappLink } from '../config/contact';
 
-const WA_MESSAGE = '¡Hola Bit & Byte Studio! Estoy interesado en construir una solución digital con ustedes.';
+const WA_MESSAGE = '¡Hola Bit & Byte Studio! Quiero una página para mi negocio.';
 const waHref = whatsappLink(WA_MESSAGE);
 
 const navLinks = [
   { label: 'Inicio', href: '#inicio', id: 'inicio' },
   { label: 'Servicios y precios', href: '#servicios', id: 'servicios' },
-  { label: 'Portafolio', href: '#portafolio', id: 'portafolio' },
+  { label: 'Ejemplos reales', href: '#portafolio', id: 'portafolio' },
   { label: 'Proceso', href: '#proceso', id: 'proceso' },
   { label: 'Contacto', href: '#contacto', id: 'contacto' },
 ];
@@ -43,35 +43,20 @@ const navLinks = [
         ))
       }
 
-      <button
-        type="button"
-        data-open-quote
-        class="border border-[#fd625d] text-[#ffb3ad] px-4 py-2 rounded-full font-sora text-sm font-semibold hover:bg-coral-strong hover:border-coral-strong hover:text-white transition-all ml-2"
-      >
-        Calcular presupuesto
-      </button>
-
       <a
         href={waHref}
         target="_blank"
         rel="noopener noreferrer"
         data-track="whatsapp"
         data-track-source="nav"
-        aria-label="WhatsApp (se abre en una pestaña nueva)"
-        class="bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-2 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral flex items-center gap-2"
+        aria-label="Escribir por WhatsApp (se abre en una pestaña nueva)"
+        class="bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-2 rounded-full font-sora text-sm font-semibold hover:scale-105 transition-transform glow-coral flex items-center gap-2 ml-2"
       >
-        <span>WhatsApp</span>
+        <span>Escribir por WhatsApp</span>
       </a>
     </nav>
 
     <div class="flex items-center gap-2 lg:hidden">
-      <button
-        type="button"
-        data-open-quote
-        class="bg-[#fd625d]/20 border border-[#fd625d] text-[#ffb3ad] px-3 min-h-11 rounded-full font-sora text-xs font-semibold"
-      >
-        Presupuesto
-      </button>
       <button
         type="button"
         data-menu-toggle
@@ -104,14 +89,6 @@ const navLinks = [
     </nav>
 
     <div class="pt-4 border-t border-[#353437] flex flex-col gap-3">
-      <button
-        type="button"
-        data-open-quote
-        data-close-menu
-        class="w-full text-center border-2 border-[#fd625d] text-[#ffb3ad] py-3 rounded-full font-sora text-sm font-semibold"
-      >
-        Calcular presupuesto
-      </button>
       <a
         href={waHref}
         target="_blank"
@@ -119,10 +96,10 @@ const navLinks = [
         data-close-menu
         data-track="whatsapp"
         data-track-source="menu-movil"
-        aria-label="Hablar por WhatsApp (se abre en una pestaña nueva)"
+        aria-label="Escribir por WhatsApp (se abre en una pestaña nueva)"
         class="w-full text-center bg-coral-strong hover:bg-coral-strong-hover text-white py-3 rounded-full font-sora text-sm font-semibold glow-coral"
       >
-        Hablar por WhatsApp
+        Escribir por WhatsApp
       </a>
     </div>
   </div>

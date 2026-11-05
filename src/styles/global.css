@@ -143,6 +143,36 @@
   animation: fadeIn 0.35s ease-out both;
 }
 
+/* Thin dark scrollbar for modals; Firefox uses scrollbar-color, Chromium/WebKit use the ::-webkit rules. */
+.scrollbar-dark {
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a4e transparent;
+}
+
+.scrollbar-dark::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb {
+  background-color: #4a4a4e;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background-color: #6b6b70;
+}
+
+.scrollbar-dark::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -5,16 +5,12 @@ import sitemap from '@astrojs/sitemap';
 
 // Every icon used in the markup. A name missing here renders as plain text, so add new icons to this list.
 const ICONS = [
-  'arrow_downward',
-  'arrow_forward',
-  'bolt',
   'brush',
   'build',
   'chat',
   'check',
   'check_circle',
   'close',
-  'cloud_done',
   'dashboard',
   'expand_less',
   'expand_more',
@@ -29,12 +25,13 @@ const ICONS = [
   'shopping_bag',
   'smart_toy',
   'storefront',
+  'tune',
   'web',
 ];
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://bitbyte-studio.vercel.app',
+  site: 'https://bitbytestudio.vercel.app',
   integrations: [sitemap()],
   fonts: [
     {

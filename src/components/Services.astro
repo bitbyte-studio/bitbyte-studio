@@ -4,14 +4,33 @@ import { whatsappLink } from '../config/contact';
 import {
   CURRENCY,
   CURRENCY_NOTE,
+  DOMAIN_OPTION,
+  HOSTING_OPTIONS,
   MAINTENANCE,
   PAYMENT,
-  PLANS_NOTE,
   PROJECT_SERVICES,
 } from '../config/pricing';
 
 const money = (value: number) => value.toLocaleString('en-US');
+const usd = (value: number) => `${money(value)} ${CURRENCY}`;
 const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
+const waGeneral = whatsappLink('¡Hola Bit & Byte Studio! Quiero una página para mi negocio.');
+
+const managedHosting = HOSTING_OPTIONS.find((option) => option.id === 'managed');
+const gestionHosting = managedHosting?.priceByService?.gestion;
+const domainPrice = DOMAIN_OPTION.price;
+const hostingPrice = managedHosting?.price ?? null;
+const maintenanceAnnual = MAINTENANCE.annualFrom;
+
+const maintenancePrice =
+  MAINTENANCE.annualFrom !== undefined
+    ? `Desde ${money(MAINTENANCE.from)} ${CURRENCY}${MAINTENANCE.suffix ?? ''}, o ${money(MAINTENANCE.annualFrom)} ${CURRENCY}/mes si pagas el año completo.`
+    : `Desde ${money(MAINTENANCE.from)} ${CURRENCY}${MAINTENANCE.suffix ?? ''}.`;
+
+const publishingNote =
+  domainPrice !== null && hostingPrice !== null && gestionHosting && maintenanceAnnual !== undefined
+    ? `Para que tu página salga en Google con tu propio nombre necesita dominio (${usd(domainPrice)} al año) y alojamiento (desde ${usd(hostingPrice)} al mes; ${usd(gestionHosting.price)} al mes en sistemas de gestión), que se pagan aparte. El mantenimiento anual es opcional (${usd(maintenanceAnnual)} al mes).`
+    : 'El dominio, el alojamiento y el mantenimiento se pagan aparte.';
 ---
 
 <section id="servicios" class="surface-light bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A] scroll-mt-20" data-services>
@@ -29,7 +48,7 @@ const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
       </p>
     </div>
 
-    <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+    <ul class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
       {
         PROJECT_SERVICES.map((service) => {
           const detail = SERVICE_DETAILS[service.id];
@@ -37,13 +56,13 @@ const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
           return (
             <li
               data-service-card={service.id}
-              class="service-card bg-white p-6 rounded-xl border border-[#E5E0D8] transition-all relative flex flex-col"
+              class="service-card bg-white p-6 rounded-xl border border-[#E5E0D8] transition-all relative flex flex-col h-full min-h-[22.5rem]"
             >
-              <div class="w-12 h-12 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-4 text-coral-ink">
+              <div class="w-12 h-12 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-4 text-coral-ink shrink-0">
                 <span class="material-symbols-outlined text-2xl" aria-hidden="true">{service.icon}</span>
               </div>
 
-              <h3 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2">
+              <h3 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2 min-h-[3.5rem]">
                 <button
                   type="button"
                   aria-expanded="false"
@@ -51,7 +70,7 @@ const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
                   data-service-toggle
                   class="text-left w-full flex items-start justify-between gap-3 after:absolute after:inset-0 after:content-[''] after:rounded-xl"
                 >
-                  <span>{service.name}</span>
+                  <span class="leading-snug">{service.name}</span>
                   <span
                     class="material-symbols-outlined text-xl text-[#5B5B5E] shrink-0 mt-0.5 transition-transform"
                     data-service-chevron
@@ -62,20 +81,21 @@ const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
                 </button>
               </h3>
 
-              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-5">{service.description}</p>
+              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-5 min-h-[4.5rem]">{service.description}</p>
 
               <div class="mt-auto pt-4 border-t border-[#E5E0D8]">
-                <p>
-                  <span class="font-technical text-xs uppercase text-[#5B5B5E] mr-1">desde</span>
-                  <span class="text-coral-ink text-3xl font-bold font-sora">{money(service.from)}</span>
-                  <span class="font-technical text-sm text-[#5B5B5E] ml-1">{CURRENCY}</span>
+                <p class="flex flex-wrap items-baseline gap-x-1">
+                  <span class="font-technical text-xs uppercase text-[#5B5B5E]">desde</span>
+                  <span class="text-coral-ink text-3xl font-bold font-sora leading-none">{money(service.from)}</span>
+                  <span class="font-technical text-sm text-[#5B5B5E]">{CURRENCY}</span>
                 </p>
-                {service.suffix && <p class="font-technical text-xs text-[#0b6b4d] mt-1">{service.suffix}</p>}
+                <p class="font-technical text-xs text-[#0b6b4d] mt-1 min-h-[1rem]">
+                  {service.suffix ?? '\u00A0'}
+                </p>
                 <p class="font-inter text-sm text-[#1A1A1A] flex items-center gap-2 mt-2">
                   <span class="material-symbols-outlined text-base text-[#8a6a10]" aria-hidden="true">schedule</span>
                   <span>Plazo: {service.leadTime}</span>
                 </p>
-                <p class="font-inter text-xs text-[#5B5B5E] mt-2">Hosting y dominio aparte</p>
               </div>
 
               <div id={panelId} data-service-panel hidden class="relative z-10 animate-fadeIn">
@@ -109,16 +129,16 @@ const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
                       data-track="whatsapp"
                       data-track-source={`servicio:${service.id}`}
                       aria-label={`Pedir por WhatsApp: ${service.name} (se abre en una pestaña nueva)`}
-                      class="bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-3 rounded-full font-sora text-sm font-semibold transition-colors text-center"
+                      class="relative z-10 bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-3 rounded-full font-sora text-sm font-semibold transition-colors text-center"
                     >
                       Pedir por WhatsApp
                     </a>
                     <button
                       type="button"
                       data-open-quote={service.id}
-                      class="border border-[#1A1A1A] text-[#1A1A1A] px-6 py-3 rounded-full font-sora text-sm font-semibold hover:bg-[#1A1A1A] hover:text-white transition-colors"
+                      class="relative z-10 font-inter text-sm text-[#5B5B5E] underline underline-offset-4 decoration-[#C4BEB6] hover:text-[#1A1A1A] transition-colors text-left"
                     >
-                      Calcular presupuesto
+                      ¿Quieres una idea del precio? Calcula un estimado
                     </button>
                   </div>
                 </div>
@@ -129,79 +149,73 @@ const waLink = (name: string) => whatsappLink(`Hola, me interesa: ${name}`);
       }
     </ul>
 
-    <div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2 p-6 md:p-7 rounded-xl bg-white border border-[#E5E0D8] flex flex-col md:flex-row md:items-center gap-6">
-        <div class="md:flex-1">
-          <div class="flex items-center gap-3 mb-2">
-            <span class="material-symbols-outlined text-2xl text-coral-ink" aria-hidden="true">{MAINTENANCE.icon}</span>
-            <h3 class="font-sora text-xl font-bold text-[#1A1A1A]">{MAINTENANCE.name}</h3>
-            <span class="font-technical text-xs uppercase text-[#5B5B5E] border border-[#E5E0D8] rounded-full px-2 py-0.5">
+    <div class="mt-10 space-y-6">
+      <p class="font-inter text-sm md:text-base text-[#4A4A4A] leading-relaxed">
+        {publishingNote}
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <div class="rounded-xl border border-dashed border-[#D5CFC6] bg-white/40 px-5 py-5 flex flex-col h-full">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-xl text-[#8A8A8E]" aria-hidden="true">{MAINTENANCE.icon}</span>
+            <h3 class="font-sora text-base font-semibold text-[#1A1A1A]">{MAINTENANCE.name}</h3>
+            <span class="font-technical text-[10px] uppercase tracking-wider text-[#8A8A8E] border border-[#E5E0D8] rounded-full px-2 py-0.5">
               opcional
             </span>
           </div>
-          <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-3">{MAINTENANCE.description}</p>
-          <p>
-            <span class="text-coral-ink text-2xl font-bold font-sora">{money(MAINTENANCE.from)}</span>
-            <span class="font-technical text-sm text-[#5B5B5E] ml-1">{CURRENCY}{MAINTENANCE.suffix}</span>
-            {
-              MAINTENANCE.annualFrom !== undefined && (
-                <span class="font-technical text-xs text-[#0b6b4d] ml-2">
-                  {money(MAINTENANCE.annualFrom)} {CURRENCY}/mes pagando el año completo
-                </span>
-              )
-            }
+          <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed">
+            {MAINTENANCE.description} {maintenancePrice}
           </p>
-        </div>
-        <ul class="space-y-2 md:flex-1">
           {
-            MAINTENANCE.includes?.map((item) => (
-              <li class="flex items-start gap-2.5 text-sm font-inter text-[#1A1A1A]">
-                <span class="material-symbols-outlined text-coral-ink shrink-0 text-lg" aria-hidden="true">check_circle</span>
-                <span>{item}</span>
-              </li>
-            ))
+            MAINTENANCE.includes && MAINTENANCE.includes.length > 0 && (
+              <p class="mt-2 font-inter text-xs text-[#6A6A6E] leading-relaxed">
+                {MAINTENANCE.includes.join(' · ')}
+              </p>
+            )
           }
-        </ul>
-        <a
-          href={waLink(MAINTENANCE.name)}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-track="whatsapp"
-          data-track-source="servicio:mantenimiento"
-          aria-label={`Pedir por WhatsApp: ${MAINTENANCE.name} (se abre en una pestaña nueva)`}
-          class="border border-[#1A1A1A] text-[#1A1A1A] px-6 py-3 rounded-full font-sora text-sm font-semibold hover:bg-[#1A1A1A] hover:text-white transition-colors text-center shrink-0"
-        >
-          Pedir por WhatsApp
-        </a>
-      </div>
+          <a
+            href={waLink(MAINTENANCE.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+            data-track-source="servicio:mantenimiento"
+            aria-label={`Pedir por WhatsApp: ${MAINTENANCE.name} (se abre en una pestaña nueva)`}
+            class="mt-auto pt-4 inline-block font-inter text-sm text-[#5B5B5E] underline underline-offset-4 decoration-[#C4BEB6] hover:text-[#1A1A1A] transition-colors"
+          >
+            Pedir por WhatsApp
+          </a>
+        </div>
 
-      <div class="p-6 md:p-7 rounded-xl bg-white border border-[#E5E0D8] space-y-6">
-        <div>
+        <div class="rounded-xl bg-white border border-[#E5E0D8] px-5 py-5 flex flex-col h-full">
           <h3 class="font-technical text-xs font-bold text-[#0b6b4d] uppercase tracking-wider mb-3 flex items-center gap-2">
             <span class="material-symbols-outlined text-base" aria-hidden="true">payments</span>
             Cómo se paga
           </h3>
           <p class="font-inter text-sm text-[#1A1A1A] mb-2">{PAYMENT.terms}</p>
           <p class="font-inter text-sm text-[#5B5B5E] mb-2">Métodos: {PAYMENT.methods.join(', ')}.</p>
-          <p class="font-inter text-sm text-[#5B5B5E]">{CURRENCY_NOTE}</p>
-        </div>
-        <div>
-          <h3 class="font-technical text-xs font-bold text-[#8a6a10] uppercase tracking-wider mb-3 flex items-center gap-2">
-            <span class="material-symbols-outlined text-base" aria-hidden="true">cloud_done</span>
-            Hosting y dominio
-          </h3>
-          <p class="font-inter text-sm text-[#1A1A1A]">{PLANS_NOTE}</p>
+          <p class="font-inter text-sm text-[#5B5B5E] mt-auto">{CURRENCY_NOTE}</p>
         </div>
       </div>
     </div>
 
-    <div class="mt-10 flex justify-center">
+    <div class="mt-10 flex flex-col items-center gap-3">
+      <a
+        href={waGeneral}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="whatsapp"
+        data-track-source="servicios"
+        aria-label="Escribir por WhatsApp (se abre en una pestaña nueva)"
+        class="bg-coral-strong hover:bg-coral-strong-hover text-white px-8 py-3.5 rounded-full font-sora text-sm font-semibold transition-colors glow-coral text-center"
+      >
+        Escribir por WhatsApp
+      </a>
       <button
         type="button"
         data-open-quote
-        class="bg-coral-strong hover:bg-coral-strong-hover text-white px-8 py-3.5 rounded-full font-sora text-sm font-semibold transition-colors glow-coral"
+        class="font-inter text-sm text-[#5B5B5E] underline underline-offset-4 decoration-[#C4BEB6] hover:text-[#1A1A1A] transition-colors"
       >
-        Calcular presupuesto
+        ¿Quieres una idea del precio? Calcula un estimado
       </button>
     </div>
   </div>

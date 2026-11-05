@@ -2,29 +2,39 @@
 import {
   CURRENCY,
   CURRENCY_NOTE,
-  DEFAULT_HOSTING_ID,
   DOMAIN_OPTION,
   EXTRAS,
   HOSTING_OPTIONS,
   MAINTENANCE,
   PROJECT_SERVICES,
+  QUOTE_SETUP,
 } from '../config/pricing';
-import { calculateQuote, hostingDisplay, publishingOptionPrice } from '../lib/quote';
+import { calculateQuote, publishingOptionPrice } from '../lib/quote';
 
 const money = (value: number) => value.toLocaleString('en-US');
 const annualMonthly = MAINTENANCE.annualFrom ?? MAINTENANCE.from;
 const maintenanceOptions = [
-  { id: 'none', name: 'Sin mantenimiento', price: '' },
-  { id: 'monthly', name: 'Mensual', price: `${money(MAINTENANCE.from)} ${CURRENCY}${MAINTENANCE.suffix ?? ''}` },
+  { id: 'none', name: 'No por ahora', price: '' },
+  { id: 'monthly', name: 'Sí, con pago mensual', price: `${money(MAINTENANCE.from)} ${CURRENCY}${MAINTENANCE.suffix ?? ''}` },
   {
     id: 'annual',
-    name: 'Anual',
+    name: 'Sí, con pago anual',
     price: `${money(annualMonthly)} ${CURRENCY}${MAINTENANCE.suffix ?? ''} · ${money(annualMonthly * 12)} ${CURRENCY} al año`,
   },
 ] as const;
+const includes = (MAINTENANCE.includes ?? []).map((item) => item.charAt(0).toLowerCase() + item.slice(1));
+const maintenanceIncludes =
+  includes.length > 1 ? `${includes.slice(0, -1).join(', ')} y ${includes[includes.length - 1]}` : includes[0];
+const freeAddress = HOSTING_OPTIONS.find((option) => option.price === 0)?.description;
 
 const initialService = PROJECT_SERVICES[0];
+const initialSetup = QUOTE_SETUP[initialService.id];
 const initialQuote = calculateQuote(initialService.id);
+
+const stepTitle = 'block font-sora text-base md:text-lg font-semibold text-white mb-3';
+const row = 'p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] transition-all';
+const control = 'w-4 h-4 shrink-0 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]';
+const priceTag = 'font-inter text-xs font-semibold text-[#edc157] text-right shrink-0';
 ---
 
 <div
@@ -37,19 +47,14 @@ const initialQuote = calculateQuote(initialService.id);
     aria-modal="true"
     aria-labelledby="quote-title"
     tabindex="-1"
-    class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl text-white outline-none"
+    class="scrollbar-dark bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl text-white outline-none"
   >
-    <div class="sticky top-0 bg-[#1A1A1A]/95 backdrop-blur-md border-b border-[#2A2A2A] px-6 py-4 flex items-center justify-between z-10">
-      <div class="flex items-center gap-3">
-        <span class="w-3 h-3 rounded-full bg-[#58ddb0]" aria-hidden="true"></span>
-        <span class="font-technical text-xs text-[#58ddb0] uppercase tracking-wider">
-          // COTIZADOR · BIT &amp; BYTE
-        </span>
-      </div>
+    <div class="sticky top-0 bg-[#1A1A1A]/95 backdrop-blur-md border-b border-[#2A2A2A] px-6 py-4 flex items-center justify-between gap-4 z-10">
+      <h2 id="quote-title" class="font-sora text-xl md:text-2xl font-bold text-white">Calcula un estimado</h2>
       <button
         type="button"
         data-quote-close
-        class="w-8 h-8 rounded-full bg-[#2A2A2A] hover:bg-[#353437] flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors"
+        class="w-8 h-8 shrink-0 rounded-full bg-[#2A2A2A] hover:bg-[#353437] flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors"
         aria-label="Cerrar cotizador"
       >
         <span class="material-symbols-outlined text-xl" aria-hidden="true">close</span>
@@ -57,19 +62,12 @@ const initialQuote = calculateQuote(initialService.id);
     </div>
 
     <div class="p-6 md:p-8 space-y-8">
-      <div>
-        <h2 id="quote-title" class="font-sora text-2xl md:text-3xl font-bold text-white mb-2">
-          Calcula tu presupuesto
-        </h2>
-        <p class="font-inter text-sm text-[#9CA3AF]">
-          Elige lo que necesitas y te mostramos un estimado de partida. El precio final lo confirmamos por WhatsApp.
-        </p>
-      </div>
+      <p class="font-inter text-sm text-[#9CA3AF]">
+        Responde estas preguntas y te mostramos un precio de partida. El precio final lo confirmamos contigo por WhatsApp.
+      </p>
 
       <div>
-        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-service-label">
-          1. ¿Qué necesitas?
-        </span>
+        <h3 id="quote-service-label" class={stepTitle}>¿Qué necesitas?</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-labelledby="quote-service-label">
           {
             PROJECT_SERVICES.map((service) => (
@@ -84,217 +82,174 @@ const initialQuote = calculateQuote(initialService.id);
                     : 'bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] hover:border-[#353437]',
                 ]}
               >
-                <div class="font-sora font-semibold text-sm mb-1">{service.name}</div>
-                <div class="font-technical text-xs text-[#fd625d]">
+                <span class="block font-sora font-semibold text-sm mb-1">{service.name}</span>
+                <span class="block font-inter text-xs text-[#9CA3AF] leading-relaxed mb-2">{service.description}</span>
+                <span class="block font-inter text-sm font-semibold text-[#ffb3ad]">
                   desde {money(service.from)} {CURRENCY}
                   {service.suffix ? ` · ${service.suffix}` : ''}
-                </div>
+                </span>
               </button>
             ))
           }
         </div>
-
-        <fieldset class="mt-4">
-          <legend class="font-technical text-xs text-[#9CA3AF] font-bold uppercase tracking-wider block mb-2">
-            Mantenimiento
-          </legend>
-          <div class="grid grid-cols-1 gap-3">
-            {
-              maintenanceOptions.map((option) => (
-                <label
-                  data-maintenance-row={option.id}
-                  class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
-                >
-                  <div class="flex items-start gap-3">
-                    <input
-                      type="radio"
-                      name="quote-maintenance"
-                      value={option.id}
-                      data-maintenance={option.id}
-                      checked={option.id === 'none'}
-                      class="mt-0.5 w-4 h-4 shrink-0 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
-                    />
-                    <span class="text-sm font-inter">{option.name}</span>
-                  </div>
-                  {option.price && (
-                    <span class="font-technical text-xs font-bold text-[#edc157] text-right shrink-0">
-                      {option.price.split(' · ').map((part, index, parts) => (
-                        <>
-                          <span class="whitespace-nowrap">{index < parts.length - 1 ? `${part} ·` : part}</span>
-                          {index < parts.length - 1 && ' '}
-                        </>
-                      ))}
-                    </span>
-                  )}
-                </label>
-              ))
-            }
-          </div>
-        </fieldset>
       </div>
 
-      <div>
-        <span class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3" id="quote-extras-label">
-          2. Extras (opcional)
-        </span>
+      <div data-extras-step class:list={[initialSetup.extras.length === 0 && 'hidden']} hidden={initialSetup.extras.length === 0}>
+        <h3 id="quote-extras-label" class={stepTitle}>
+          ¿Algo más? <span class="font-inter text-sm font-normal text-[#9CA3AF]">(opcional)</span>
+        </h3>
         <div class="grid grid-cols-1 gap-3" role="group" aria-labelledby="quote-extras-label">
           {
-            EXTRAS.map((extra) => (
-              <div
-                data-extra-row={extra.id}
-                class="quote-extra flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] transition-all"
-              >
-                <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-[12rem]">
-                  <input
-                    type="checkbox"
-                    data-extra={extra.id}
-                    class="w-4 h-4 shrink-0 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
-                  />
-                  <span class="text-sm font-inter">{extra.name}</span>
-                </label>
+            EXTRAS.map((extra) => {
+              const offered = initialSetup.extras.some((id) => id === extra.id);
+              return (
+                <div
+                  data-extra-row={extra.id}
+                  hidden={!offered}
+                  class:list={['quote-extra flex flex-wrap items-center justify-between gap-3', row, !offered && 'hidden']}
+                >
+                  <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-[12rem]">
+                    <input type="checkbox" data-extra={extra.id} class:list={[control, 'rounded']} />
+                    <span class="text-sm font-inter">{extra.name}</span>
+                  </label>
 
-                <div class="flex items-center gap-4">
-                  {extra.quantity && (
-                    <label class="flex items-center gap-2 text-xs font-technical">
-                      <span class="sr-only">{extra.quantity.label}</span>
-                      <span aria-hidden="true">×</span>
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        data-extra-qty={extra.id}
-                        min="1"
-                        max={extra.quantity.max}
-                        value="1"
-                        disabled
-                        aria-label={extra.quantity.label}
-                        class="w-16 bg-[#1A1A1A] border border-[#353437] rounded-lg px-2 py-1 text-white text-center disabled:opacity-40"
-                      />
-                    </label>
-                  )}
-                  <span class="font-technical text-xs font-bold text-[#edc157] whitespace-nowrap shrink-0">
-                    {extra.price === undefined
-                      ? 'precio a consultar'
-                      : `+${money(extra.price)} ${CURRENCY}${extra.unit ? ` ${extra.unit}` : ''}`}
-                  </span>
+                  <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    {extra.quantity && (
+                      <label class="flex items-center gap-2 text-xs font-inter">
+                        <span>{extra.quantity.label}</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          data-extra-qty={extra.id}
+                          min="1"
+                          max={extra.quantity.max}
+                          value="1"
+                          disabled
+                          class="w-20 bg-[#1A1A1A] border border-[#353437] rounded-lg px-2 py-1 text-white text-center disabled:opacity-40"
+                        />
+                      </label>
+                    )}
+                    <span class:list={[priceTag, 'whitespace-nowrap']}>
+                      {extra.price === undefined
+                        ? 'precio a consultar'
+                        : `+${money(extra.price)} ${CURRENCY}${extra.unit ? ` ${extra.unit}` : ''}`}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           }
         </div>
       </div>
 
+      <fieldset data-domain-step class:list={[!initialSetup.domain && 'hidden']} hidden={!initialSetup.domain}>
+        <legend class={stepTitle}>¿Quieres tu propio nombre en internet?</legend>
+        <div class="grid grid-cols-1 gap-3">
+          <label data-domain-row class:list={['flex items-start gap-3 cursor-pointer', row]}>
+            <input type="radio" name="quote-domain" value="no" data-domain checked class:list={[control, 'mt-0.5']} />
+            <span>
+              <span class="block text-sm font-inter">No por ahora</span>
+              {freeAddress && (
+                <span data-free-address class="block text-xs font-inter opacity-80 mt-0.5">
+                  Tu web queda en una dirección gratuita, tipo {freeAddress}.
+                </span>
+              )}
+            </span>
+          </label>
+          <label data-domain-row class:list={['flex items-start justify-between gap-3 cursor-pointer', row]}>
+            <span class="flex items-start gap-3">
+              <input type="radio" name="quote-domain" value="yes" data-domain class:list={[control, 'mt-0.5']} />
+              <span>
+                <span class="block text-sm font-inter">Sí, quiero mi dominio propio .com</span>
+                <span class="block text-xs font-inter opacity-80 mt-0.5">
+                  Por ejemplo, tunegocio.com. Nosotros lo registramos y lo gestionamos.
+                </span>
+              </span>
+            </span>
+            <span class:list={[priceTag, 'whitespace-nowrap']}>{publishingOptionPrice(DOMAIN_OPTION, initialService.id)}</span>
+          </label>
+        </div>
+        <p data-hosting-note class="mt-3 font-inter text-xs text-[#9CA3AF]"></p>
+      </fieldset>
+
       <fieldset>
-        <legend class="font-technical text-xs text-[#fd625d] font-bold uppercase tracking-wider block mb-3">
-          3. Publicación
-        </legend>
+        <legend class={stepTitle}>¿Quieres mantenimiento después de la entrega?</legend>
+        {maintenanceIncludes && <p class="-mt-1 mb-3 font-inter text-xs text-[#9CA3AF]">Incluye {maintenanceIncludes}.</p>}
         <div class="grid grid-cols-1 gap-3">
           {
-            HOSTING_OPTIONS.map((option) => (
-              <label
-                data-hosting-row={option.id}
-                class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
-              >
-                <div class="flex items-start gap-3">
+            maintenanceOptions.map((option) => (
+              <label data-maintenance-row={option.id} class:list={['flex items-start justify-between gap-3 cursor-pointer', row]}>
+                <span class="flex items-start gap-3">
                   <input
                     type="radio"
-                    name="quote-hosting"
+                    name="quote-maintenance"
                     value={option.id}
-                    data-hosting={option.id}
-                    checked={option.id === DEFAULT_HOSTING_ID}
-                    class="mt-0.5 w-4 h-4 shrink-0 border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
+                    data-maintenance={option.id}
+                    checked={option.id === 'none'}
+                    class:list={[control, 'mt-0.5']}
                   />
-                  <span>
-                    <span data-hosting-name class="block text-sm font-inter">
-                      {hostingDisplay(option, false).name}
-                    </span>
-                    <span data-hosting-description class="block text-xs font-inter opacity-80 mt-0.5">
-                      {hostingDisplay(option, false).description}
-                    </span>
-                  </span>
-                </div>
-                <span
-                  data-hosting-price
-                  class="font-technical text-xs font-bold text-[#edc157] text-right whitespace-nowrap shrink-0"
-                >
-                  {publishingOptionPrice(option, initialService.id)}
+                  <span class="text-sm font-inter">{option.name}</span>
                 </span>
+                {option.price && (
+                  <span class={priceTag}>
+                    {option.price.split(' · ').map((part, index, parts) => (
+                      <>
+                        <span class="whitespace-nowrap">{index < parts.length - 1 ? `${part} ·` : part}</span>
+                        {index < parts.length - 1 && ' '}
+                      </>
+                    ))}
+                  </span>
+                )}
               </label>
             ))
           }
-
-          <label
-            data-domain-row
-            class="flex items-start justify-between gap-3 p-3.5 rounded-xl border bg-[#131315] border-[#2A2A2A] text-[#9CA3AF] cursor-pointer transition-all"
-          >
-            <div class="flex items-start gap-3">
-              <input
-                type="checkbox"
-                data-domain
-                class="mt-0.5 w-4 h-4 shrink-0 rounded border-[#353437] text-[#fd625d] focus:ring-[#fd625d]"
-              />
-              <span>
-                <span class="block text-sm font-inter">{DOMAIN_OPTION.name}</span>
-                <span class="block text-xs font-inter opacity-80 mt-0.5">
-                  {DOMAIN_OPTION.description}. Se puede combinar con cualquiera de las opciones de arriba.
-                </span>
-              </span>
-            </div>
-            <span class="font-technical text-xs font-bold text-[#edc157] text-right whitespace-nowrap shrink-0">
-              {publishingOptionPrice(DOMAIN_OPTION, initialService.id)}
-            </span>
-          </label>
         </div>
       </fieldset>
 
-      <div class="bg-[#131315] p-6 rounded-2xl border-2 border-[#fd625d]/60 shadow-xl space-y-5">
-        <div aria-live="polite">
-          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-1">Pago único del proyecto</div>
-          <div class="font-sora text-3xl md:text-4xl font-bold text-white flex items-baseline gap-2">
-            <span class="text-sm font-normal text-[#9CA3AF] font-inter">desde</span>
-            <span data-quote-total>{money(initialQuote.oneTime)}</span>
-            <span class="text-sm font-normal text-[#9CA3AF] font-inter">{CURRENCY}</span>
-          </div>
-          <p class="text-xs font-technical text-[#58ddb0] mt-2">
+      <div class="bg-[#131315] p-6 rounded-2xl border border-[#2A2A2A] space-y-5">
+        <div>
+          <h3 class="font-sora text-sm font-semibold text-white mb-2">Pago único</h3>
+          <ul data-quote-once class="space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
+          <p class="mt-3 pt-3 border-t border-[#2A2A2A] flex justify-between gap-4 text-sm font-inter font-semibold text-white">
+            <span>Total</span>
+            <span>desde <span data-quote-total>{money(initialQuote.oneTime)}</span> {CURRENCY}</span>
+          </p>
+          <p class="text-xs font-inter text-[#58ddb0] mt-2">
             Plazo orientativo: <span data-quote-leadtime>{initialQuote.leadTime}</span>
           </p>
-          <ul data-quote-once class="mt-3 space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
         </div>
 
-        <div class="border-t border-[#2A2A2A] pt-4" aria-live="polite">
-          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-2">Publicación</div>
-          <ul data-quote-publishing class="space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
-        </div>
-
-        <div class="border-t border-[#2A2A2A] pt-4" aria-live="polite">
-          <div class="font-technical text-xs text-[#9CA3AF] uppercase mb-2">Pago recurrente</div>
+        <div class="border-t border-[#2A2A2A] pt-4">
+          <h3 class="font-sora text-sm font-semibold text-white mb-2">Pagos mensuales o anuales</h3>
           <ul data-quote-recurring class="space-y-1.5 text-sm font-inter text-[#e5e1e4]"></ul>
           <ul data-quote-recurring-totals class="mt-2 pt-2 border-t border-[#2A2A2A] space-y-1 text-sm font-inter font-semibold text-white hidden" hidden></ul>
-          <p data-quote-empty class="text-sm font-inter text-[#9CA3AF] hidden" hidden>Ninguno.</p>
+          <p data-quote-empty class="text-sm font-inter text-[#9CA3AF] hidden" hidden>No tienes pagos mensuales ni anuales.</p>
         </div>
 
-        <p class="text-xs font-inter text-[#9CA3AF]">
-          Precio final por WhatsApp. {CURRENCY_NOTE}
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
-          <button
-            type="button"
-            data-quote-close
-            class="px-5 py-3 rounded-full border border-[#353437] text-white font-sora text-sm hover:bg-[#2A2A2A] transition-colors text-center"
-          >
-            Cerrar
-          </button>
-          <button
-            type="button"
-            data-quote-whatsapp
-            aria-label="Enviar la cotización por WhatsApp (se abre en una pestaña nueva)"
-            class="px-6 py-3 rounded-full bg-coral-strong hover:bg-coral-strong-hover text-white font-sora text-sm font-semibold hover:scale-105 transition-all glow-coral flex items-center justify-center gap-2"
-          >
-            <span class="material-symbols-outlined text-lg" aria-hidden="true">send</span>
-            <span>Enviar por WhatsApp</span>
-          </button>
-        </div>
+        <p class="text-xs font-inter text-[#9CA3AF]">El precio final lo confirmamos por WhatsApp. {CURRENCY_NOTE}</p>
       </div>
+    </div>
+
+    <div class="sticky bottom-0 z-10 bg-[#1A1A1A]/95 backdrop-blur-md border-t border-[#2A2A2A] px-6 py-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+      <div aria-live="polite">
+        <p class="font-inter text-sm text-[#9CA3AF] flex items-baseline gap-1.5">
+          <span>Pago único desde</span>
+          <span data-bar-total class="font-sora text-2xl font-bold text-white">{money(initialQuote.oneTime)}</span>
+          <span>{CURRENCY}</span>
+        </p>
+        <p class="font-inter text-xs text-[#9CA3AF]">
+          <span data-bar-later></span> · Plazo: <span data-bar-leadtime>{initialQuote.leadTime}</span>
+        </p>
+      </div>
+      <button
+        type="button"
+        data-quote-whatsapp
+        aria-label="Enviar el estimado por WhatsApp (se abre en una pestaña nueva)"
+        class="w-full sm:w-auto px-6 py-3 rounded-full bg-coral-strong hover:bg-coral-strong-hover text-white font-sora text-sm font-semibold transition-colors glow-coral flex items-center justify-center gap-2"
+      >
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">send</span>
+        <span>Enviar por WhatsApp</span>
+      </button>
     </div>
   </div>
 </div>
@@ -304,30 +259,31 @@ const initialQuote = calculateQuote(initialService.id);
   import { whatsappLink } from '../config/contact';
   import { mountTracking, track } from '../lib/analytics';
   import {
-    DEFAULT_HOSTING_ID,
     HOSTING_OPTIONS,
     PROJECT_SERVICES,
+    QUOTE_SETUP,
     type ExtraId,
-    type HostingId,
     type ProjectServiceId,
+    type PublishingOption,
   } from '../config/pricing';
   import {
     calculateQuote,
     clampQuantity,
     formatLineAmount,
-    hostingDisplay,
+    lineLabel,
     oneTimeLines,
     publishingOptionPrice,
-    publishingSummary,
+    publishingPriceFor,
     quoteToMessage,
     recurringLines,
     recurringTotals,
     type MaintenanceMode,
+    type Quote,
     type QuoteExtraInput,
     type QuoteLine,
   } from '../lib/quote';
   import { mountAll } from '../lib/lifecycle';
-  import { createModal } from '../lib/modal';
+  import { createModal, setVisible } from '../lib/modal';
 
   const SERVICE_ACTIVE = ['is-active', 'bg-[#fd625d]/10', 'border-[#fd625d]', 'text-white', 'shadow-md'];
   const SERVICE_INACTIVE = ['bg-[#131315]', 'border-[#2A2A2A]', 'text-[#9CA3AF]'];
@@ -337,9 +293,6 @@ const initialQuote = calculateQuote(initialService.id);
   const isServiceId = (value: string | undefined): value is ProjectServiceId =>
     PROJECT_SERVICES.some((service) => service.id === value);
 
-  const isHostingId = (value: string | undefined): value is HostingId =>
-    HOSTING_OPTIONS.some((option) => option.id === value);
-
   const isMaintenanceMode = (value: string | undefined): value is MaintenanceMode =>
     value === 'none' || value === 'monthly' || value === 'annual';
 
@@ -347,48 +300,71 @@ const initialQuote = calculateQuote(initialService.id);
     const li = document.createElement('li');
     li.className = 'flex justify-between gap-4';
     const label = document.createElement('span');
-    label.textContent = line.label;
+    label.textContent = lineLabel(line);
     const amount = document.createElement('span');
-    amount.className = 'font-technical text-xs text-[#edc157] whitespace-nowrap';
+    amount.className = 'text-xs font-semibold text-[#edc157] whitespace-nowrap';
     amount.textContent = formatLineAmount(line);
     li.append(label, amount);
     return li;
   }
 
+  function laterSummary(quote: Quote): string {
+    const parts: string[] = [];
+    if (quote.monthly > 0) {
+      parts.push(formatLineAmount({ amount: quote.monthly, billing: 'monthly', from: quote.monthlyFrom }));
+    }
+    if (quote.yearly > 0) {
+      parts.push(formatLineAmount({ amount: quote.yearly, billing: 'yearly', from: quote.yearlyFrom }));
+    }
+    if (recurringLines(quote).some((line) => line.amount === null)) parts.push('a consultar');
+    return parts.length ? `Además: ${parts.join(' + ')}` : 'Sin pagos mensuales ni anuales';
+  }
+
+  function hostingNote(option: PublishingOption, serviceId: ProjectServiceId): string {
+    const { amount } = publishingPriceFor(option, serviceId);
+    if (amount === 0) return 'El alojamiento es gratis.';
+    if (amount === null) return 'El precio del alojamiento te lo confirmamos por WhatsApp.';
+    return `El alojamiento cuesta ${publishingOptionPrice(option, serviceId)} y se paga aparte.`;
+  }
+
   function initQuoteModal(root: HTMLElement, signal: AbortSignal) {
     const serviceButtons = Array.from(root.querySelectorAll<HTMLElement>('[data-service]'));
     const extraInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-extra]'));
+    const domainInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-domain]'));
     const maintenanceInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-maintenance]'));
-    const publishingEl = root.querySelector<HTMLElement>('[data-quote-publishing]');
-    const recurringTotalsEl = root.querySelector<HTMLElement>('[data-quote-recurring-totals]');
-    const domainInput = root.querySelector<HTMLInputElement>('[data-domain]');
+    const extrasStep = root.querySelector<HTMLElement>('[data-extras-step]');
+    const domainStep = root.querySelector<HTMLElement>('[data-domain-step]');
+    const freeAddressEl = root.querySelector<HTMLElement>('[data-free-address]');
+    const hostingNoteEl = root.querySelector<HTMLElement>('[data-hosting-note]');
     const totalEl = root.querySelector<HTMLElement>('[data-quote-total]');
     const leadTimeEl = root.querySelector<HTMLElement>('[data-quote-leadtime]');
     const onceEl = root.querySelector<HTMLElement>('[data-quote-once]');
     const recurringEl = root.querySelector<HTMLElement>('[data-quote-recurring]');
+    const recurringTotalsEl = root.querySelector<HTMLElement>('[data-quote-recurring-totals]');
     const emptyEl = root.querySelector<HTMLElement>('[data-quote-empty]');
-    const hostingInputs = Array.from(root.querySelectorAll<HTMLInputElement>('[data-hosting]'));
+    const barTotalEl = root.querySelector<HTMLElement>('[data-bar-total]');
+    const barLaterEl = root.querySelector<HTMLElement>('[data-bar-later]');
+    const barLeadTimeEl = root.querySelector<HTMLElement>('[data-bar-leadtime]');
 
-    if (!serviceButtons.length || !maintenanceInputs.length || !domainInput) return;
+    if (!serviceButtons.length || !maintenanceInputs.length || !domainInputs.length) return;
 
     const modal = createModal(root, signal);
     let serviceId: ProjectServiceId = PROJECT_SERVICES[0].id;
 
+    const setup = () => QUOTE_SETUP[serviceId];
+    const offersExtra = (id: string) => setup().extras.some((extra) => extra === id);
     const qtyInput = (id: string) => root.querySelector<HTMLInputElement>(`[data-extra-qty="${id}"]`);
 
     const selectedExtras = (): QuoteExtraInput[] =>
       extraInputs
-        .filter((input) => input.checked)
+        .filter((input) => input.checked && offersExtra(input.dataset.extra ?? ''))
         .map((input) => {
           const id = input.dataset.extra as ExtraId;
           const qty = qtyInput(id);
           return { id, quantity: qty ? Number(qty.value) : undefined };
         });
 
-    const selectedHosting = (): HostingId => {
-      const value = hostingInputs.find((input) => input.checked)?.value;
-      return isHostingId(value) ? value : DEFAULT_HOSTING_ID;
-    };
+    const wantsDomain = () => setup().domain && domainInputs.some((input) => input.checked && input.value === 'yes');
 
     const selectedMaintenance = (): MaintenanceMode => {
       const value = maintenanceInputs.find((input) => input.checked)?.value;
@@ -398,7 +374,7 @@ const initialQuote = calculateQuote(initialService.id);
     const currentQuote = () =>
       calculateQuote(serviceId, selectedExtras(), {
         maintenance: selectedMaintenance(),
-        publishing: { hosting: selectedHosting(), domain: domainInput.checked },
+        publishing: { hosting: setup().hosting ?? undefined, domain: wantsDomain() },
       });
 
     // Rewrites a quantity input with the same clamped integer that calculateQuote uses.
@@ -415,60 +391,50 @@ const initialQuote = calculateQuote(initialService.id);
     };
 
     const render = () => {
+      const { extras, hosting, domain } = setup();
+
+      setVisible(extrasStep, extras.length > 0);
       extraInputs.forEach((input) => {
         const id = input.dataset.extra ?? '';
+        const row = input.closest<HTMLElement>('[data-extra-row]');
         const qty = qtyInput(id);
         if (qty) qty.disabled = !input.checked;
-        paintRow(input.closest<HTMLElement>('[data-extra-row]'), input.checked);
+        setVisible(row, offersExtra(id));
+        paintRow(row, input.checked);
+      });
+
+      setVisible(domainStep, domain);
+      const hostingOption = HOSTING_OPTIONS.find((option) => option.id === hosting);
+      setVisible(freeAddressEl, !!hostingOption && publishingPriceFor(hostingOption, serviceId).amount === 0);
+      if (hostingNoteEl) hostingNoteEl.textContent = hostingOption ? hostingNote(hostingOption, serviceId) : '';
+      domainInputs.forEach((input) => {
+        paintRow(input.closest<HTMLElement>('[data-domain-row]'), input.checked);
       });
       maintenanceInputs.forEach((input) => {
         paintRow(input.closest<HTMLElement>('[data-maintenance-row]'), input.checked);
       });
-      paintRow(domainInput.closest<HTMLElement>('[data-domain-row]'), domainInput.checked);
-      hostingInputs.forEach((input) => {
-        const row = input.closest<HTMLElement>('[data-hosting-row]');
-        paintRow(row, input.checked);
-        const option = HOSTING_OPTIONS.find((item) => item.id === input.value);
-        if (!option || !row) return;
-        const text = hostingDisplay(option, domainInput.checked);
-        const nameEl = row.querySelector('[data-hosting-name]');
-        const descriptionEl = row.querySelector('[data-hosting-description]');
-        const priceEl = row.querySelector('[data-hosting-price]');
-        if (nameEl) nameEl.textContent = text.name;
-        if (descriptionEl) descriptionEl.textContent = text.description;
-        if (priceEl) priceEl.textContent = publishingOptionPrice(option, serviceId);
-      });
 
       const quote = currentQuote();
-      if (totalEl) totalEl.textContent = quote.oneTime.toLocaleString('en-US');
+      const total = quote.oneTime.toLocaleString('en-US');
+      if (totalEl) totalEl.textContent = total;
+      if (barTotalEl) barTotalEl.textContent = total;
       if (leadTimeEl) leadTimeEl.textContent = quote.leadTime;
-      publishingEl?.replaceChildren(
-        ...publishingSummary(quote).map((text) => {
+      if (barLeadTimeEl) barLeadTimeEl.textContent = quote.leadTime;
+      if (barLaterEl) barLaterEl.textContent = laterSummary(quote);
+      onceEl?.replaceChildren(...oneTimeLines(quote).map(lineItem));
+
+      const recurring = recurringLines(quote);
+      recurringEl?.replaceChildren(...recurring.map(lineItem));
+      const totals = recurringTotals(quote);
+      recurringTotalsEl?.replaceChildren(
+        ...totals.map((text) => {
           const li = document.createElement('li');
           li.textContent = text;
           return li;
         }),
       );
-      onceEl?.replaceChildren(...oneTimeLines(quote).map(lineItem));
-
-      const recurring = recurringLines(quote);
-      recurringEl?.replaceChildren(...recurring.map(lineItem));
-      if (recurringTotalsEl) {
-        const totals = recurringTotals(quote);
-        recurringTotalsEl.replaceChildren(
-          ...totals.map((text) => {
-            const li = document.createElement('li');
-            li.textContent = text;
-            return li;
-          }),
-        );
-        recurringTotalsEl.classList.toggle('hidden', totals.length === 0);
-        recurringTotalsEl.hidden = totals.length === 0;
-      }
-      if (emptyEl) {
-        emptyEl.classList.toggle('hidden', recurring.length > 0);
-        emptyEl.hidden = recurring.length > 0;
-      }
+      setVisible(recurringTotalsEl, totals.length > 0);
+      setVisible(emptyEl, recurring.length === 0);
     };
 
     const setService = (id: ProjectServiceId) => {
@@ -498,7 +464,7 @@ const initialQuote = calculateQuote(initialService.id);
       );
     });
 
-    [...extraInputs, ...hostingInputs, ...maintenanceInputs, domainInput].forEach((input) => {
+    [...extraInputs, ...domainInputs, ...maintenanceInputs].forEach((input) => {
       input.addEventListener('change', render, { signal });
     });
     root.querySelectorAll<HTMLInputElement>('[data-extra-qty]').forEach((input) => {

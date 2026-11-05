@@ -139,12 +139,13 @@ export function calculateQuote(
     if (!extra) throw new RangeError(`Unknown quote extra: ${String(input.id)}`);
 
     const quantity = extra.quantity ? clampQuantity(input.quantity, extra.quantity.max) : 1;
+    const units = extra.quantity?.per ? Math.ceil(quantity / extra.quantity.per) : quantity;
     lines.push({
       id: extra.id,
       kind: 'extra',
       label: extra.quantity ? `${extra.name} × ${quantity}` : extra.name,
       billing: 'once',
-      amount: extra.price === undefined ? null : extra.price * quantity,
+      amount: extra.price === undefined ? null : extra.price * units,
     });
   }
 
@@ -216,29 +217,16 @@ export function calculateQuote(
   };
 }
 
-/** Lines of the "Pago único del proyecto" block: base service and extras. */
+/** Lines of the "Pago único" block: base service and extras. */
 export const oneTimeLines = (quote: Quote): QuoteLine[] =>
   quote.lines.filter((line) => line.kind === 'service' || line.kind === 'extra');
 
-/** Lines of the "Pago recurrente" block: anything billed yearly or monthly. */
+/** Lines of the "Pagos mensuales o anuales" block: anything billed yearly or monthly. */
 export const recurringLines = (quote: Quote): QuoteLine[] =>
   quote.lines.filter((line) => line.billing !== 'once');
 
-/** Hosting and domain lines: what the "Publicación" block describes. */
-export const publishingLines = (quote: Quote): QuoteLine[] =>
-  quote.lines.filter((line) => line.kind === 'hosting' || line.kind === 'domain');
-
-/**
- * Publishing choices as text lines, shared by the quote result and the WhatsApp message.
- * Free one-time options show "Gratis"; recurring ones are priced in "Pago recurrente".
- */
-export function publishingSummary(quote: Quote): string[] {
-  return publishingLines(quote).map((line) => {
-    const detail = line.detail ? ` (${line.detail})` : '';
-    const amount = line.billing === 'once' ? ` - ${formatLineAmount(line)}` : '';
-    return `${line.label}${detail}${amount}`;
-  });
-}
+/** Name shown to the client. We pick the hosting, so it is always "Alojamiento" whatever the option. */
+export const lineLabel = (line: QuoteLine): string => (line.kind === 'hosting' ? 'Alojamiento' : line.label);
 
 /**
  * Totals for a recurring period, only when the period has more than one line
@@ -271,15 +259,12 @@ export function quoteToMessage(quote: Quote): string {
     `- Servicio: ${service?.label ?? ''}`,
     `- Plazo orientativo: ${quote.leadTime}`,
     '',
-    'Pago único del proyecto:',
+    'Pago único:',
     ...oneTimeLines(quote).map((line) => `- ${line.label}: ${formatLineAmount(line)}`),
     `- Estimado desde: ${formatUsd(quote.oneTime)}`,
     '',
-    'Publicación:',
-    ...publishingSummary(quote).map((text) => `- ${text}`),
-    '',
-    'Pago recurrente:',
-    ...(recurring.length ? recurring.map((line) => `- ${line.label}: ${formatLineAmount(line)}`) : ['- Ninguno']),
+    'Pagos mensuales o anuales:',
+    ...(recurring.length ? recurring.map((line) => `- ${lineLabel(line)}: ${formatLineAmount(line)}`) : ['- Ninguno']),
     ...recurringTotals(quote).map((text) => `- ${text}`),
   ].join('\n');
 }

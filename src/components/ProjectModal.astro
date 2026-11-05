@@ -12,7 +12,7 @@ import { PROJECTS } from '../data';
     role="dialog"
     aria-modal="true"
     tabindex="-1"
-    class="bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl text-white relative outline-none"
+    class="scrollbar-dark bg-[#1A1A1A] border border-[#353437] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl text-white relative outline-none"
   >
     {
       PROJECTS.map((project) => (
@@ -76,7 +76,7 @@ import { PROJECTS } from '../data';
               </ul>
             </div>
 
-            <ul class="flex flex-wrap gap-2" aria-label="Tecnologías">
+            <ul class="flex flex-wrap gap-2" aria-label="Beneficios">
               {project.tags.map((tag) => (
                 <li class="px-2.5 py-0.5 rounded bg-[#2A2A2A] text-xs font-technical text-[#fd625d]">{tag}</li>
               ))}
@@ -125,9 +125,9 @@ import { PROJECTS } from '../data';
                 <button
                   type="button"
                   data-quote-similar={project.serviceId}
-                  class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-coral-strong hover:bg-coral-strong-hover text-white font-sora text-sm font-semibold whitespace-nowrap hover:scale-105 transition-transform glow-coral"
+                  class="w-full sm:w-auto px-2 py-2.5 font-inter text-sm text-[#9CA3AF] underline underline-offset-4 hover:text-white transition-colors text-center"
                 >
-                  Calcular algo similar
+                  ¿Quieres una idea del precio? Calcula un estimado
                 </button>
               </div>
             </div>

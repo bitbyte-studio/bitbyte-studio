@@ -24,7 +24,8 @@ const service = (id: ProjectServiceId) => {
 };
 
 const managed = HOSTING_OPTIONS.find((option) => option.id === 'managed')!;
-const quantityExtra = EXTRAS.find((extra) => extra.quantity)!;
+const quantityExtra = EXTRAS.find((extra) => extra.quantity && !extra.quantity.per)!;
+const blockExtra = EXTRAS.find((extra) => extra.quantity?.per)!;
 const flatExtra = EXTRAS.find((extra) => !extra.quantity && extra.price !== undefined)!;
 
 describe('clampQuantity', () => {
@@ -86,6 +87,13 @@ describe('calculateQuote', () => {
     ]);
     expect(quote.oneTime).toBe(base + flatExtra.price! + quantityExtra.price! * max);
     expect(quote.lines.some((line) => line.label.endsWith(`× ${max}`))).toBe(true);
+  });
+
+  test('extras sold in blocks charge every started block', () => {
+    const per = blockExtra.quantity!.per!;
+    const quote = calculateQuote('landing', [{ id: blockExtra.id as never, quantity: per * 2 + 1 }]);
+    expect(quote.oneTime).toBe(service('landing').from + blockExtra.price! * 3);
+    expect(quote.lines.some((line) => line.label.endsWith(`× ${per * 2 + 1}`))).toBe(true);
   });
 
   test('a repeated extra is only counted once', () => {
@@ -175,5 +183,10 @@ describe('quoteToMessage', () => {
 
   test('says "Ninguno" when nothing recurs', () => {
     expect(quoteToMessage(calculateQuote('landing'))).toContain('- Ninguno');
+  });
+
+  test('calls the hosting "Alojamiento" whatever the option', () => {
+    const message = quoteToMessage(calculateQuote('gestion', [], { publishing: { hosting: 'managed' } }));
+    expect(message).toContain(`- Alojamiento: ${publishingOptionPrice(managed, 'gestion')}`);
   });
 });

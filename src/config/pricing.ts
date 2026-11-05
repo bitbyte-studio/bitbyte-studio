@@ -8,7 +8,6 @@
 
 export const CURRENCY = 'USD';
 export const CURRENCY_NOTE = 'Precios en USD; también aceptamos CUP al cambio del día.';
-export const PLANS_NOTE = 'Hosting y dominio no incluidos: elige y suma su precio en el cotizador.';
 
 export interface Service {
   id: string;
@@ -90,6 +89,15 @@ const SERVICE_LIST = [
     icon: 'restaurant_menu',
   },
   {
+    id: 'medida',
+    name: 'Proyecto a medida',
+    description: '¿Tienes una idea distinta, una herramienta interna o un programa para PC? Lo armamos contigo.',
+    from: 50,
+    variablePrice: true,
+    leadTime: 'Según alcance',
+    icon: 'tune',
+  },
+  {
     id: 'mantenimiento',
     name: 'Mantenimiento',
     description: 'Tu web al día y funcionando, con soporte directo por WhatsApp.',
@@ -129,7 +137,12 @@ export interface Extra {
   /** Shown next to the price, e.g. "por página". */
   unit?: string;
   /** When present the price is multiplied by a quantity between 1 and `max`. */
-  quantity?: { label: string; max: number };
+  quantity?: {
+    label: string;
+    max: number;
+    /** The price covers this many items (e.g. 5 USD per 20 photos): the quantity counts items and every started block is charged. */
+    per?: number;
+  };
 }
 
 const EXTRA_LIST = [
@@ -147,7 +160,7 @@ const EXTRA_LIST = [
     name: 'Carga de productos o fotos',
     price: 5,
     unit: 'por cada 20',
-    quantity: { label: 'Bloques de 20 productos o fotos', max: 25 },
+    quantity: { label: 'Cantidad de productos o fotos', max: 500, per: 20 },
   },
 ] as const satisfies readonly Extra[];
 
@@ -175,7 +188,7 @@ export interface PublishingOption {
   withDomain?: { name: string; description: string };
 }
 
-/** Where the project lives. Exactly one is chosen in the quote (radio). */
+/** Where the project lives. The quote picks one per service (see QUOTE_SETUP); the client does not choose it. */
 const HOSTING_LIST = [
   {
     id: 'free',
@@ -192,7 +205,7 @@ const HOSTING_LIST = [
     description: 'Para proyectos sencillos con base de datos. Los sistemas de gestión requieren más recursos.',
     price: 10,
     billing: 'monthly',
-    priceByService: { gestion: { price: 25, from: true } },
+    priceByService: { gestion: { price: 25, from: true }, medida: { price: 10, from: true } },
   },
 ] as const satisfies readonly PublishingOption[];
 
@@ -200,13 +213,35 @@ export type HostingId = (typeof HOSTING_LIST)[number]['id'];
 export const DEFAULT_HOSTING_ID = 'free' satisfies HostingId;
 export const HOSTING_OPTIONS: readonly (PublishingOption & { id: HostingId })[] = HOSTING_LIST;
 
-/** Custom .com domain. It is independent from the hosting choice (checkbox) and billed yearly. */
+/** Custom .com domain. It is independent from the hosting and billed yearly. */
 export const DOMAIN_OPTION: PublishingOption = {
   id: 'domain',
   name: 'Dominio propio .com',
   description: 'Registro y gestión del dominio',
   price: 20,
   billing: 'yearly',
+};
+
+/**
+ * What the quote asks for each service: the extras that make sense, the hosting we use (the client only decides
+ * on the custom domain) and whether the domain question applies. `hosting: null` means the service is not
+ * published online: the digital menu runs on the venue's Wi-Fi.
+ */
+export interface QuoteSetup {
+  extras: readonly ExtraId[];
+  hosting: HostingId | null;
+  domain: boolean;
+}
+
+export const QUOTE_SETUP: Record<ProjectServiceId, QuoteSetup> = {
+  catalogo: { extras: ['logo', 'idioma', 'carga'], hosting: 'free', domain: true },
+  landing: { extras: ['pagina', 'logo', 'idioma', 'carga'], hosting: 'free', domain: true },
+  tienda: { extras: ['pagina', 'logo', 'idioma', 'carga'], hosting: 'free', domain: true },
+  rediseno: { extras: ['pagina', 'logo', 'idioma', 'carga'], hosting: 'free', domain: true },
+  gestion: { extras: ['logo', 'idioma', 'carga'], hosting: 'managed', domain: true },
+  bots: { extras: ['idioma'], hosting: 'managed', domain: false },
+  digitalmenu: { extras: ['logo', 'idioma', 'carga'], hosting: null, domain: false },
+  medida: { extras: ['logo', 'idioma', 'carga'], hosting: 'managed', domain: true },
 };
 
 /** Revision rounds included in every project. Extra or out-of-scope changes are quoted separately. */

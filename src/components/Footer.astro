@@ -8,7 +8,7 @@ import {
   WHATSAPP_DISPLAY,
   WHATSAPP_URL,
 } from '../config/contact';
-import { SITE_DESCRIPTION } from '../config/site';
+import { COPYRIGHT, SITE_DESCRIPTION } from '../config/site';
 
 const legalLinks = [
   { label: 'Privacidad', href: '/privacidad' },
@@ -70,7 +70,7 @@ const socials = [
       <ul>
         <li><a href="#inicio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Inicio</a></li>
         <li><a href="#servicios" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Servicios y precios</a></li>
-        <li><a href="#portafolio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Portafolio</a></li>
+        <li><a href="#portafolio" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Ejemplos reales</a></li>
         <li><a href="#proceso" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Proceso</a></li>
         <li><a href="#contacto" class="text-[#9CA3AF] hover:text-[#fd625d] hover:translate-x-1 transition-all inline-block font-inter text-sm py-2">Contacto</a></li>
       </ul>
@@ -136,7 +136,7 @@ const socials = [
 
   <div class="max-w-[1280px] mx-auto px-4 md:px-6 mt-16 pt-8 border-t border-[#2A2A2A] flex flex-col md:flex-row justify-between items-center gap-4">
     <p class="text-sm font-inter text-[#9CA3AF] text-center md:text-left">
-      © 2026 Bit &amp; Byte Studio. Hecho en Cuba.
+      {COPYRIGHT}
     </p>
   </div>
 </footer>
