@@ -2,15 +2,23 @@
 import { OWNERSHIP, PAYMENT, REVISION_ROUNDS, SERVICES } from '../config/pricing';
 import { EMAIL, EMAIL_URL, TELEGRAM_HANDLE, TELEGRAM_URL } from '../config/contact';
 
-const inputClass =
-  'w-full bg-[#F7F5F2] border border-[#E5E0D8] rounded-xl px-4 py-3.5 text-[#1A1A1A] placeholder:text-[#6A6A6E] focus:ring-2 focus:ring-[#fd625d] focus:border-[#fd625d] aria-[invalid=true]:border-red-600 transition-all font-inter text-sm outline-none';
+const fieldClass =
+  'w-full bg-[#F7F5F2] border border-[#E5E0D8] rounded-xl px-4 py-3.5 text-[#1A1A1A] placeholder:text-[#8A8A8E] focus:ring-2 focus:ring-[#fd625d]/35 focus:border-coral-ink aria-[invalid=true]:border-red-600 aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-600/20 transition-[border-color,box-shadow] font-inter text-sm outline-none';
+const labelClass = 'block font-sora text-sm font-semibold text-[#1A1A1A] mb-2';
+const hintClass = 'mt-1.5 font-inter text-xs text-[#6A6A6E]';
+const fieldErrorClass = 'mt-1.5 font-inter text-xs text-red-700 hidden';
 const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} rondas de revisión.`, OWNERSHIP.summary];
+const serviceOptions = [
+  { value: '', label: 'Aún no lo tengo claro' },
+  ...SERVICES.map((service) => ({ value: service.name, label: service.name })),
+  { value: 'Otro', label: 'Otro / No estoy seguro' },
+] as const;
 ---
 
 <div id="contacto" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch scroll-mt-24" data-about-contact>
   <div class="bg-[#1A1A1A] p-8 md:p-12 rounded-3xl text-white relative binary-texture overflow-hidden flex flex-col justify-between border border-[#2A2A2A]">
     <div class="relative z-10">
-      <p class="font-technical text-sm font-bold text-[#fd625d] mb-6 uppercase tracking-widest">// nosotros</p>
+      <p class="font-technical text-sm font-bold text-[#fd625d] mb-6 uppercase tracking-widest">nosotros</p>
       <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold mb-8 leading-tight">
         Pasión por el detalle
       </h2>
@@ -33,10 +41,13 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
 
   <div class="bg-white p-8 md:p-12 rounded-3xl border border-[#E5E0D8] text-[#1A1A1A] flex flex-col justify-between">
     <div>
-      <p class="font-technical text-sm font-bold text-coral-ink mb-4 uppercase tracking-widest">// hablemos</p>
-      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A] mb-8">
+      <p class="font-technical text-sm font-bold text-coral-ink mb-4 uppercase tracking-widest">hablemos</p>
+      <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A] mb-3">
         ¿Tienes un proyecto?
       </h2>
+      <p class="font-inter text-sm md:text-base text-[#5B5B5E] mb-8 leading-relaxed">
+        Cuéntanos qué necesitas y te respondemos por WhatsApp con una propuesta clara.
+      </p>
 
       <div
         data-contact-success
@@ -70,56 +81,114 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
       </div>
 
       <form data-contact-form class="space-y-5" novalidate>
-        <div>
-          <label for="contact-name" class="sr-only">Nombre completo</label>
+        <div data-field="name">
+          <label for="contact-name" class={labelClass}>Nombre</label>
           <input
             id="contact-name"
             type="text"
             name="name"
-            placeholder="Nombre completo"
+            placeholder="Ej. María López"
             autocomplete="name"
             required
-            class={inputClass}
+            aria-describedby="contact-name-error"
+            class={fieldClass}
           />
+          <p id="contact-name-error" data-field-error class={fieldErrorClass} hidden>
+            Escribe tu nombre para que sepamos cómo dirigirnos a ti.
+          </p>
         </div>
-        <div>
-          <label for="contact-service" class="sr-only">Servicio de interés</label>
-          <select id="contact-service" name="service" class={inputClass}>
-            <option value="">Servicio de interés (opcional)</option>
-            {SERVICES.map((service) => <option value={service.name}>{service.name}</option>)}
-            <option value="Otro">Otro / No estoy seguro</option>
-          </select>
+
+        <div data-field="service">
+          <span id="contact-service-label" class={labelClass}>
+            Qué necesitas
+            <span class="font-inter font-normal text-[#6A6A6E]">(opcional)</span>
+          </span>
+          <div data-service-select class="relative">
+            <input type="hidden" id="contact-service" name="service" value="" data-service-value />
+            <button
+              type="button"
+              data-service-trigger
+              class:list={[fieldClass, 'flex items-center justify-between gap-3 text-left cursor-pointer']}
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="contact-service-list"
+              aria-labelledby="contact-service-label"
+            >
+              <span data-service-label class="truncate">{serviceOptions[0].label}</span>
+              <span class="material-symbols-outlined text-[#6A6A6E] text-xl shrink-0" aria-hidden="true">
+                unfold_more
+              </span>
+            </button>
+            <ul
+              id="contact-service-list"
+              data-service-list
+              role="listbox"
+              tabindex="-1"
+              aria-labelledby="contact-service-label"
+              class="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-20 max-h-64 overflow-y-auto rounded-xl border border-[#E5E0D8] bg-white py-1.5 shadow-[0_12px_32px_rgba(26,26,26,0.12)] outline-none hidden"
+              hidden
+            >
+              {
+                serviceOptions.map((option, index) => (
+                  <li
+                    role="option"
+                    data-service-option
+                    data-value={option.value}
+                    aria-selected={index === 0 ? 'true' : 'false'}
+                    class:list={[
+                      'px-4 py-2.5 font-inter text-sm cursor-pointer transition-colors',
+                      index === 0
+                        ? 'bg-[#F7F5F2] text-[#1A1A1A] font-medium'
+                        : 'text-[#1A1A1A] hover:bg-[#F7F5F2]',
+                    ]}
+                  >
+                    {option.label}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <p class={hintClass}>Si no estás seguro, déjalo así y lo vemos juntos.</p>
         </div>
-        <div>
-          <label for="contact-message" class="sr-only">Mensaje</label>
+
+        <div data-field="message">
+          <label for="contact-message" class={labelClass}>Cuéntanos tu idea</label>
           <textarea
             id="contact-message"
             name="message"
             rows="4"
-            placeholder="Cuéntanos sobre tu proyecto..."
+            placeholder="Ej. Tengo una barbería y quiero que me reserven turnos por WhatsApp."
             required
-            class:list={[inputClass, 'resize-none']}
+            aria-describedby="contact-message-hint contact-message-error"
+            class:list={[fieldClass, 'resize-y min-h-[7.5rem]']}
           ></textarea>
+          <p id="contact-message-hint" class={hintClass}>
+            Con el tipo de negocio y lo que quieres lograr alcanza para empezar.
+          </p>
+          <p id="contact-message-error" data-field-error class={fieldErrorClass} hidden>
+            Cuéntanos un poco sobre tu negocio o lo que te gustaría lograr.
+          </p>
         </div>
 
-        <p data-contact-error role="alert" class="text-xs font-technical text-red-700 font-bold hidden" hidden>
-          * Por favor completa tu nombre y un mensaje sobre tu proyecto.
-        </p>
+        <p data-contact-error role="alert" class="sr-only" hidden></p>
 
-        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+        <div class="pt-1">
           <button
             type="submit"
             data-contact-submit
             aria-label="Enviar por WhatsApp (se abre en una pestaña nueva)"
-            class="bg-[#25D366] text-[#003818] px-8 py-3.5 rounded-full font-sora text-sm font-semibold flex-grow flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-md"
+            class="w-full bg-[#25D366] text-[#003818] px-8 py-3.5 rounded-full font-sora text-sm font-semibold flex items-center justify-center gap-2 hover:brightness-105 transition-all"
           >
             <span class="material-symbols-outlined text-lg" aria-hidden="true">chat</span>
             <span>Enviar por WhatsApp</span>
           </button>
+          <p class="mt-3 text-center font-inter text-xs text-[#6A6A6E]">
+            Se abre WhatsApp con tu mensaje listo. Tú decides si lo envías.
+          </p>
         </div>
       </form>
 
-      <div class="mt-6 pt-6 border-t border-[#E5E0D8]">
+      <div class="mt-8 pt-6 border-t border-[#E5E0D8]">
         <p class="font-technical text-xs text-[#6A6A6E] uppercase tracking-wider mb-3">
           O escríbenos directamente
         </p>
@@ -129,7 +198,7 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Escribir por Telegram a ${TELEGRAM_HANDLE} (se abre en una pestaña nueva)`}
-            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#1A1A1A] text-[#1A1A1A] font-sora text-sm font-semibold hover:bg-[#1A1A1A] hover:text-white transition-colors"
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#D5CFC6] text-[#1A1A1A] font-sora text-sm font-semibold hover:border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
           >
             <span class="material-symbols-outlined text-lg" aria-hidden="true">send</span>
             <span>Telegram</span>
@@ -138,7 +207,7 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
             data-contact-email
             href={EMAIL_URL}
             aria-label={`Email: ${EMAIL}`}
-            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#1A1A1A] text-[#1A1A1A] font-sora text-sm font-semibold hover:bg-[#1A1A1A] hover:text-white transition-colors"
+            class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-[#D5CFC6] text-[#1A1A1A] font-sora text-sm font-semibold hover:border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
           >
             <span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span>
             <span>Email</span>
@@ -156,7 +225,15 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
 <script>
   import { emailLink, whatsappLink } from '../config/contact';
   import { track } from '../lib/analytics';
+  import { PREFILL_CONTACT_EVENT, type PrefillContactDetail } from '../lib/events';
   import { mountAll } from '../lib/lifecycle';
+
+  type RequiredField = 'name' | 'message';
+
+  const OPTION_BASE = 'px-4 py-2.5 font-inter text-sm cursor-pointer transition-colors';
+  const OPTION_IDLE = 'text-[#1A1A1A] hover:bg-[#F7F5F2]';
+  const OPTION_ACTIVE = 'bg-[#F7F5F2] text-[#1A1A1A] font-medium';
+  const OPTION_FOCUS = 'bg-[#FD625D]/12 text-[#1A1A1A]';
 
   function buildMessage(name: string, service: string, message: string) {
     return [
@@ -170,15 +247,193 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
       .join('\n');
   }
 
+  function initServiceSelect(
+    root: HTMLElement,
+    signal: AbortSignal,
+    onChange: () => void,
+  ): { reset: () => void; setService: (value: string) => void } | null {
+    const wrap = root.querySelector<HTMLElement>('[data-service-select]');
+    if (!wrap) return null;
+
+    const valueInput = wrap.querySelector<HTMLInputElement>('[data-service-value]');
+    const trigger = wrap.querySelector<HTMLButtonElement>('[data-service-trigger]');
+    const label = wrap.querySelector<HTMLElement>('[data-service-label]');
+    const list = wrap.querySelector<HTMLElement>('[data-service-list]');
+    const options = Array.from(wrap.querySelectorAll<HTMLElement>('[data-service-option]'));
+    if (!valueInput || !trigger || !label || !list || options.length === 0) return null;
+
+    let open = false;
+    let activeIndex = 0;
+
+    const setHidden = (el: HTMLElement, hidden: boolean) => {
+      el.classList.toggle('hidden', hidden);
+      el.hidden = hidden;
+    };
+
+    const paintOptions = () => {
+      options.forEach((option, index) => {
+        const selected = option.getAttribute('aria-selected') === 'true';
+        option.className = OPTION_BASE;
+        if (selected) option.classList.add(...OPTION_ACTIVE.split(' '));
+        else if (open && index === activeIndex) option.classList.add(...OPTION_FOCUS.split(' '));
+        else option.classList.add(...OPTION_IDLE.split(' '));
+      });
+    };
+
+    const setValue = (value: string, announce = true) => {
+      const option = options.find((item) => item.dataset.value === value) ?? options[0];
+      valueInput.value = option.dataset.value ?? '';
+      label.textContent = option.textContent?.trim() ?? '';
+      options.forEach((item) => item.setAttribute('aria-selected', String(item === option)));
+      activeIndex = options.indexOf(option);
+      paintOptions();
+      if (announce) {
+        valueInput.dispatchEvent(new Event('change', { bubbles: true }));
+        onChange();
+      }
+    };
+
+    const setOpen = (next: boolean) => {
+      open = next;
+      trigger.setAttribute('aria-expanded', String(next));
+      setHidden(list, !next);
+      if (next) {
+        activeIndex = Math.max(
+          0,
+          options.findIndex((item) => item.getAttribute('aria-selected') === 'true'),
+        );
+        paintOptions();
+        options[activeIndex]?.scrollIntoView({ block: 'nearest' });
+        list.focus({ preventScroll: true });
+      } else {
+        paintOptions();
+      }
+    };
+
+    const selectIndex = (index: number) => {
+      const option = options[index];
+      if (!option) return;
+      setValue(option.dataset.value ?? '');
+      setOpen(false);
+      trigger.focus({ preventScroll: true });
+    };
+
+    trigger.addEventListener(
+      'click',
+      () => {
+        setOpen(!open);
+      },
+      { signal },
+    );
+
+    trigger.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          setOpen(true);
+        }
+      },
+      { signal },
+    );
+
+    list.addEventListener(
+      'keydown',
+      (event) => {
+        if (!open) return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setOpen(false);
+          trigger.focus({ preventScroll: true });
+          return;
+        }
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          activeIndex = Math.min(options.length - 1, activeIndex + 1);
+          paintOptions();
+          options[activeIndex]?.scrollIntoView({ block: 'nearest' });
+          return;
+        }
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          activeIndex = Math.max(0, activeIndex - 1);
+          paintOptions();
+          options[activeIndex]?.scrollIntoView({ block: 'nearest' });
+          return;
+        }
+        if (event.key === 'Home') {
+          event.preventDefault();
+          activeIndex = 0;
+          paintOptions();
+          options[0]?.scrollIntoView({ block: 'nearest' });
+          return;
+        }
+        if (event.key === 'End') {
+          event.preventDefault();
+          activeIndex = options.length - 1;
+          paintOptions();
+          options[activeIndex]?.scrollIntoView({ block: 'nearest' });
+          return;
+        }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectIndex(activeIndex);
+        }
+      },
+      { signal },
+    );
+
+    options.forEach((option, index) => {
+      option.addEventListener(
+        'click',
+        () => {
+          selectIndex(index);
+        },
+        { signal },
+      );
+      option.addEventListener(
+        'mouseenter',
+        () => {
+          activeIndex = index;
+          paintOptions();
+        },
+        { signal },
+      );
+    });
+
+    document.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (!open) return;
+        if (event.target instanceof Node && wrap.contains(event.target)) return;
+        setOpen(false);
+      },
+      { signal },
+    );
+
+    setValue('', false);
+
+    return {
+      reset: () => {
+        setOpen(false);
+        setValue('', false);
+      },
+      setService: (value: string) => {
+        setOpen(false);
+        setValue(value, true);
+      },
+    };
+  }
+
   function initAboutContact(root: HTMLElement, signal: AbortSignal) {
     const form = root.querySelector<HTMLFormElement>('[data-contact-form]');
     const success = root.querySelector<HTMLElement>('[data-contact-success]');
-    const error = root.querySelector<HTMLElement>('[data-contact-error]');
+    const summaryError = root.querySelector<HTMLElement>('[data-contact-error]');
     const fallback = root.querySelector<HTMLAnchorElement>('[data-contact-fallback]');
     const reset = root.querySelector<HTMLElement>('[data-contact-reset]');
     const emailLinkEl = root.querySelector<HTMLAnchorElement>('[data-contact-email]');
 
-    if (!form || !success || !error || !fallback || !reset) return;
+    if (!form || !success || !summaryError || !fallback || !reset) return;
 
     const setHidden = (el: HTMLElement, hidden: boolean) => {
       el.classList.toggle('hidden', hidden);
@@ -186,7 +441,9 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
     };
 
     const field = (name: string) =>
-      form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+      form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement;
+
+    const fieldWrap = (name: RequiredField) => root.querySelector<HTMLElement>(`[data-field="${name}"]`);
 
     const values = () => ({
       name: field('name').value.trim(),
@@ -194,23 +451,54 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
       message: field('message').value.trim(),
     });
 
+    const clearErrors = () => {
+      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+      root.querySelectorAll<HTMLElement>('[data-field-error]').forEach((el) => setHidden(el, true));
+      root.querySelector<HTMLElement>('[data-service-trigger]')?.removeAttribute('aria-invalid');
+      summaryError.textContent = '';
+      setHidden(summaryError, true);
+    };
+
+    const showFieldError = (name: RequiredField) => {
+      const wrap = fieldWrap(name);
+      const error = wrap?.querySelector<HTMLElement>('[data-field-error]');
+      field(name).setAttribute('aria-invalid', 'true');
+      if (error) setHidden(error, false);
+    };
+
     const showForm = (show: boolean) => {
       setHidden(form, !show);
       setHidden(success, show);
     };
 
+    const syncEmail = () => {
+      if (!emailLinkEl) return;
+      const { name, service, message } = values();
+      emailLinkEl.href = emailLink(
+        service ? `Proyecto: ${service}` : 'Consulta desde la web',
+        name || message ? `${message}\n\n— ${name}` : undefined,
+      );
+    };
+
+    const serviceSelect = initServiceSelect(root, signal, () => {
+      clearErrors();
+      syncEmail();
+    });
+
     form.addEventListener(
       'input',
       () => {
-        setHidden(error, true);
-        form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
-        if (emailLinkEl) {
-          const { name, service, message } = values();
-          emailLinkEl.href = emailLink(
-            service ? `Proyecto: ${service}` : 'Consulta desde la web',
-            name || message ? `${message}\n\n— ${name}` : undefined,
-          );
-        }
+        clearErrors();
+        syncEmail();
+      },
+      { signal },
+    );
+
+    form.addEventListener(
+      'change',
+      () => {
+        clearErrors();
+        syncEmail();
       },
       { signal },
     );
@@ -219,12 +507,14 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
       'submit',
       (event) => {
         event.preventDefault();
+        clearErrors();
         const { name, service, message } = values();
 
         const missing = (['name', 'message'] as const).filter((key) => !values()[key]);
         if (missing.length) {
-          missing.forEach((key) => field(key).setAttribute('aria-invalid', 'true'));
-          setHidden(error, false);
+          missing.forEach(showFieldError);
+          summaryError.textContent = 'Revisa los campos marcados para poder enviarte el mensaje.';
+          setHidden(summaryError, false);
           field(missing[0]).focus();
           return;
         }
@@ -235,6 +525,8 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
         window.open(url, '_blank', 'noopener,noreferrer');
 
         form.reset();
+        serviceSelect?.reset();
+        syncEmail();
         showForm(false);
         fallback.focus();
       },
@@ -244,8 +536,30 @@ const guarantees = [PAYMENT.terms, `Cada proyecto incluye ${REVISION_ROUNDS} ron
     reset.addEventListener(
       'click',
       () => {
+        clearErrors();
         showForm(true);
         field('name').focus();
+      },
+      { signal },
+    );
+
+    window.addEventListener(
+      PREFILL_CONTACT_EVENT,
+      (event) => {
+        const detail = (event as CustomEvent<PrefillContactDetail>).detail;
+        if (!detail?.message) return;
+
+        clearErrors();
+        showForm(true);
+        serviceSelect?.setService(detail.service ?? '');
+        field('message').value = detail.message;
+        syncEmail();
+
+        // Let the hash scroll settle, then focus the message so the template is obvious.
+        window.setTimeout(() => {
+          field('message').focus({ preventScroll: true });
+          field('message').setSelectionRange(detail.message.length, detail.message.length);
+        }, 120);
       },
       { signal },
     );

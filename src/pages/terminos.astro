@@ -10,16 +10,21 @@ import {
   PROJECT_SERVICES,
   OWNERSHIP,
   REVISION_ROUNDS,
+  type Billing,
   type PublishingOption,
 } from '../config/pricing';
-import { publishingOptionPrice } from '../lib/quote';
 
 const h2 = 'font-sora text-xl md:text-2xl font-bold text-white mb-3';
 const link = 'text-[#fd625d] underline underline-offset-2 hover:text-[#ffb3ad]';
 const money = (value: number) => value.toLocaleString('en-US');
+const BILLING_SUFFIX: Record<Billing, string> = { once: '', yearly: '/año', monthly: '/mes' };
 
 /** Price tag for the default case; options with a per-service price list it in `serviceNote`. */
-const publishingPrice = (option: PublishingOption) => publishingOptionPrice(option, PROJECT_SERVICES[0].id);
+const publishingPrice = (option: PublishingOption) => {
+  if (option.price === null) return 'precio a consultar';
+  if (option.price === 0) return 'Gratis';
+  return `${money(option.price)} ${CURRENCY}${BILLING_SUFFIX[option.billing]}`;
+};
 const serviceNote = (option: PublishingOption) => {
   const overrides = Object.entries(option.priceByService ?? {});
   return overrides
@@ -61,8 +66,8 @@ const serviceNote = (option: PublishingOption) => {
   <section>
     <h2 class={h2}>Cotización</h2>
     <p>
-      El cotizador de la web da un estimado, no una oferta cerrada. Lo que vale es la cotización que te confirmamos por
-      WhatsApp: ahí quedan el alcance, el precio y el plazo.
+      Los precios de la web son de partida. Lo que vale es la cotización que te confirmamos por WhatsApp: ahí quedan el
+      alcance, el precio y el plazo.
     </p>
   </section>
 

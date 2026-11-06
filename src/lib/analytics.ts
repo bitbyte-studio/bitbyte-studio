@@ -5,11 +5,10 @@
 
 export type AnalyticsEvent =
   | 'whatsapp_click'
-  | 'quote_open'
   | 'contact_submit'
+  | 'contact_prefill'
   | 'project_open'
-  | 'project_demo_click'
-  | 'project_quote_similar';
+  | 'project_demo_click';
 
 export type AnalyticsProps = {
   /** Where the event came from, e.g. "nav", "flotante" or "servicio:catalogo". */
@@ -41,7 +40,7 @@ export function track(event: AnalyticsEvent, props: AnalyticsProps = {}) {
   }
 }
 
-/** Delegated listener for `[data-track="whatsapp"]` links. `quote_open` is tracked where the quote opens. */
+/** Delegated listener for `[data-track="whatsapp"]` links. */
 export function mountTracking(signal?: AbortSignal) {
   document.addEventListener(
     'click',

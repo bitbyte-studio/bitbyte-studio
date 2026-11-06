@@ -33,11 +33,11 @@ const publishingNote =
     : 'El dominio, el alojamiento y el mantenimiento se pagan aparte.';
 ---
 
-<section id="servicios" class="surface-light bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A] scroll-mt-20" data-services>
+<section id="servicios" class="surface-light bg-[#F7F5F2] py-20 md:py-[120px] px-4 md:px-6 text-[#1A1A1A] scroll-mt-24" data-services>
   <div class="max-w-[1280px] mx-auto">
     <div class="mb-14 md:mb-16 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
       <div>
-        <p class="font-technical text-sm font-bold text-coral-ink mb-2 uppercase tracking-widest">// servicios y precios</p>
+        <p class="font-technical text-sm font-bold text-coral-ink mb-2 uppercase tracking-widest">servicios y precios</p>
         <h2 class="font-sora text-3xl md:text-4xl lg:text-[40px] font-bold text-[#1A1A1A] leading-tight">
           Lo que hacemos y cuánto cuesta
         </h2>
@@ -48,7 +48,7 @@ const publishingNote =
       </p>
     </div>
 
-    <ul class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
+    <ul class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6 items-stretch isolate">
       {
         PROJECT_SERVICES.map((service) => {
           const detail = SERVICE_DETAILS[service.id];
@@ -56,23 +56,31 @@ const publishingNote =
           return (
             <li
               data-service-card={service.id}
-              class="service-card bg-white p-6 rounded-xl border border-[#E5E0D8] transition-all relative flex flex-col h-full min-h-[22.5rem]"
+              class="service-card group bg-white p-6 rounded-2xl border border-[#E5E0D8] relative flex flex-col h-full"
             >
-              <div class="w-12 h-12 rounded-xl bg-[#FD625D]/10 flex items-center justify-center mb-4 text-coral-ink shrink-0">
-                <span class="material-symbols-outlined text-2xl" aria-hidden="true">{service.icon}</span>
+              <div class="flex items-start justify-between gap-3 mb-5">
+                <div class="w-11 h-11 rounded-xl bg-[#FD625D]/10 flex items-center justify-center text-coral-ink shrink-0 ring-1 ring-[#FD625D]/15">
+                  <span class="material-symbols-outlined text-[1.35rem]" aria-hidden="true">{service.icon}</span>
+                </div>
+                <span
+                  class="font-technical text-[10px] uppercase tracking-wider text-[#8A8A8E] border border-[#E5E0D8] rounded-full px-2.5 py-1 bg-[#F7F5F2]/80 group-[&.is-open]:border-[#FD625D]/35 group-[&.is-open]:text-coral-ink transition-colors"
+                >
+                  <span class="group-[&.is-open]:hidden">Ver detalle</span>
+                  <span class="hidden group-[&.is-open]:inline">Abierto</span>
+                </span>
               </div>
 
-              <h3 class="font-sora text-xl font-bold text-[#1A1A1A] mb-2 min-h-[3.5rem]">
+              <h3 class="font-sora text-lg md:text-xl font-bold text-[#1A1A1A] mb-2">
                 <button
                   type="button"
                   aria-expanded="false"
                   aria-controls={panelId}
                   data-service-toggle
-                  class="text-left w-full flex items-start justify-between gap-3 after:absolute after:inset-0 after:content-[''] after:rounded-xl"
+                  class="text-left w-full flex items-start justify-between gap-3 after:absolute after:inset-0 after:content-[''] after:rounded-2xl"
                 >
-                  <span class="leading-snug">{service.name}</span>
+                  <span class="leading-snug pr-1">{service.name}</span>
                   <span
-                    class="material-symbols-outlined text-xl text-[#5B5B5E] shrink-0 mt-0.5 transition-transform"
+                    class="material-symbols-outlined text-xl text-[#5B5B5E] shrink-0 mt-0.5"
                     data-service-chevron
                     aria-hidden="true"
                   >
@@ -81,65 +89,72 @@ const publishingNote =
                 </button>
               </h3>
 
-              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-5 min-h-[4.5rem]">{service.description}</p>
+              <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed mb-6 flex-1">{service.description}</p>
 
               <div class="mt-auto pt-4 border-t border-[#E5E0D8]">
-                <p class="flex flex-wrap items-baseline gap-x-1">
-                  <span class="font-technical text-xs uppercase text-[#5B5B5E]">desde</span>
-                  <span class="text-coral-ink text-3xl font-bold font-sora leading-none">{money(service.from)}</span>
+                <p class="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+                  <span class="font-technical text-[10px] uppercase tracking-wider text-[#8A8A8E]">desde</span>
+                  <span class="text-coral-ink text-[1.75rem] md:text-3xl font-bold font-sora leading-none tracking-tight">
+                    {money(service.from)}
+                  </span>
                   <span class="font-technical text-sm text-[#5B5B5E]">{CURRENCY}</span>
                 </p>
-                <p class="font-technical text-xs text-[#0b6b4d] mt-1 min-h-[1rem]">
-                  {service.suffix ?? '\u00A0'}
-                </p>
-                <p class="font-inter text-sm text-[#1A1A1A] flex items-center gap-2 mt-2">
-                  <span class="material-symbols-outlined text-base text-[#8a6a10]" aria-hidden="true">schedule</span>
+                {
+                  service.suffix ? (
+                    <p class="font-technical text-xs text-[#0b6b4d] mt-1.5">{service.suffix}</p>
+                  ) : null
+                }
+                <p class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#F7F5F2] px-2.5 py-1 font-inter text-xs text-[#4A4A4A]">
+                  <span class="material-symbols-outlined text-sm text-[#8a6a10]" aria-hidden="true">schedule</span>
                   <span>Plazo: {service.leadTime}</span>
                 </p>
               </div>
 
-              <div id={panelId} data-service-panel hidden class="relative z-10 animate-fadeIn">
-                <div class="mt-5 pt-5 border-t border-[#E5E0D8] space-y-5">
-                  <div>
-                    <h4 class="font-technical text-xs font-bold text-[#0b6b4d] uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <span class="material-symbols-outlined text-base" aria-hidden="true">check_circle</span>
-                      Qué incluye
-                    </h4>
-                    <ul class="space-y-2">
-                      {detail.highlights.map((item) => (
-                        <li class="flex items-start gap-2.5 text-sm font-inter text-[#1A1A1A]">
-                          <span class="text-coral-ink font-bold font-technical" aria-hidden="true">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 class="font-technical text-xs font-bold text-[#8a6a10] uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <span class="material-symbols-outlined text-base" aria-hidden="true">storefront</span>
-                      Ideal para
-                    </h4>
-                    <p class="text-sm font-inter text-[#1A1A1A]">{detail.idealFor}</p>
-                  </div>
-                  <div class="flex flex-col gap-3 pt-1">
-                    <a
-                      href={waLink(service.name)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-track="whatsapp"
-                      data-track-source={`servicio:${service.id}`}
-                      aria-label={`Pedir por WhatsApp: ${service.name} (se abre en una pestaña nueva)`}
-                      class="relative z-10 bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-3 rounded-full font-sora text-sm font-semibold transition-colors text-center"
-                    >
-                      Pedir por WhatsApp
-                    </a>
-                    <button
-                      type="button"
-                      data-open-quote={service.id}
-                      class="relative z-10 font-inter text-sm text-[#5B5B5E] underline underline-offset-4 decoration-[#C4BEB6] hover:text-[#1A1A1A] transition-colors text-left"
-                    >
-                      ¿Quieres una idea del precio? Calcula un estimado
-                    </button>
+              <div
+                id={panelId}
+                data-service-panel
+                class="service-card__collapse"
+                aria-hidden="true"
+              >
+                <div class="service-card__collapse-inner">
+                  <div class="service-card__collapse-body pt-4 pb-6 space-y-5">
+                    <div>
+                      <h4 class="font-technical text-xs font-bold text-[#0b6b4d] uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base" aria-hidden="true">check_circle</span>
+                        Qué incluye
+                      </h4>
+                      <ul class="space-y-2.5">
+                        {detail.highlights.map((item) => (
+                          <li class="flex items-start gap-2.5 text-sm font-inter text-[#1A1A1A] leading-snug">
+                            <span
+                              class="mt-0.5 w-1.5 h-1.5 rounded-full bg-coral-ink shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div class="rounded-xl bg-[#F7F5F2] px-3.5 py-3">
+                      <h4 class="font-technical text-[10px] font-bold text-[#8a6a10] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm" aria-hidden="true">storefront</span>
+                        Ideal para
+                      </h4>
+                      <p class="text-sm font-inter text-[#1A1A1A] leading-relaxed">{detail.idealFor}</p>
+                    </div>
+                    <div>
+                      <a
+                        href={waLink(service.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-track="whatsapp"
+                        data-track-source={`servicio:${service.id}`}
+                        aria-label={`Pedir por WhatsApp: ${service.name} (se abre en una pestaña nueva)`}
+                        class="relative z-10 block bg-coral-strong hover:bg-coral-strong-hover text-white px-6 py-3 rounded-full font-sora text-sm font-semibold transition-colors text-center"
+                      >
+                        Pedir por WhatsApp
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -155,16 +170,13 @@ const publishingNote =
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-        <div class="rounded-xl border border-dashed border-[#D5CFC6] bg-white/40 px-5 py-5 flex flex-col h-full">
+        <div class="rounded-2xl border border-dashed border-[#D5CFC6] bg-white/50 px-5 py-5 flex flex-col h-full">
           <div class="flex flex-wrap items-center gap-2 mb-2">
             <span class="material-symbols-outlined text-xl text-[#8A8A8E]" aria-hidden="true">{MAINTENANCE.icon}</span>
             <h3 class="font-sora text-base font-semibold text-[#1A1A1A]">{MAINTENANCE.name}</h3>
-            <span class="font-technical text-[10px] uppercase tracking-wider text-[#8A8A8E] border border-[#E5E0D8] rounded-full px-2 py-0.5">
-              opcional
-            </span>
           </div>
           <p class="font-inter text-sm text-[#5B5B5E] leading-relaxed">
-            {MAINTENANCE.description} {maintenancePrice}
+            {MAINTENANCE.description} {maintenancePrice} Se contrata por separado y no es obligatorio.
           </p>
           {
             MAINTENANCE.includes && MAINTENANCE.includes.length > 0 && (
@@ -186,7 +198,7 @@ const publishingNote =
           </a>
         </div>
 
-        <div class="rounded-xl bg-white border border-[#E5E0D8] px-5 py-5 flex flex-col h-full">
+        <div class="rounded-2xl bg-white border border-[#E5E0D8] px-5 py-5 flex flex-col h-full">
           <h3 class="font-technical text-xs font-bold text-[#0b6b4d] uppercase tracking-wider mb-3 flex items-center gap-2">
             <span class="material-symbols-outlined text-base" aria-hidden="true">payments</span>
             Cómo se paga
@@ -198,7 +210,7 @@ const publishingNote =
       </div>
     </div>
 
-    <div class="mt-10 flex flex-col items-center gap-3">
+    <div class="mt-10 flex justify-center">
       <a
         href={waGeneral}
         target="_blank"
@@ -210,13 +222,6 @@ const publishingNote =
       >
         Escribir por WhatsApp
       </a>
-      <button
-        type="button"
-        data-open-quote
-        class="font-inter text-sm text-[#5B5B5E] underline underline-offset-4 decoration-[#C4BEB6] hover:text-[#1A1A1A] transition-colors"
-      >
-        ¿Quieres una idea del precio? Calcula un estimado
-      </button>
     </div>
   </div>
 </section>
@@ -225,22 +230,33 @@ const publishingNote =
   import { mountAll } from '../lib/lifecycle';
 
   function initServices(root: HTMLElement, signal: AbortSignal) {
-    root.querySelectorAll<HTMLElement>('[data-service-card]').forEach((card) => {
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-service-card]'));
+
+    const setOpen = (card: HTMLElement, open: boolean) => {
       const toggle = card.querySelector<HTMLButtonElement>('[data-service-toggle]');
       const panel = card.querySelector<HTMLElement>('[data-service-panel]');
-      const chevron = card.querySelector<HTMLElement>('[data-service-chevron]');
       if (!toggle || !panel) return;
+
+      card.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      panel.setAttribute('aria-hidden', String(!open));
+    };
+
+    cards.forEach((card) => {
+      const toggle = card.querySelector<HTMLButtonElement>('[data-service-toggle]');
+      if (!toggle) return;
 
       toggle.addEventListener(
         'click',
         () => {
-          const open = toggle.getAttribute('aria-expanded') !== 'true';
-          toggle.setAttribute('aria-expanded', String(open));
-          panel.hidden = !open;
-          chevron?.classList.toggle('rotate-180', open);
-          card.classList.toggle('border-coral-ink', open);
-          card.classList.toggle('shadow-lg', open);
-          card.classList.toggle('border-[#E5E0D8]', !open);
+          const willOpen = !card.classList.contains('is-open');
+          cards.forEach((other) => setOpen(other, other === card ? willOpen : false));
+
+          if (willOpen) {
+            window.requestAnimationFrame(() => {
+              card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+          }
         },
         { signal },
       );

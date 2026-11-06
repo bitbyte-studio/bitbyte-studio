@@ -12,6 +12,7 @@ const ICONS = [
   'check_circle',
   'close',
   'dashboard',
+  'devices',
   'expand_less',
   'expand_more',
   'mail',
@@ -26,6 +27,7 @@ const ICONS = [
   'smart_toy',
   'storefront',
   'tune',
+  'unfold_more',
   'web',
 ];
 

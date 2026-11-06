@@ -1,9 +1,9 @@
 /**
- * Single source of truth for prices, lead times, extras and payment terms.
- * Every price shown on the site or used by the quote calculator must come from here.
+ * Single source of truth for prices, lead times, hosting, domain and payment terms.
+ * Every price shown on the site must come from here.
  *
  * Publicación (HOSTING_OPTIONS y DOMAIN_OPTION): si algún `price` vuelve a ser null, el sitio
- * muestra "a consultar" y nunca suma un importe inventado.
+ * muestra "a consultar" y nunca inventa un importe.
  */
 
 export const CURRENCY = 'USD';
@@ -15,7 +15,7 @@ export interface Service {
   description: string;
   /** "Desde" price in CURRENCY. For the maintenance plan it is the monthly price. */
   from: number;
-  /** The price depends on the scope, so quotes show it as "desde X". */
+  /** The price depends on the scope, so the site shows it as "desde X". */
   variablePrice?: boolean;
   suffix?: string;
   leadTime: string;
@@ -91,11 +91,11 @@ const SERVICE_LIST = [
   {
     id: 'medida',
     name: 'Proyecto a medida',
-    description: '¿Tienes una idea distinta, una herramienta interna o un programa para PC? Lo armamos contigo.',
+    description: 'Apps para móvil, herramientas internas o programas para PC: lo armamos a tu medida.',
     from: 50,
     variablePrice: true,
     leadTime: 'Según alcance',
-    icon: 'tune',
+    icon: 'devices',
   },
   {
     id: 'mantenimiento',
@@ -117,7 +117,7 @@ const SERVICE_LIST = [
 
 export type ServiceId = (typeof SERVICE_LIST)[number]['id'];
 export const MAINTENANCE_ID = 'mantenimiento' satisfies ServiceId;
-/** Services that can be the base of a quote (everything except the monthly maintenance). */
+/** Project services (everything except the monthly maintenance add-on). */
 export type ProjectServiceId = Exclude<ServiceId, typeof MAINTENANCE_ID>;
 
 export const SERVICES: readonly Service[] = SERVICE_LIST;
@@ -129,43 +129,6 @@ export const PROJECT_SERVICES: readonly (Service & { id: ProjectServiceId })[] =
 const maintenance = SERVICES.find((service) => service.id === MAINTENANCE_ID);
 if (!maintenance) throw new Error(`pricing.ts: missing service "${MAINTENANCE_ID}"`);
 export const MAINTENANCE: Service = maintenance;
-
-export interface Extra {
-  id: string;
-  name: string;
-  price?: number;
-  /** Shown next to the price, e.g. "por página". */
-  unit?: string;
-  /** When present the price is multiplied by a quantity between 1 and `max`. */
-  quantity?: {
-    label: string;
-    max: number;
-    /** The price covers this many items (e.g. 5 USD per 20 photos): the quantity counts items and every started block is charged. */
-    per?: number;
-  };
-}
-
-const EXTRA_LIST = [
-  {
-    id: 'pagina',
-    name: 'Página adicional',
-    price: 10,
-    unit: 'por página',
-    quantity: { label: 'Cantidad de páginas', max: 20 },
-  },
-  { id: 'logo', name: 'Logo sencillo', price: 15 },
-  { id: 'idioma', name: 'Segundo idioma', price: 15 },
-  {
-    id: 'carga',
-    name: 'Carga de productos o fotos',
-    price: 5,
-    unit: 'por cada 20',
-    quantity: { label: 'Cantidad de productos o fotos', max: 500, per: 20 },
-  },
-] as const satisfies readonly Extra[];
-
-export type ExtraId = (typeof EXTRA_LIST)[number]['id'];
-export const EXTRAS: readonly Extra[] = EXTRA_LIST;
 
 export type Billing = 'once' | 'yearly' | 'monthly';
 
@@ -179,16 +142,14 @@ export interface PublishingOption {
   id: string;
   name: string;
   description: string;
-  /** Default price. `null` = not set yet: shown as "a consultar" and never added to a total. */
+  /** Default price. `null` = not set yet: shown as "a consultar". */
   price: number | null;
   billing: Billing;
-  /** Overrides `price` when the quote's base service is one of these. */
+  /** Overrides `price` for heavier project types. */
   priceByService?: Partial<Record<ProjectServiceId, PublishingPrice>>;
-  /** Wording used instead of `name`/`description` when a custom domain is also selected. */
-  withDomain?: { name: string; description: string };
 }
 
-/** Where the project lives. The quote picks one per service (see QUOTE_SETUP); the client does not choose it. */
+/** Publishing options shown in FAQ and /terminos. */
 const HOSTING_LIST = [
   {
     id: 'free',
@@ -196,13 +157,11 @@ const HOSTING_LIST = [
     description: 'tunegocio.vercel.app',
     price: 0,
     billing: 'once',
-    // With a custom domain the .vercel.app address is not the final one, so it is not mentioned.
-    withDomain: { name: 'Alojamiento gratuito', description: 'Tu sitio se verá en tu dominio propio' },
   },
   {
     id: 'managed',
     name: 'Hosting gestionado',
-    description: 'Para proyectos sencillos con base de datos. Los sistemas de gestión requieren más recursos.',
+    description: 'Para proyectos con base de datos. Los sistemas de gestión requieren más recursos.',
     price: 10,
     billing: 'monthly',
     priceByService: { gestion: { price: 25, from: true }, medida: { price: 10, from: true } },
@@ -210,38 +169,15 @@ const HOSTING_LIST = [
 ] as const satisfies readonly PublishingOption[];
 
 export type HostingId = (typeof HOSTING_LIST)[number]['id'];
-export const DEFAULT_HOSTING_ID = 'free' satisfies HostingId;
 export const HOSTING_OPTIONS: readonly (PublishingOption & { id: HostingId })[] = HOSTING_LIST;
 
-/** Custom .com domain. It is independent from the hosting and billed yearly. */
+/** Custom .com domain, billed yearly and paid apart from the project. */
 export const DOMAIN_OPTION: PublishingOption = {
   id: 'domain',
   name: 'Dominio propio .com',
   description: 'Registro y gestión del dominio',
   price: 20,
   billing: 'yearly',
-};
-
-/**
- * What the quote asks for each service: the extras that make sense, the hosting we use (the client only decides
- * on the custom domain) and whether the domain question applies. `hosting: null` means the service is not
- * published online: the digital menu runs on the venue's Wi-Fi.
- */
-export interface QuoteSetup {
-  extras: readonly ExtraId[];
-  hosting: HostingId | null;
-  domain: boolean;
-}
-
-export const QUOTE_SETUP: Record<ProjectServiceId, QuoteSetup> = {
-  catalogo: { extras: ['logo', 'idioma', 'carga'], hosting: 'free', domain: true },
-  landing: { extras: ['pagina', 'logo', 'idioma', 'carga'], hosting: 'free', domain: true },
-  tienda: { extras: ['pagina', 'logo', 'idioma', 'carga'], hosting: 'free', domain: true },
-  rediseno: { extras: ['pagina', 'logo', 'idioma', 'carga'], hosting: 'free', domain: true },
-  gestion: { extras: ['logo', 'idioma', 'carga'], hosting: 'managed', domain: true },
-  bots: { extras: ['idioma'], hosting: 'managed', domain: false },
-  digitalmenu: { extras: ['logo', 'idioma', 'carga'], hosting: null, domain: false },
-  medida: { extras: ['logo', 'idioma', 'carga'], hosting: 'managed', domain: true },
 };
 
 /** Revision rounds included in every project. Extra or out-of-scope changes are quoted separately. */

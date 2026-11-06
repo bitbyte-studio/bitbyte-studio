@@ -3,13 +3,13 @@ import { whatsappLink } from '../config/contact';
 import { CURRENCY, PROJECT_SERVICES } from '../config/pricing';
 
 const cheapest = PROJECT_SERVICES.reduce((min, service) => (service.from < min.from ? service : min));
-const subtitle = `Tus clientes ven tus productos desde el móvil y te piden por WhatsApp. Desde ${cheapest.from} ${CURRENCY}, listo en ${cheapest.leadTime}.`;
+const subtitle = `Páginas web, tiendas online y sistemas a medida. Desde ${cheapest.from} ${CURRENCY}.`;
 const waHref = whatsappLink('¡Hola Bit & Byte Studio! Quiero una página para mi negocio.');
 ---
 
 <section
   id="inicio"
-  class="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#131315] pt-24 pb-28"
+  class="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#131315] pt-24 pb-28 scroll-mt-24"
   data-hero
 >
   <div class="absolute inset-0 w-full h-full opacity-40 pointer-events-none">
@@ -39,16 +39,12 @@ const waHref = whatsappLink('¡Hola Bit & Byte Studio! Quiero una página para m
       ></canvas>
     </div>
 
-    <p class="font-technical text-xs md:text-sm text-white tracking-[0.4em] mb-3 uppercase font-bold">
+    <p class="font-technical text-xs md:text-sm text-white tracking-[0.4em] mb-6 uppercase font-bold">
       BIT <span class="ampersand font-normal tracking-normal text-[#fd625d]">&amp;</span> BYTE STUDIO
     </p>
 
-    <p class="font-technical text-xs md:text-sm text-[#fd625d] mb-6 uppercase tracking-wider font-semibold">
-      // WEBS Y SOFTWARE A MEDIDA
-    </p>
-
     <h1 class="font-sora text-4xl sm:text-5xl md:text-[64px] text-white mb-6 leading-tight font-bold tracking-tight">
-      Tu negocio en internet en <span class="text-gradient-coral">pocos días</span>
+      Tu negocio en internet en pocos días
     </h1>
 
     <p class="font-inter text-base md:text-lg text-[#9CA3AF] mb-10 max-w-2xl">
@@ -71,14 +67,6 @@ const waHref = whatsappLink('¡Hola Bit & Byte Studio! Quiero una página para m
       <a href="#portafolio" class="font-inter text-sm text-white/80 hover:text-white underline underline-offset-4 transition-colors">
         Ver ejemplos
       </a>
-
-      <button
-        type="button"
-        data-open-quote
-        class="font-inter text-sm text-[#9CA3AF] underline underline-offset-4 decoration-white/30 hover:text-white transition-colors"
-      >
-        ¿Quieres una idea del precio? Calcula un estimado
-      </button>
     </div>
   </div>
 

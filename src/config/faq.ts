@@ -30,7 +30,7 @@ export const FAQ: readonly FaqItem[] = [
     question: '¿Cuánto cuesta una web?',
     answer: `Depende del servicio. Los precios de partida van desde ${money(
       Math.min(...PROJECT_SERVICES.map((service) => service.from)),
-    )} ${CURRENCY}. El precio final lo cerramos contigo por WhatsApp según lo que necesites, y el cotizador de la web te da un estimado antes de escribirnos.`,
+    )} ${CURRENCY}. El precio final lo cerramos contigo por WhatsApp según lo que necesites.`,
   },
   {
     question: '¿Cuánto tarda?',
@@ -82,11 +82,6 @@ export const FAQ: readonly FaqItem[] = [
   {
     question: '¿Trabajan con negocios fuera de Cuba?',
     answer: `Sí. Trabajamos en remoto con negocios de cualquier país y aceptamos pago en ${CURRENCY}.`,
-  },
-  {
-    question: '¿El cotizador es un precio cerrado?',
-    answer:
-      'No, es un estimado. Lo que vale es la cotización que te confirmamos por WhatsApp: ahí quedan el alcance, el precio y el plazo.',
   },
 ];
 

@@ -1,6 +1,9 @@
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** Must cover the longest close transition in `.modal-shell` (panel transform). */
+const CLOSE_MS = 300;
+
 export function setVisible(el: HTMLElement | null, visible: boolean) {
   if (!el) return;
   el.classList.toggle('hidden', !visible);
@@ -12,15 +15,24 @@ type ModalOptions = {
   initialFocus?: string;
 };
 
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 /**
  * Accessible modal behaviour: scroll lock, focus trap, Escape, backdrop click
  * and focus restoration. The dialog panel must carry role="dialog" and tabindex="-1".
+ * Open/close uses a short opacity + scale transition unless reduced motion is on.
  */
 export function createModal(root: HTMLElement, signal: AbortSignal, options: ModalOptions = {}) {
   let lastFocused: HTMLElement | null = null;
   let pressedOnBackdrop = false;
+  let openState = false;
+  let closing = false;
+  let closeTimer = 0;
 
-  const isOpen = () => !root.hidden;
+  const panel = () => root.querySelector<HTMLElement>('[role="dialog"]');
+
+  const isOpen = () => openState;
 
   const focusables = () =>
     Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
@@ -28,25 +40,56 @@ export function createModal(root: HTMLElement, signal: AbortSignal, options: Mod
     );
 
   const open = () => {
-    if (isOpen()) return;
+    if (openState || closing) return;
+    openState = true;
     lastFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setVisible(root, true);
     document.body.style.overflow = 'hidden';
 
-    const panel = root.querySelector<HTMLElement>('[role="dialog"]');
-    const target =
+    const focusTarget =
       (options.initialFocus && root.querySelector<HTMLElement>(options.initialFocus)) ||
       focusables()[0] ||
-      panel;
-    target?.focus({ preventScroll: true });
+      panel();
+
+    if (prefersReducedMotion()) {
+      root.classList.add('is-open');
+      focusTarget?.focus({ preventScroll: true });
+      return;
+    }
+
+    root.classList.remove('is-open');
+    // Two frames so the browser paints the closed state before transitioning in.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!openState) return;
+        root.classList.add('is-open');
+        focusTarget?.focus({ preventScroll: true });
+      });
+    });
   };
 
-  const close = () => {
-    if (!isOpen()) return;
+  const finishClose = () => {
+    window.clearTimeout(closeTimer);
     setVisible(root, false);
+    root.classList.remove('is-open');
     document.body.style.overflow = '';
     if (lastFocused?.isConnected) lastFocused.focus({ preventScroll: true });
     lastFocused = null;
+    closing = false;
+  };
+
+  const close = () => {
+    if (!openState || closing) return;
+    openState = false;
+    closing = true;
+    root.classList.remove('is-open');
+
+    if (prefersReducedMotion()) {
+      finishClose();
+      return;
+    }
+
+    closeTimer = window.setTimeout(finishClose, CLOSE_MS + 40);
   };
 
   root.addEventListener('mousedown', (event) => (pressedOnBackdrop = event.target === root), { signal });
@@ -62,7 +105,7 @@ export function createModal(root: HTMLElement, signal: AbortSignal, options: Mod
   document.addEventListener(
     'keydown',
     (event) => {
-      if (!isOpen()) return;
+      if (!openState) return;
 
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -92,7 +135,8 @@ export function createModal(root: HTMLElement, signal: AbortSignal, options: Mod
   );
 
   signal.addEventListener('abort', () => {
-    if (isOpen()) document.body.style.overflow = '';
+    window.clearTimeout(closeTimer);
+    if (openState || closing) document.body.style.overflow = '';
   });
 
   return { open, close, isOpen };
